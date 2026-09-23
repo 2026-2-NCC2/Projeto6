@@ -1,0 +1,82 @@
+[
+  {
+    "id": "lollapalooza",
+    "title": "Lollapalooza Brasil 2025",
+    "date": "28 a 30 de Março",
+    "location": "São Paulo, SP",
+    "price": 540,
+    "image": "/images/lollapalooza.jpg",
+    "imageAlt": "Festival com multidão, palco iluminado e feixes de luz coloridos",
+    "description": "Música, encontros e grandes apresentações. Explore a experiência de um dos festivais mais conhecidos do Brasil."
+  },
+  {
+    "id": "coldplay",
+    "title": "Coldplay - Tour 2025",
+    "date": "15 de Novembro",
+    "location": "Allianz Parque, SP",
+    "price": 490,
+    "image": "/images/coldplay.jpg",
+    "imageAlt": "Show em estádio com público e fogos de artifício sobre o palco",
+    "description": "Uma noite de música e luzes em um grande espetáculo ao vivo no Allianz Parque."
+  },
+  {
+    "id": "rock-in-rio",
+    "title": "Rock in Rio - 40 Anos",
+    "date": "Setembro, 2026",
+    "location": "Rio de Janeiro, RJ",
+    "price": 620,
+    "image": "/images/rock-in-rio.jpg",
+    "imageAlt": "Festival noturno com roda-gigante iluminada e grande público",
+    "description": "Uma celebração da música com grandes atrações e experiências na Cidade do Rock."
+  },
+  {
+    "id": "vintage",
+    "title": "Vintage Culture Sunset",
+    "date": "05 de Dezembro",
+    "location": "Laroc Club, Valinhos - SP",
+    "price": 220,
+    "image": "/images/asset-10.jpg",
+    "imageAlt": "Vintage Culture Sunset",
+    "description": "Uma experiência de música, encontros e apresentações ao vivo. Evento demonstrativo da plataforma TrocaTicket."
+  },
+  {
+    "id": "dennis",
+    "title": "Baile do Dennis + Convidados",
+    "date": "Hoje · 22:00",
+    "location": "Audio Club, São Paulo - SP",
+    "price": 110,
+    "image": "/images/asset-19.jpg",
+    "imageAlt": "Baile do Dennis + Convidados",
+    "description": "Uma experiência de música, encontros e apresentações ao vivo. Evento demonstrativo da plataforma TrocaTicket."
+  },
+  {
+    "id": "imagine",
+    "title": "Imagine Dragons: LOOM World Tour",
+    "date": "Sábado · 21:00",
+    "location": "Allianz Parque, São Paulo - SP",
+    "price": 310,
+    "image": "/images/asset-29.jpg",
+    "imageAlt": "Imagine Dragons: LOOM World Tour",
+    "description": "Uma experiência de música, encontros e apresentações ao vivo. Evento demonstrativo da plataforma TrocaTicket."
+  },
+  {
+    "id": "latina",
+    "title": "Festival Primavera Latina & Gastronomia",
+    "date": "Domingo · 11:00",
+    "location": "Memorial América Latina, São Paulo - SP",
+    "price": 45,
+    "image": "/images/asset-17.jpg",
+    "imageAlt": "Festival Primavera Latina & Gastronomia",
+    "description": "Uma experiência de música, encontros e apresentações ao vivo. Evento demonstrativo da plataforma TrocaTicket."
+  },
+  {
+    "id": "marisa",
+    "title": "Marisa Monte: Portas Abertas",
+    "date": "14 de Outubro",
+    "location": "Tokio Marine Hall, São Paulo - SP",
+    "price": 180,
+    "image": "/images/asset-3.jpg",
+    "imageAlt": "Marisa Monte: Portas Abertas",
+    "description": "Uma experiência de música, encontros e apresentações ao vivo. Evento demonstrativo da plataforma TrocaTicket."
+  }
+]
