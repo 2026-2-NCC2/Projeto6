@@ -192,7 +192,6 @@ const blank = {
   image: '/images/asset-5.jpg',
   suppliers: ['vibe', 'buffet'],
 };
-
 export function EventEditor() {
   const { id } = useParams();
   const { data, update, notify } = useStore();
