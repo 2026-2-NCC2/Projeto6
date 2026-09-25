@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useId } from 'react';
+import React, { useEffect, useRef, useId, useState } from 'react';
 import { Link } from 'react-router';
+import { csvText } from '../services/rules';
 export const money = (value) =>
   Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 export const dateLabel = (date) =>
@@ -8,7 +9,7 @@ export function Badge({ children, tone }) {
   const text = String(children).toLowerCase();
   const color =
     tone ||
-    (/confirm|aprov|dispon|public|abert/.test(text)
+    (/confirm|aprov|dispon|public|abert|reservado/.test(text)
       ? 'green'
       : /pend|análise|andamento|alocado|prioridade/.test(text)
         ? 'amber'
@@ -17,12 +18,12 @@ export function Badge({ children, tone }) {
           : 'blue');
   return <span className={`badge ${color}`}>{children}</span>;
 }
-export function PageTitle({ title, subtitle, children, eyebrow }) {
+export function PageTitle({ title, subtitle, children, eyebrow, as: Heading = 'h1' }) {
   return (
     <div className="page-title">
       <div>
         {eyebrow && <p className="eyebrow purple">{eyebrow}</p>}
-        <h1>{title}</h1>
+        <Heading>{title}</Heading>
         {subtitle && <p>{subtitle}</p>}
       </div>
       <div className="actions">{children}</div>
@@ -111,12 +112,20 @@ export function Modal({ title, children, onClose }) {
       ref={ref}
       onCancel={onClose}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (
+          event.target === event.currentTarget &&
+          (event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom)
+        )
+          onClose();
       }}
     >
       <div className="panel-heading">
         <h2 id={titleId}>{title}</h2>
-        <button className="icon-button" aria-label="Fechar janela" onClick={onClose}>
+        <button type="button" className="icon-button" aria-label="Fechar janela" onClick={onClose}>
           ×
         </button>
       </div>
@@ -125,27 +134,44 @@ export function Modal({ title, children, onClose }) {
   );
 }
 export function DownloadButton({ name, rows, children = '↓ Exportar CSV' }) {
+  const [open, setOpen] = useState(false);
   return (
-    <button className="button outline" onClick={() => downloadCSV(name, rows)}>
-      {children}
-    </button>
+    <>
+      <button type="button" className="button outline" onClick={() => setOpen(true)}>
+        {children}
+      </button>
+      {open && (
+        <Modal title="Exportar relatório" onClose={() => setOpen(false)}>
+          <p>Confira os dados e baixe o arquivo para abrir no Excel ou em outra planilha.</p>
+          <label htmlFor="csv-preview">Conteúdo do arquivo {name}</label>
+          <textarea
+            id="csv-preview"
+            className="csv-preview"
+            readOnly
+            value={csvText(rows).replace(/^\ufeff/, '')}
+          />
+          <p className="muted">
+            Se o navegador impedir o download, selecione e copie o conteúdo acima para um arquivo
+            .csv.
+          </p>
+          <button type="button" className="button primary" onClick={() => downloadCSV(name, rows)}>
+            Baixar arquivo CSV
+          </button>
+        </Modal>
+      )}
+    </>
   );
 }
 export function downloadCSV(name, rows) {
-  const cell = (value) => {
-    let text = String(value ?? '');
-    if (/^[=+@-]/.test(text)) text = `'${text}`;
-    return `"${text.replaceAll('"', '""')}"`;
-  };
-  const blob = new Blob(['\ufeff' + rows.map((row) => row.map(cell).join(';')).join('\r\n')], {
-    type: 'text/csv;charset=utf-8;',
-  });
+  const blob = new Blob([csvText(rows)], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = name;
+  document.body.appendChild(a);
   a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 export function NotFound({ title = 'Página não encontrada' }) {
   return (

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import { useStore } from '../context/Store';
+import { useStore } from '../context/StoreContext';
 import { destinations, roleNames } from '../data/demo';
 import { Field, Tabs } from '../components/UI';
 export default function Account({ login = false }) {
@@ -15,8 +15,16 @@ export default function Account({ login = false }) {
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   async function submit(event) {
     event.preventDefault();
+    if (busy) return;
     const data = Object.fromEntries(new FormData(event.currentTarget));
     const next = {};
     if (!login && data.name.trim().length < 2) next.name = 'Informe seu nome completo.';
@@ -32,6 +40,7 @@ export default function Account({ login = false }) {
     }
     setBusy(true);
     await new Promise((resolve) => setTimeout(resolve, 450));
+    if (!mounted.current) return;
     chooseRole(profile);
     notify(
       login ? 'Acesso de demonstração iniciado.' : 'Cadastro validado. Bem-vindo à demonstração!',

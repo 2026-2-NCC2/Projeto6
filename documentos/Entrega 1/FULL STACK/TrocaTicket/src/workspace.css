@@ -2416,3 +2416,160 @@ td code {
     transition: none;
   }
 }
+
+.csv-preview {
+  width: 100%;
+  min-height: 180px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #ccd0da;
+  border-radius: 12px;
+  font: 12px/1.6 monospace;
+  resize: vertical;
+}
+.page-title h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 0 0 8px;
+}
+
+/* Carteira de ingressos: tabela à esquerda e detalhes à direita. */
+.wallet-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(290px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.wallet-grid > .panel {
+  min-width: 0;
+}
+.wallet-detail {
+  border: 1px solid #dfe5ee;
+  border-radius: 20px;
+  background: white;
+  overflow: hidden;
+}
+.wallet-ticket-heading {
+  padding: 26px;
+  background: #1e3779;
+  color: white;
+}
+.wallet-ticket-heading h2 {
+  font-size: 23px;
+  margin: 16px 0 8px;
+}
+.wallet-ticket-heading p {
+  color: #d2ddfa;
+}
+.wallet-ticket-body {
+  padding: 22px;
+}
+.ticket-demo-stamp {
+  text-align: center;
+  padding: 24px 12px;
+  background: #f6f8fc;
+  border: 1px solid #dfe5ee;
+  border-radius: 14px;
+}
+.ticket-demo-stamp > span {
+  display: block;
+  font-size: 76px;
+  line-height: 1.3;
+  color: #1e3779;
+}
+.ticket-demo-stamp strong {
+  display: block;
+  font-size: 13px;
+}
+.ticket-demo-stamp p {
+  font-size: 12px;
+  color: #58677f;
+}
+.wallet-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+.cell-caption {
+  display: block;
+  margin-top: 7px;
+  color: #66758c;
+  font-size: 12px;
+}
+.selected-row {
+  background: #eff5ff;
+}
+.directory-name {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 185px;
+}
+.directory-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  height: 42px;
+  border-radius: 9px;
+  color: #235be5;
+  background: #e8efff;
+  font-weight: 700;
+}
+.directory-table td {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+@media (max-width: 1000px) {
+  .wallet-grid {
+    grid-template-columns: 1fr;
+  }
+  .wallet-detail {
+    max-width: 650px;
+    width: 100%;
+  }
+}
+@media print {
+  body:has(.wallet-page) .header,
+  body:has(.wallet-page) footer,
+  body:has(.wallet-page) .demo-strip,
+  .wallet-page > .panel,
+  .wallet-grid > .panel,
+  .wallet-actions,
+  .toast {
+    display: none !important;
+  }
+  .wallet-grid {
+    display: block;
+  }
+  .wallet-detail {
+    max-width: 700px;
+    margin: auto;
+    break-inside: avoid;
+  }
+  .wallet-ticket-heading {
+    color: black;
+    background: white;
+    border-bottom: 1px solid #ccc;
+  }
+  .wallet-ticket-heading p {
+    color: black;
+  }
+}
+
+.quote-main > h2:first-of-type {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 18px 0;
+}
+
+.dashboard-layout > *,
+.detail-layout > * {
+  min-width: 0;
+}
+@media (max-width: 620px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .event-hero-panel .card-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}

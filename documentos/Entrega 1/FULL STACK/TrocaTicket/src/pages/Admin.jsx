@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { opportunities } from '../data/demo';
-import { useStore } from '../context/Store';
+import { useStore } from '../context/StoreContext';
 import {
   Badge,
   DownloadButton,

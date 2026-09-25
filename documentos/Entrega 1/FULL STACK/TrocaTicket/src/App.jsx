@@ -1,13 +1,17 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router';
 import Layout from './components/Layout';
+import Wallet from './pages/Wallet';
+import SupplierDirectory from './pages/SupplierDirectory';
 import Home from './pages/Home';
 import Account, { Profiles, Recover } from './pages/Account';
 import Profile from './pages/Profile';
-import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organizer';
+import { Organizer, EventEditor, Consolidation } from './pages/Organizer';
 import { Opportunities, Proposals, Quote, Inventory } from './pages/Supplier';
 import { Admin, Report, Moderation } from './pages/Admin';
-import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
+import { Catalog, EventDetails, Community } from './pages/Participant';
+
+
 function Info({ title, children }) {
   return (
     <div className="workspace narrow">
@@ -21,6 +25,7 @@ function Info({ title, children }) {
     </div>
   );
 }
+
 export default function App() {
   return (
     <Routes>
@@ -32,16 +37,17 @@ export default function App() {
         <Route path="perfis" element={<Profiles />} />
         <Route path="perfil" element={<Profile />} />
         <Route path="eventos" element={<Catalog />} />
-        <Route path="eventos/:id" element={<EventDetails />} />
-        <Route path="favoritos" element={<Catalog favorites />} />
-        <Route path="ingressos" element={<Tickets />} />
+        <Route path="eventos/:id" element={<EventDetailsRoute />} />
+        <Route path="favoritos" element={<Catalog key="favorites" favorites />} />
+        <Route path="ingressos" element={<Wallet />} />
         <Route path="comunidade" element={<Community />} />
         <Route path="organizador" element={<Organizer />} />
+        <Route path="organizador/visualizar/:id" element={<EventDetailsRoute organizer />} />
         <Route path="organizador/eventos" element={<Organizer list />} />
         <Route path="organizador/novo" element={<EventEditor key="new" />} />
         <Route path="organizador/eventos/:id/editar" element={<EventEditorRoute />} />
         <Route path="organizador/eventos/:id/consolidar" element={<Consolidation />} />
-        <Route path="organizador/fornecedores" element={<Suppliers />} />
+        <Route path="organizador/fornecedores" element={<SupplierDirectory />} />
         <Route path="fornecedor" element={<Opportunities />} />
         <Route path="fornecedor/propostas" element={<Proposals />} />
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
@@ -93,12 +99,4 @@ export default function App() {
     </Routes>
   );
 }
-import { useParams } from 'react-router';
-function EventEditorRoute() {
-  const { id } = useParams();
-  return <EventEditor key={id} />;
-}
-function QuoteRoute() {
-  const { id } = useParams();
-  return <Quote key={id} />;
-}
+

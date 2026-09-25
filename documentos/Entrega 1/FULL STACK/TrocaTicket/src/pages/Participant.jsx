@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useEvents, LoadState } from '../components/Events';
-import { useStore } from '../context/Store';
-import { Badge, Empty, Modal, PageTitle, Panel, Tabs, money } from '../components/UI';
+import { useStore } from '../context/StoreContext';
+import { reservationError, normalizeSearch } from '../services/rules';
+import { Badge, Empty, Modal, PageTitle, Panel, Tabs, money, dateLabel } from '../components/UI';
 
 export function EventCard({ event }) {
   const { data, toggleFavorite } = useStore();
@@ -23,7 +24,7 @@ export function EventCard({ event }) {
       </div>
       <div className="discovery-body">
         <h3>{event.title}</h3>
-        <p>▦ {event.date}</p>
+        <p>▦ {/^\d{4}-\d{2}-\d{2}$/.test(event.date) ? dateLabel(event.date) : event.date}</p>
         <p>⌖ {event.location}</p>
         <div className="card-actions">
           <div>
@@ -48,8 +49,8 @@ export function Catalog({ favorites = false }) {
   const filtered = all.filter(
     (e) =>
       (!favorites || data.favorites.includes(e.id)) &&
-      `${e.title} ${e.location}`.toLowerCase().includes(query.toLowerCase()) &&
-      (city === 'Todas' || e.location.includes(city)),
+      normalizeSearch(`${e.title} ${e.location}`).includes(normalizeSearch(query)) &&
+      (city === 'Todas' || normalizeSearch(e.location).includes(normalizeSearch(city))),
   );
   return (
     <div className="workspace discovery">
@@ -80,6 +81,7 @@ export function Catalog({ favorites = false }) {
       {!state.loading && !state.error && (
         <>
           <PageTitle
+            as="h2"
             title={favorites ? 'Eventos salvos' : 'Recomendados para Você'}
             subtitle={`${filtered.length} eventos encontrados`}
           />
@@ -91,6 +93,7 @@ export function Catalog({ favorites = false }) {
           {filtered.length > 4 && (
             <>
               <PageTitle
+                as="h2"
                 title="Mais experiências para descobrir"
                 subtitle="Shows, cultura e encontros para todos os gostos."
               />
@@ -102,8 +105,14 @@ export function Catalog({ favorites = false }) {
             </>
           )}
           {!filtered.length && (
-            <Empty title={favorites ? 'Você ainda não tem favoritos' : 'Nenhum evento encontrado'}>
-              {favorites
+            <Empty
+              title={
+                favorites && !data.favorites.length
+                  ? 'Você ainda não tem favoritos'
+                  : 'Nenhum evento encontrado'
+              }
+            >
+              {favorites && !data.favorites.length
                 ? 'Toque no coração de um evento para encontrá-lo aqui.'
                 : 'Experimente outro nome ou cidade.'}
             </Empty>
@@ -114,11 +123,14 @@ export function Catalog({ favorites = false }) {
   );
 }
 
-export function EventDetails() {
+export function EventDetails({ organizer = false }) {
   const { id } = useParams();
   const state = useEvents();
   const { data, update, notify, toggleFavorite } = useStore();
-  const event = [...state.events, ...data.events].find((e) => e.id === id);
+  const event = [
+    ...state.events,
+    ...data.events.filter((e) => organizer || ['Publicado', 'Cancelado'].includes(e.status)),
+  ].find((e) => e.id === id);
   const [tab, setTab] = useState('Sobre o evento');
   const [type, setType] = useState('Inteira');
   const [quantity, setQuantity] = useState(1);
@@ -139,16 +151,23 @@ export function EventDetails() {
       </div>
     );
   const price = event.price * (type === 'Meia-entrada' ? 0.5 : 1);
-  const total = price * quantity;
+  const bookingError = reservationError(event, quantity, data.tickets);
+  const total = (Math.round(price * 100) * (Number(quantity) || 0)) / 100;
   function reserve() {
+    if (reservationError(event, quantity, data.tickets)) {
+      setModal(false);
+      return;
+    }
     update('tickets', (old) => [
       {
-        id: `DEMO-${Date.now().toString().slice(-7)}`,
+        id: `DEMO-${crypto.randomUUID().slice(0, 8)}`,
         eventId: id,
         title: event.title,
         image: event.image,
         type,
-        quantity,
+        location: event.location,
+        date: event.date,
+        quantity: Number(quantity),
         total,
         status: 'Reservado (demo)',
       },
@@ -178,6 +197,16 @@ export function EventDetails() {
         >
           {data.favorites.includes(id) ? '♥ Salvo' : '♡ Salvar'}
         </button>
+        {organizer && data.events.some((item) => item.id === id) && (
+          <Link className="button blue-button" to={`/organizador/eventos/${id}/editar`}>
+            Editar evento
+          </Link>
+        )}
+        {organizer && data.events.some((item) => item.id === id) && (
+          <Link className="button outline" to={`/organizador/eventos/${id}/consolidar`}>
+            Consolidar evento
+          </Link>
+        )}
         <Link className="button outline" to="/comunidade">
           Comunidade →
         </Link>
@@ -269,19 +298,31 @@ export function EventDetails() {
               min="1"
               max="6"
               value={quantity}
-              onChange={(e) => setQuantity(Math.min(6, Math.max(1, Number(e.target.value) || 1)))}
+              step="1"
+              aria-invalid={!!bookingError}
+              aria-describedby={bookingError ? 'booking-error' : undefined}
+              onChange={(e) => setQuantity(e.target.value)}
             />
             <div className="card-actions">
               <span>Total</span>
               <strong>{money(total)}</strong>
             </div>
-            <button className="button primary full" onClick={() => setModal(true)}>
-              Simular reserva →
-            </button>
+            <p id="booking-error" className="field-error" role="status">
+              {bookingError}
+            </p>
+            {!organizer && (
+              <button
+                className="button primary full"
+                disabled={!!bookingError}
+                onClick={() => setModal(true)}
+              >
+                Simular reserva →
+              </button>
+            )}
             <small className="muted">Sem cobrança. Ingressos sem validade para entrada.</small>
           </Panel>
           <Panel title="Detalhes e Localização">
-            <p>▦ {event.date}</p>
+            <p>▦ {/^\d{4}-\d{2}-\d{2}$/.test(event.date) ? dateLabel(event.date) : event.date}</p>
             <p>⌖ {event.location}</p>
             <p className="muted">
               Consulte as regras e a classificação indicativa na programação oficial.
@@ -321,54 +362,6 @@ export function EventDetails() {
   );
 }
 
-export function Tickets() {
-  const { data, update, notify } = useStore();
-  return (
-    <div className="workspace">
-      <PageTitle title="Meus Ingressos" subtitle="Acompanhe as reservas feitas na demonstração.">
-        <Link className="button primary" to="/eventos">
-          Explorar eventos
-        </Link>
-      </PageTitle>
-      <div className="cards-three">
-        {data.tickets.map((ticket) => (
-          <Panel key={ticket.id}>
-            <img className="supplier-cover" src={ticket.image} alt={ticket.title} />
-            <Badge>{ticket.status}</Badge>
-            <h2>{ticket.title}</h2>
-            <code>{ticket.id}</code>
-            <p>
-              {ticket.quantity} × {ticket.type} · {money(ticket.total)}
-            </p>
-            <p className="muted">SEM VALIDADE PARA ENTRADA</p>
-            <div className="actions">
-              <Link className="button outline" to={`/eventos/${ticket.eventId}`}>
-                Ver evento
-              </Link>
-              <button
-                className="button danger-outline"
-                disabled={ticket.status === 'Cancelado'}
-                onClick={() => {
-                  update('tickets', (old) =>
-                    old.map((t) => (t.id === ticket.id ? { ...t, status: 'Cancelado' } : t)),
-                  );
-                  notify('Reserva de demonstração cancelada.');
-                }}
-              >
-                Cancelar reserva
-              </button>
-            </div>
-          </Panel>
-        ))}
-      </div>
-      {!data.tickets.length && (
-        <Empty title="Sua próxima experiência começa aqui">
-          Explore os eventos e simule uma reserva para vê-la nesta página.
-        </Empty>
-      )}
-    </div>
-  );
-}
 export function Community() {
   const { data, update, notify } = useStore();
   const [message, setMessage] = useState('');

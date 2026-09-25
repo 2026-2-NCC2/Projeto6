@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
-import { useStore } from '../context/Store';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { useStore } from '../context/StoreContext';
+import { validateEvent } from '../services/rules';
 import { suppliers } from '../data/demo';
 import {
   Badge,
@@ -111,7 +112,7 @@ export function Organizer({ list = false }) {
                     <span>
                       Capacidade: <strong>{event.capacity}</strong>
                     </span>
-                    <Link className="text-link" to={`/organizador/eventos/${event.id}/consolidar`}>
+                    <Link className="text-link" to={`/organizador/visualizar/${event.id}`}>
                       Detalhes →
                     </Link>
                   </div>
@@ -191,12 +192,17 @@ const blank = {
   image: '/images/asset-5.jpg',
   suppliers: ['vibe', 'buffet'],
 };
+
 export function EventEditor() {
   const { id } = useParams();
   const { data, update, notify } = useStore();
   const navigate = useNavigate();
   const existing = data.events.find((e) => e.id === id);
-  const [form, setForm] = useState(existing || blank);
+  const [params] = useSearchParams();
+  const selectedSupplier = suppliers.find((s) => s.id === params.get('fornecedor'));
+  const [form, setForm] = useState(
+    existing || { ...blank, suppliers: selectedSupplier ? [selectedSupplier.id] : blank.suppliers },
+  );
   const [errors, setErrors] = useState({});
   const [preview, setPreview] = useState(false);
   if (id && !existing) return <NotFound title="Evento não encontrado" />;
@@ -204,19 +210,7 @@ export function EventEditor() {
     setForm((old) => ({ ...old, [name]: value }));
   }
   function save(consolidate) {
-    const next = {};
-    if (form.title.trim().length < 3) next.title = 'Informe um nome com pelo menos 3 caracteres.';
-    if (!form.location.trim()) next.location = 'Informe o local.';
-    if (
-      !form.date ||
-      !form.endDate ||
-      `${form.endDate}T${form.endTime}` <= `${form.date}T${form.time}`
-    )
-      next.endDate = 'O término deve ser posterior ao início.';
-    if (Number(form.capacity) < 1 || !Number.isInteger(Number(form.capacity)))
-      next.capacity = 'Informe uma capacidade inteira maior que zero.';
-    if (!Number.isFinite(Number(form.price)) || Number(form.price) < 0)
-      next.price = 'Informe um preço válido.';
+    const next = validateEvent(form, data.tickets);
     setErrors(next);
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
@@ -228,12 +222,19 @@ export function EventEditor() {
       capacity: Number(form.capacity),
       price: Number(form.price),
       status: existing?.status || 'Rascunho',
+      confirmations: (form.confirmations || []).filter((supplierId) =>
+        form.suppliers.includes(supplierId),
+      ),
+      title: form.title.trim(),
+      location: form.location.trim(),
     };
     update('events', (old) => (id ? old.map((e) => (e.id === id ? event : e)) : [...old, event]));
     notify(
       consolidate
         ? 'Evento salvo. Revise os custos antes de publicar.'
-        : 'Rascunho salvo neste navegador.',
+        : existing?.status === 'Publicado'
+          ? 'Alterações salvas no evento publicado.'
+          : 'Evento salvo neste navegador.',
     );
     navigate(`/organizador/eventos/${event.id}/${consolidate ? 'consolidar' : 'editar'}`);
   }
@@ -248,7 +249,15 @@ export function EventEditor() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => field('image', reader.result);
+    reader.onload = () => {
+      field('image', reader.result);
+      setErrors((old) => ({ ...old, image: '' }));
+    };
+    reader.onerror = () =>
+      setErrors((old) => ({
+        ...old,
+        image: 'Não foi possível ler a imagem. Tente outro arquivo.',
+      }));
     reader.readAsDataURL(file);
   }
   return (
@@ -261,7 +270,7 @@ export function EventEditor() {
           ◉ Pré-visualizar
         </button>
         <button className="button blue-button" onClick={() => save(false)}>
-          Salvar rascunho
+          {existing ? 'Salvar alterações' : 'Salvar rascunho'}
         </button>
       </PageTitle>
       <form
@@ -401,7 +410,7 @@ export function EventEditor() {
               Cancelar
             </Link>
             <button type="button" className="button outline" onClick={() => save(false)}>
-              Salvar rascunho
+              {existing ? 'Salvar alterações' : 'Salvar rascunho'}
             </button>
             <button className="button blue-button">Consolidação de custo →</button>
           </div>
@@ -580,64 +589,6 @@ export function Consolidation() {
               Confirmar cancelamento
             </button>
           </div>
-        </Modal>
-      )}
-    </div>
-  );
-}
-
-export function Suppliers() {
-  const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState(null);
-  const filtered = suppliers.filter((s) =>
-    `${s.name} ${s.category}`.toLowerCase().includes(query.toLowerCase()),
-  );
-  return (
-    <div className="workspace">
-      <PageTitle
-        title="Rede de Fornecedores"
-        subtitle="Encontre parceiros para transformar o seu próximo evento."
-      />
-      <div className="filter-bar">
-        <input
-          aria-label="Buscar fornecedores"
-          placeholder="Buscar por nome ou especialidade…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
-      <div className="cards-three">
-        {filtered.map((s) => (
-          <Panel key={s.id}>
-            <img className="supplier-cover" src={s.image} alt={s.name} />
-            <Badge>{s.status}</Badge>
-            <h2>{s.name}</h2>
-            <p className="muted">{s.category}</p>
-            <strong>{money(s.price)}</strong>
-            <div className="form-footer">
-              <button className="button outline" onClick={() => setSelected(s)}>
-                Ver detalhes
-              </button>
-              <Link className="button blue-button" to="/organizador/novo">
-                Vincular a evento
-              </Link>
-            </div>
-          </Panel>
-        ))}
-      </div>
-      {!filtered.length && <Empty />}
-      {selected && (
-        <Modal title={selected.name} onClose={() => setSelected(null)}>
-          <p>{selected.category}</p>
-          <p>
-            Valor de referência: <strong>{money(selected.price)}</strong>
-          </p>
-          <p>
-            Atendimento em São Paulo e região. Os contratos desta plataforma são demonstrativos.
-          </p>
-          <Link className="button blue-button" to="/organizador/novo">
-            Planejar evento com este parceiro
-          </Link>
         </Modal>
       )}
     </div>

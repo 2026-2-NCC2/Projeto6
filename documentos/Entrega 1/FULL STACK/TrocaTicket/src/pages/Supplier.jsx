@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { useStore } from '../context/Store';
+import { useStore } from '../context/StoreContext';
+import { quoteTemplates } from '../data/quotes';
+import { lineTotal, validAmount } from '../services/rules';
 import { opportunities } from '../data/demo';
 import {
   Badge,
@@ -215,30 +217,35 @@ export function Quote() {
   const navigate = useNavigate();
   const event = opportunities.find((e) => e.id === id);
   const draft = data.proposals.find((p) => p.eventId === id && p.status === 'Rascunho');
-  const [prices, setPrices] = useState(draft?.prices || [3750, 14200, 380]);
+  const template = quoteTemplates[id];
+  const [prices, setPrices] = useState(
+    draft?.prices?.length === template?.items.length ? draft.prices : template?.prices || [],
+  );
   const [note, setNote] = useState(draft?.note || '');
   const [payment, setPayment] = useState(draft?.payment || '50% sinal + 50% D+10');
   const [error, setError] = useState('');
   if (!event) return <NotFound title="Cotação não encontrada" />;
-  const items = [
-    ['Ilhas de Bares Modulares (Pista & Premium)', 12, 'Módulos', 3800],
-    ['Logística Térmica & Abastecimento de Chopp', 3, 'Diárias', 14500],
-    ['Staff Operacional Treinado (Bartenders e Caixas)', 70, 'Profissionais', 380],
-  ];
-  const total = items.reduce((sum, item, i) => sum + item[1] * (Number(prices[i]) || 0), 0);
+  const items = template.items;
+  const total = lineTotal(items, prices);
   function submit(status) {
-    if (prices.some((v) => !Number.isFinite(Number(v)) || Number(v) <= 0)) {
-      setError('Informe um valor maior que zero para todos os itens.');
+    if (prices.length !== items.length || prices.some((v) => !validAmount(v))) {
+      setError('Informe valores positivos com até 2 casas decimais para todos os itens.');
       return;
     }
     const proposal = {
-      id: draft?.id || `PRP-${Date.now().toString().slice(-7)}`,
+      id: draft?.id || `PRP-${crypto.randomUUID().slice(0, 8)}`,
       eventId: id,
       title: event.title,
       total,
       status,
       date: new Date().toISOString().slice(0, 10),
-      description: 'Gestão integral de bar, logística térmica e equipe operacional.',
+      description: template.description,
+      items: items.map((item, i) => ({
+        name: item[0],
+        quantity: item[1],
+        unit: item[2],
+        price: Number(prices[i]),
+      })),
       payment,
       prices: prices.map(Number),
       note,
@@ -279,10 +286,7 @@ export function Quote() {
             </Link>
           ))}
           <Panel title="Evento: detalhes & briefing">
-            <p className="muted">
-              Operação completa de bebidas e bar. Inclui montagem, abastecimento, equipe e
-              desmontagem.
-            </p>
+            <p className="muted">{template.description}</p>
             <DownloadButton
               name="briefing.csv"
               rows={[[event.title], ['Item', 'Quantidade', 'Unidade', 'Referência'], ...items]}
@@ -293,15 +297,14 @@ export function Quote() {
         </aside>
         <Panel className="quote-main">
           <Badge>COTAÇÃO ATIVA · {event.id.toUpperCase()}</Badge>
-          <h1>
+          <h2>
             {event.title} — {event.subtitle}
-          </h1>
+          </h2>
           <p className="muted">
             ⌖ {event.location} · {dateLabel(event.date)}
           </p>
           <div className="info-note">
-            <strong>Escopo resumido:</strong> gestão integral dos pontos de bar, armazenamento
-            refrigerado, montagem de ilhas e equipe treinada para atendimento.
+            <strong>Escopo resumido:</strong> {template.description}
           </div>
           <h2>Itens requisitados para cotação</h2>
           <div className="table-wrap">
@@ -390,7 +393,7 @@ export function Inventory() {
   const [selectedId, setSelectedId] = useState(data.inventory[0]?.id);
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState('');
-  const selected = data.inventory.find((i) => i.id === selectedId);
+
   const categories = ['Todas', ...new Set(data.inventory.map((i) => i.category))];
   const items = data.inventory.filter(
     (i) =>
@@ -398,21 +401,27 @@ export function Inventory() {
       (category === 'Todas' || i.category === category) &&
       (status === 'Todos' || i.status === status),
   );
+  const selected = items.find((i) => i.id === selectedId) || items[0];
   function save(e) {
     e.preventDefault();
-    if (editing.name.trim().length < 3 || Number(editing.price) <= 0) {
-      setError('Informe nome e preço maiores que zero.');
+    if (editing.name.trim().length < 3 || !editing.unit.trim() || !validAmount(editing.price)) {
+      setError(
+        'Informe nome com pelo menos 3 caracteres, unidade e preço positivo com até 2 casas decimais.',
+      );
       return;
     }
     const item = {
       ...editing,
-      id: editing.id || `ITEM-${Date.now().toString().slice(-6)}`,
+      id: editing.id || `ITEM-${crypto.randomUUID().slice(0, 8)}`,
       price: Number(editing.price),
     };
     update('inventory', (old) =>
       editing.id ? old.map((i) => (i.id === item.id ? item : i)) : [...old, item],
     );
     setSelectedId(item.id);
+    setQuery('');
+    setCategory('Todas');
+    setStatus('Todos');
     setEditing(null);
     notify('Item salvo no inventário.');
   }
@@ -494,7 +503,7 @@ export function Inventory() {
               </thead>
               <tbody>
                 {items.map((item) => (
-                  <tr className={selectedId === item.id ? 'selected-row' : ''} key={item.id}>
+                  <tr className={selected?.id === item.id ? 'selected-row' : ''} key={item.id}>
                     <td>
                       <strong>{item.name}</strong>
                       <small>#{item.id}</small>

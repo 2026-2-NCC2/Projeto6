@@ -12,7 +12,9 @@ export function useEvents() {
     const controller = new AbortController();
     setState({ loading: true, events: [], error: '' });
     getEvents(controller.signal, simulateError && attempt === 0)
-      .then((events) => setState({ loading: false, events, error: '' }))
+      .then((events) => {
+        if (!controller.signal.aborted) setState({ loading: false, events, error: '' });
+      })
       .catch((error) => {
         if (error.name !== 'AbortError')
           setState({ loading: false, events: [], error: error.message });

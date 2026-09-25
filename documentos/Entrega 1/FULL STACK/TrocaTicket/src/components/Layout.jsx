@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
-import { useStore } from '../context/Store';
+import { useStore } from '../context/StoreContext';
 import { destinations, roleNames } from '../data/demo';
 const menus = {
   organizador: [
@@ -30,17 +30,25 @@ const menus = {
 };
 export default function Layout() {
   const { pathname } = useLocation();
-  const { role, chooseRole } = useStore();
+  const { data, role, chooseRole } = useStore();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const activeRole = pathname.startsWith('/organizador')
-    ? 'organizador'
-    : pathname.startsWith('/fornecedor')
-      ? 'fornecedor'
-      : pathname.startsWith('/admin')
-        ? 'admin'
-        : role || 'comprador';
+  let activeRole = role || 'comprador';
+  if (pathname.startsWith('/organizador')) activeRole = 'organizador';
+  else if (pathname.startsWith('/fornecedor')) activeRole = 'fornecedor';
+  else if (pathname.startsWith('/admin')) activeRole = 'admin';
+  else if (
+    ['/eventos', '/favoritos', '/ingressos', '/comunidade'].some(
+      (caminho) => pathname === caminho || pathname.startsWith(caminho + '/'),
+    )
+  )
+    activeRole = 'comprador';
+
+  // Mantém o perfil das configurações igual ao da área que está aberta.
+  useEffect(() => {
+    if (activeRole !== role) chooseRole(activeRole);
+  }, [pathname, activeRole, role]);
   const publicPage = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -105,7 +113,14 @@ export default function Layout() {
                 ⚙
               </Link>
               <Link className="user-chip" to="/perfis">
-                <span className="avatar small">CM</span>
+                <span className="avatar small">
+                  {data.profile.name
+                    .trim()
+                    .split(/\s+/)
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join('') || 'TT'}
+                </span>
                 <span>
                   MINHA CONTA<small>{roleNames[activeRole]}</small>
                 </span>

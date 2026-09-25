@@ -1,6 +1,6 @@
 # TrocaTicket — Front-end React
 
-Site navegável baseado nas 21 telas únicas exportadas do Figma. Inclui áreas de participante, organizador, fornecedor e administrador. React, React Router, Vite e CSS responsivo, sem backend.
+Site navegável atualizado a partir dos 27 arquivos PROTÓTIPO TROCATIKET exportados do Figma. Inclui áreas de participante, organizador, fornecedor e administrador. React, React Router, Vite e CSS responsivo, sem backend.
 
 ## Abrir no VS Code
 
@@ -28,13 +28,24 @@ Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aprovei
 - **Perfil:** dados de demonstração, foto, preferências e cancelamento das alterações não salvas.
 - **Geral:** menu móvel, estados vazios, carregamento, falha com nova tentativa, formulários validados, modais com foco contido e fechamento por Escape, avisos de ação e página 404.
 
+## Atualização do protótipo (23/09/2026)
+
+- `Wallet.jsx`: carteira com seleção, busca, filtros, paginação, revenda, transferência, reversão e impressão do ingresso demonstrativo.
+- `SupplierDirectory.jsx`: fornecedores em tabela com filtros por categoria, status e região; abas de materiais e propostas; vinculação ao novo evento.
+- Detalhes do evento para organizadores em `/organizador/visualizar/:id`, com acesso à edição e consolidação.
+- Perfil com fuso horário, variação administrativa e informações sobre histórico de acesso.
+- Validação de reservas, horários, valores monetários, cotações específicas por evento e recuperação de dados locais inválidos.
+- Guia `GUIA-DO-CODIGO.md` para estudo, apresentação e divisão do trabalho.
+
+A carteira tem cinco exemplos iniciais, além das reservas locais. As quantidades exibidas são calculadas a partir dos registros existentes. Os novos dados do navegador não são incluídos no ZIP.
+
 ## Dados e limitações
 
 O catálogo inicial é carregado assincronamente de `public/data/events.json`. Para testar erro, abra `/eventos?erro=1` e clique em **Tentar novamente**.
 
 Alterações de eventos, inventário, propostas, reservas, comunidade, perfil e favoritos ficam no `localStorage` deste navegador sob `trocaticket-v2`. O perfil escolhido fica no `sessionStorage`. Limpar os dados do site restaura a demonstração inicial. As alterações feitas durante a verificação do navegador não estão dentro do ZIP.
 
-**Não há autenticação ou autorização reais.** Qualquer perfil é acessível para avaliação acadêmica. Senhas e documentos de cadastro não são enviados nem armazenados. Use somente dados fictícios, inclusive no perfil. Reservas não geram ingressos válidos, pagamentos, contratos, e-mails, notificações externas ou verificação de identidade. OAuth, chat em tempo real, importação XLSX/CSV e relatórios PDF não foram conectados; os controles implementados oferecem demonstrações locais e exportações CSV. A cotação usa itens de exemplo para demonstrar o cálculo; não integra estoque real.
+**Não há autenticação ou autorização reais.** Qualquer perfil é acessível para avaliação acadêmica. Senhas e documentos de cadastro não são enviados nem armazenados. Use somente dados fictícios, inclusive no perfil. Reservas não geram ingressos válidos, pagamentos, contratos, e-mails, notificações externas ou verificação de identidade. OAuth, chat em tempo real, importação XLSX/CSV e relatórios PDF automáticos não foram conectados; os controles implementados oferecem demonstrações locais e exportações CSV. A cotação usa itens de exemplo para demonstrar o cálculo; não integra estoque real.
 
 As imagens não fornecem camadas, fontes ou regras de interação. O layout foi reconstruído em componentes, com ajustes de responsividade, consistência e acessibilidade. Alguns símbolos e textos foram adaptados. Datas e nomes fictícios do material foram mantidos como exemplos, sem confirmação de existência dos eventos.
 
@@ -50,7 +61,7 @@ As imagens não fornecem camadas, fontes ou regras de interação. O layout foi 
 | `src/services/events.js`    | Carregamento assíncrono do catálogo                     |
 | `src/pages/Home.jsx`        | Página inicial                                          |
 | `src/pages/Account.jsx`     | Entrada, cadastro, recuperação e escolha de perfil      |
-| `src/pages/Participant.jsx` | Catálogo, detalhes, ingressos e comunidade              |
+| `src/pages/Participant.jsx` | Catálogo, detalhes e comunidade                         |
 | `src/pages/Organizer.jsx`   | Painel, editor, consolidação e fornecedores             |
 | `src/pages/Supplier.jsx`    | Oportunidades, cotações, propostas e inventário         |
 | `src/pages/Admin.jsx`       | Painel, relatórios e moderação                          |
@@ -99,3 +110,30 @@ A hospedagem de produção precisa redirecionar as rotas da SPA para `index.html
 ## Verificação
 
 Consulte `VALIDACAO.md` para os fluxos e tamanhos de tela verificados. A versão de produção fica em `dist/` após executar o build; `node_modules/` e `dist/` não são incluídos no ZIP.
+
+## Correspondência com a atualização PROTÓTIPO TROCATIKET
+
+| Arquivo ZIP (sufixo) | Tela / rota                                              |
+| -------------------- | -------------------------------------------------------- |
+| Sem número           | Início `/`                                               |
+| 1, 2, 3, 4           | Perfil `/perfil`, conforme área selecionada              |
+| 5, 6, 7              | Cadastro `/cadastro`, conforme tipo de conta             |
+| 8                    | Moderação `/admin/moderacao`                             |
+| 9                    | Relatório `/admin/relatorios/tim-maia`                   |
+| 10, 11               | Login `/entrar` e seleção `/perfis`                      |
+| 12                   | Organizador `/organizador`                               |
+| 13                   | Oportunidades `/fornecedor`                              |
+| 14, 17               | Catálogo `/eventos`                                      |
+| 15                   | Painel `/admin`                                          |
+| 16                   | Detalhes `/eventos/lollapalooza`                         |
+| 18                   | Novo evento `/organizador/novo`                          |
+| 19                   | Detalhes do organizador `/organizador/visualizar/:id`    |
+| 20                   | Insumos e fornecedores `/organizador/fornecedores`       |
+| 21                   | Carteira `/ingressos`                                    |
+| 22                   | Consolidação `/organizador/eventos/primavera/consolidar` |
+| 23                   | Edição `/organizador/eventos/primavera/editar`           |
+| 24                   | Inventário `/fornecedor/inventario`                      |
+| 25                   | Propostas `/fornecedor/propostas`                        |
+| 26                   | Cotação `/fornecedor/cotacao/tim-maia`                   |
+
+As telas foram adaptadas ao protótipo funcional: contatos e quantidades são demonstrativos; não se afirma autenticação, custódia financeira ou validação antifraude real. O layout se baseia nos exports, não em medidas extraídas de camadas do Figma.

@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { restoreData } from '../services/rules';
+import { roleNames } from '../data/demo';
 import { initialEvents, initialInventory, initialProposals, initialPeople } from '../data/demo';
-const Context = createContext(null);
+import { StoreContext } from './StoreContext';
 const defaults = {
   events: initialEvents,
   inventory: initialInventory,
@@ -16,10 +18,11 @@ const defaults = {
     preferences: [true, true, true, false],
   },
 };
+// Lê os dados do navegador. Se houver algo inválido, usa os exemplos iniciais.
 function read() {
   try {
     const saved = JSON.parse(localStorage.getItem('trocaticket-v2'));
-    return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
+    return restoreData(saved, defaults);
   } catch {
     return defaults;
   }
@@ -28,7 +31,8 @@ export function StoreProvider({ children }) {
   const [data, setData] = useState(read);
   const [role, setRole] = useState(() => {
     try {
-      return sessionStorage.getItem('trocaticket-role') || '';
+      const savedRole = sessionStorage.getItem('trocaticket-role');
+      return Object.hasOwn(roleNames, savedRole) ? savedRole : '';
     } catch {
       return '';
     }
@@ -49,11 +53,13 @@ export function StoreProvider({ children }) {
     return () => clearTimeout(id);
   }, [toast]);
   function chooseRole(value) {
+    value = Object.hasOwn(roleNames, value) ? value : '';
     setRole(value);
     try {
       sessionStorage.setItem('trocaticket-role', value);
     } catch {}
   }
+  // Atualiza uma lista ou o perfil sem alterar diretamente o estado anterior.
   function update(key, value) {
     setData((old) => ({ ...old, [key]: typeof value === 'function' ? value(old[key]) : value }));
   }
@@ -61,7 +67,9 @@ export function StoreProvider({ children }) {
     update('favorites', (old) => (old.includes(id) ? old.filter((x) => x !== id) : [...old, id]));
   }
   return (
-    <Context.Provider value={{ data, update, role, chooseRole, notify: setToast, toggleFavorite }}>
+    <StoreContext.Provider
+      value={{ data, update, role, chooseRole, notify: setToast, toggleFavorite }}
+    >
       {children}
       {storageError && (
         <div className="storage-warning" role="alert">
@@ -78,7 +86,6 @@ export function StoreProvider({ children }) {
           </button>
         </div>
       )}
-    </Context.Provider>
+    </StoreContext.Provider>
   );
 }
-export const useStore = () => useContext(Context);
