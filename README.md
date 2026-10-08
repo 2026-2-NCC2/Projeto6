@@ -10,7 +10,7 @@
 
 ## Integrantes: <a href="https://www.linkedin.com/">Miguel Sanchez Batista</a>, <a href="https://www.linkedin.com/in/gabriel-alves-gabriel">Gabriel Alves Gabriel</a>, <a href="https://www.linkedin.com/">Leonardo</a>, <a href="https://www.linkedin.com/">Rafael Barbosa</a>, <a href="https://www.linkedin.com/">Tiago Urias</a>
 
-## Professores Orientadores: <a href="https://www.linkedin.com/in/victorbarq/">Dr. Victor Von Doom</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Saitama</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Strange</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Yoda</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Gero</a>
+## Professores Orientadores: <a href="https://www.linkedin.com/in/francisco-escobar/">Francisco de Souza Escobar</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Saitama</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Strange</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Yoda</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Gero</a>
 
 ## Descrição
 
