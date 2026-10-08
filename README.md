@@ -15,7 +15,8 @@
 ## Descrição
 
 <p align="center">
-<img src="https://placehold.co/1000x650" alt="NOME DO JOGO" border="0">
+<img src="<img width="883" height="410" alt="image" src="https://github.com/user-attachments/assets/2641f913-a016-4bdc-886c-93cd03fed811" />
+">
 </p>
 
 
