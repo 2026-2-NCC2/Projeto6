@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel } from '../components/UI';
 import { roleNames } from '../data/demo';
+import AdminProfile from './ProfileAdmin';
+
+// Administrador usa a tela nova; os demais perfis mantêm a tela atual.
 export default function Profile() {
+  const { role } = useStore();
+  return role === 'admin' ? <AdminProfile /> : <GenericProfile />;
+}
+
+function GenericProfile() {
   const { data, update, role, notify } = useStore();
   const [form, setForm] = useState(data.profile);
   const [error, setError] = useState('');

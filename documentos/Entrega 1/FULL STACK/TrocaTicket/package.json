@@ -11,6 +11,7 @@
     "format:check": "prettier --check src public/data package.json index.html README.md"
   },
   "dependencies": {
+    "chart.js": "^4.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.0"

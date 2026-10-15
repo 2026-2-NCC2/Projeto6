@@ -1191,110 +1191,6 @@ td code {
 .chart-legend span {
   flex: 1;
 }
-.moderation-panel {
-  padding: 0;
-  overflow: hidden;
-}
-.moderation-banner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  background: #101010;
-  color: #b0c1d7;
-  padding: 17px 24px;
-  font-size: 11px;
-}
-.moderation-content {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-}
-.moderation-content > div {
-  padding: 25px;
-}
-.decision-panel {
-  background: #f8fafd;
-  border-left: 1px solid var(--line);
-}
-.person-heading {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  margin-bottom: 30px;
-}
-.person-heading .avatar {
-  width: 80px;
-  height: 80px;
-  font-size: 25px;
-}
-.person-heading small {
-  color: var(--muted);
-}
-.person-heading h2 {
-  margin: 6px 0;
-}
-.person-heading code {
-  font-size: 11px;
-  color: var(--blue);
-}
-.check-line {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: 11px;
-  margin: 15px 0;
-}
-.decision-panel > .field {
-  margin-top: 25px;
-}
-.decision-buttons {
-  display: flex;
-  gap: 12px;
-}
-.decision-buttons button {
-  border: 0;
-  border-radius: 12px;
-  color: white;
-  flex: 1;
-  font-size: 36px;
-  padding: 16px;
-}
-.decision-buttons small {
-  display: block;
-  font-size: 11px;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-.approve {
-  background: #009d76;
-}
-.reject {
-  background: #e7194d;
-}
-.person-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 16px 10px;
-  background: white;
-  border: 0;
-  border-bottom: 1px solid #edf1f6;
-  text-align: left;
-}
-.person-row.active {
-  background: #f0f5ff;
-  box-shadow: inset 3px 0 #2860ed;
-}
-.person-row small {
-  display: block;
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-.person-row strong {
-  font-size: 12px;
-}
 .auth-page {
   min-height: calc(100vh - 74px);
   background: #f7f9fb;
@@ -1827,13 +1723,6 @@ td code {
   .chart-legend {
     min-width: 160px;
   }
-  .moderation-content {
-    grid-template-columns: 1fr;
-  }
-  .decision-panel {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-  }
   .role-grid {
     grid-template-columns: repeat(2, 1fr);
     max-width: 750px;
@@ -2229,27 +2118,6 @@ td code {
   .chart-legend i {
     width: 8px;
     height: 8px;
-  }
-  .moderation-banner {
-    padding: 15px;
-    font-size: 9px;
-  }
-  .moderation-content > div {
-    padding: 20px;
-  }
-  .person-heading {
-    gap: 15px;
-  }
-  .person-heading .avatar {
-    width: 65px;
-    height: 65px;
-    font-size: 22px;
-  }
-  .person-heading h2 {
-    font-size: 20px;
-  }
-  .decision-buttons button {
-    padding: 13px;
   }
   .role-grid {
     grid-template-columns: 1fr;
