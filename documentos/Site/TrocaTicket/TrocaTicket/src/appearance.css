@@ -1,0 +1,532 @@
+/* Os valores claros são os mesmos da primeira entrega. */
+:root {
+  color-scheme: light;
+  --ui-bg: #f7f9fb;
+  --ui-surface: #fff;
+  --ui-panel: #fff;
+  --ui-text: #121b30;
+  --ui-muted: #657997;
+  --ui-border: #dde5f0;
+  --ui-accent: #5746ef;
+  --ui-soft: #f2efff;
+  --ui-focus: #7650e8;
+  --on-action: #fff;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --ui-bg: #121a29;
+  --ui-surface: #212b3c;
+  --ui-panel: #1d2637;
+  --ui-text: #f2f4fa;
+  --ui-muted: #bdc9df;
+  --ui-border: #53627c;
+  --ui-accent: #c5b6ff;
+  --ui-soft: #2c2948;
+  --ui-focus: #ffd965;
+  --ink: var(--ui-text);
+  --muted: var(--ui-muted);
+  --surface: var(--ui-bg);
+  --line: var(--ui-border);
+  --blue: #a7c3ff;
+  --purple: #c5b6ff;
+  --green: #73e4c0;
+  --text-main: var(--ui-text);
+  --text-secondary: var(--ui-muted);
+  --surface-soft: #202b3e;
+  --border-soft: var(--ui-border);
+  --deep-surface: #33435c;
+  --accent-text: #c5b6ff;
+  --action-blue: #2e5dcc;
+  --action-blue-hover: #3a6cdd;
+  --action-purple: #6450db;
+  --action-purple-hover: #735eea;
+  --favorite-color: #ff92b0;
+  --error-text: #ffb2c0;
+  --status-green-bg: #113e34;
+  --status-green-text: #8aefd0;
+  --status-green-border: #3a9e80;
+  --status-blue-bg: #243c60;
+  --status-blue-text: #bfd5ff;
+  --status-blue-border: #5d82bd;
+  --status-amber-bg: #443719;
+  --status-amber-text: #ffe29a;
+  --status-amber-border: #a28a44;
+  --status-red-bg: #4b2835;
+  --status-red-text: #ffbacb;
+  --status-red-border: #b3788b;
+  --status-purple-bg: #3b3259;
+  --status-purple-text: #d6c8ff;
+}
+
+/* Alto contraste sobrepõe as cores, sem alterar a escolha de aparência. */
+html[data-contrast='high'] {
+  color-scheme: dark;
+  --ui-bg: #000;
+  --ui-surface: #000;
+  --ui-panel: #000;
+  --ui-text: #fff;
+  --ui-muted: #eee;
+  --ui-border: #fff;
+  --ui-accent: #ffed4a;
+  --ui-soft: #171717;
+  --ui-focus: #ffed4a;
+  --ink: #fff;
+  --muted: #eee;
+  --surface: #000;
+  --line: #fff;
+  --blue: #ffed4a;
+  --purple: #ffed4a;
+  --green: #8dffc5;
+  --text-main: #fff;
+  --text-secondary: #eee;
+  --surface-soft: #111;
+  --border-soft: #fff;
+  --deep-surface: #000;
+  --accent-text: #ffed4a;
+  --action-blue: #ffed4a;
+  --action-blue-hover: #fff3a5;
+  --action-purple: #ffed4a;
+  --action-purple-hover: #fff3a5;
+  --on-action: #000;
+  --favorite-color: #ffb6cb;
+  --error-text: #ffb6cb;
+  --status-green-bg: #000;
+  --status-green-text: #8dffc5;
+  --status-green-border: #8dffc5;
+  --status-blue-bg: #000;
+  --status-blue-text: #b8d6ff;
+  --status-blue-border: #b8d6ff;
+  --status-amber-bg: #000;
+  --status-amber-text: #ffed4a;
+  --status-amber-border: #ffed4a;
+  --status-red-bg: #000;
+  --status-red-text: #ffb6cb;
+  --status-red-border: #ffb6cb;
+  --status-purple-bg: #000;
+  --status-purple-text: #e0c3ff;
+}
+
+body {
+  background: var(--ui-surface);
+}
+
+textarea,
+.modal {
+  background: var(--ui-surface);
+}
+
+.person-row,
+.plain-button {
+  color: inherit;
+}
+
+.primary,
+.blue-button {
+  color: var(--on-action);
+}
+
+/* Estes seletores tratam as áreas com fundo próprio no projeto original. */
+html:is([data-theme='dark'], [data-contrast='high'])
+  :is(.profile-card, .step, .events, .inner-page, .catalog, .auth-page) {
+  background: var(--surface-soft);
+  color: var(--ui-text);
+}
+
+html:is([data-theme='dark'], [data-contrast='high'])
+  :is(
+    .profile-tag,
+    .profile-icon,
+    .step-number,
+    .ticket-link,
+    .demo-note,
+    .role-symbol,
+    .auth-symbol
+  ) {
+  background: var(--ui-soft);
+  color: var(--ui-accent);
+}
+
+html:is([data-theme='dark'], [data-contrast='high'])
+  :is(.profile-card > p, .step p, .section-heading > p:last-child, .hero-description) {
+  color: var(--ui-muted);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .header {
+  border: 1px solid var(--ui-border);
+}
+
+html[data-theme='dark'][data-contrast='normal'] .header {
+  background: #101010;
+  border-color: #344052;
+}
+
+html[data-theme='dark'][data-contrast='normal'] .header .app-navigation.is-open {
+  background: #141414;
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .header-cta {
+  color: var(--ui-text);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) :is(input, select, textarea) {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) :is(input, textarea)::placeholder {
+  color: var(--ui-muted);
+  opacity: 1;
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .field input[readonly] {
+  background: var(--surface-soft);
+}
+
+html:is([data-theme='dark'], [data-contrast='high'])
+  :is(
+    .profile-card li span,
+    .organizador li span,
+    .fornecedor .profile-tag,
+    .fornecedor .profile-icon
+  ) {
+  color: var(--green);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .step:last-child .step-number {
+  color: var(--green);
+  background: var(--status-green-bg);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .success h2 {
+  color: var(--green);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .favorite {
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .favorite.saved {
+  color: var(--favorite-color);
+}
+
+html[data-theme='dark'] .hero:before {
+  background:
+    linear-gradient(110deg, #34243bd9, #202e51e3, #32284be6),
+    url('/images/hero.jpg') center 44% / cover;
+}
+
+html[data-theme='dark'] .hero h1 {
+  color: var(--ui-text);
+}
+
+html[data-theme='dark'] .hero h1 em {
+  color: #d0bfff;
+}
+
+html[data-contrast='high'] :is(.hero, .hero:before) {
+  background: #000;
+  filter: none;
+}
+
+html[data-contrast='high'] .hero h1 {
+  color: #fff;
+}
+
+html[data-contrast='high'] .hero h1 em {
+  color: #ffed4a;
+}
+
+html[data-contrast='high']
+  :is(.dark, .hero-badge, .profiles, .quote-total, .blue-panel, .moderation-banner, .toast) {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+html[data-contrast='high']
+  :is(
+    .profiles .section-heading > p,
+    .quote-total small,
+    .user-chip small,
+    .notification-button,
+    .header-tools > a:not(.user-chip)
+  ) {
+  color: #eee;
+}
+
+html[data-contrast='high'] :is(.approve, .reject, .danger) {
+  background: #000;
+  color: #fff;
+  border: 2px solid currentColor;
+}
+
+html[data-contrast='high'] .approve {
+  color: #8dffc5;
+}
+
+html[data-contrast='high'] :is(.reject, .danger) {
+  color: #ffb6cb;
+}
+
+html[data-contrast='high'] :is(.verified, .organizador .profile-tag) {
+  background: #000;
+  color: #ffed4a;
+  border: 1px solid currentColor;
+}
+
+html[data-contrast='high'] :is(.app-navigation a.active, .tabs .active) {
+  color: #ffed4a;
+}
+
+html[data-contrast='high'] :is(.badge, .cover-upload, .booking-panel) {
+  border-color: currentColor;
+}
+
+html[data-contrast='high'] button:disabled {
+  opacity: 0.7;
+}
+
+html[data-readable='true'] body {
+  font-family: Verdana, Tahoma, Arial, sans-serif;
+}
+
+/* Os atributos com zero preservam o espaçamento original de cada componente. */
+html[data-letter-spacing]:not([data-letter-spacing='0']) :where(body, body *) {
+  letter-spacing: var(--reading-letter-spacing) !important;
+}
+
+html[data-line-spacing]:not([data-line-spacing='0']) :where(body, body *) {
+  line-height: var(--reading-line-height) !important;
+}
+
+html[data-links='true'] a {
+  text-decoration-line: underline !important;
+  text-decoration-thickness: 0.13em !important;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: auto;
+  border-radius: 3px;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--ui-focus);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  z-index: 1000;
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+}
+
+/* Os controles novos compartilham o cabeçalho já existente. */
+.header .ui-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.header .ui-tools button {
+  min-width: 42px;
+  min-height: 42px;
+}
+
+.header .brand,
+.header nav,
+.header-tools {
+  min-width: 0;
+}
+
+.public-shell .header nav {
+  margin-left: auto;
+}
+
+.app-header.header {
+  gap: 20px;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.hero-actions, .header-tools, .hero .button) {
+  flex-wrap: wrap;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(
+    .grid,
+    .cards-three,
+    .cards-two,
+    .role-grid,
+    .organizer-grid,
+    .discovery-grid,
+    .agenda-grid,
+    .form-grid,
+    .metrics
+  ) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(
+    .dashboard-layout,
+    .consolidation-layout,
+    .quote-layout,
+    .proposal-layout,
+    .editor-layout,
+    .moderation-content
+  ) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  .organizer-grid
+  .managed-event:last-child {
+  grid-column: auto;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.badge, .form-footer .button, .demo-strip button, .app-navigation a) {
+  white-space: normal;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  .public-shell
+  .header {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  margin: 12px 6px;
+  flex-wrap: wrap;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.hero, .auth-page, .profile-selection) {
+  padding-top: 60px;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200']) .app-header {
+  flex-wrap: wrap;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  .app-header
+  .app-navigation {
+  flex-basis: 100%;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1150px) {
+  .app-header.header {
+    flex-wrap: wrap;
+    border-radius: 28px;
+    gap: 10px 16px;
+  }
+  .app-header .app-navigation {
+    order: 4;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+  }
+  .app-header .header-tools {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 850px) {
+  .public-shell .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-radius: 24px;
+    gap: 8px 12px;
+    padding: 12px 16px;
+  }
+  .public-shell .header .ui-tools {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .public-shell .header nav {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  .public-shell :is(.auth-page, .profile-selection) {
+    padding-top: 170px;
+  }
+  .app-header .app-navigation.is-open {
+    top: calc(100% + 8px);
+  }
+  .app-header .header-tools {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .public-shell .header .brand small {
+    font-size: 0.55rem;
+  }
+  .public-shell .header .login-link {
+    display: inline;
+  }
+  .public-shell .header .demo-link {
+    display: none;
+  }
+  .public-shell .hero {
+    padding-top: 170px;
+  }
+  .header .ui-tools {
+    gap: 5px;
+  }
+  .header .ui-tools button {
+    min-width: 38px;
+    min-height: 38px;
+  }
+  .app-header.header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .app-header .brand {
+    flex: 1;
+  }
+  .app-header .header-tools {
+    gap: 10px;
+  }
+  .app-header .ui-tools {
+    margin-left: auto;
+  }
+  .workspace h1,
+  .hero h1,
+  .page-title h1 {
+    overflow-wrap: anywhere;
+  }
+  .demo-strip {
+    flex-wrap: wrap;
+  }
+  html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200']) .hero {
+    padding-top: 60px;
+  }
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  .public-shell
+  :is(.auth-page, .profile-selection) {
+  padding-top: 60px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
