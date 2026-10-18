@@ -1,0 +1,47 @@
+{
+  "dataUtc": "2026-10-18T23:24:44.621Z",
+  "instance": {
+    "version": "8.0.46",
+    "port": 34763,
+    "isolation": "Instância exclusiva conferida; M1 e conexão pessoal não acessados"
+  },
+  "escopo": "Corrupção temporária de checksum e estrutura_hash em metadados, revertida com ROLLBACK. Não foi feito ALTER de esquema real.",
+  "resultados": [
+    {
+      "id": "M01",
+      "teste": "Recusa de checksum divergente",
+      "esperado": "Runner recusa antes de DDL; ROLLBACK restaura os metadados; estrutura e contagens iguais.",
+      "observado": {
+        "recusa": "Histórico/checksum divergente. Não edite migração já aplicada.",
+        "rollback": "Histórico idêntico ao original",
+        "estrutura": "Fingerprint idêntico",
+        "contagens": "Todas as tabelas com contagem preservada"
+      },
+      "resultado": "aprovado"
+    },
+    {
+      "id": "M02",
+      "teste": "Recusa de estrutura_hash divergente",
+      "esperado": "Runner recusa antes de DDL; ROLLBACK restaura os metadados; estrutura e contagens iguais.",
+      "observado": {
+        "recusa": "Estrutura divergente do histórico: nenhuma migração foi aplicada.",
+        "rollback": "Histórico idêntico ao original",
+        "estrutura": "Fingerprint idêntico",
+        "contagens": "Todas as tabelas com contagem preservada"
+      },
+      "resultado": "aprovado"
+    },
+    {
+      "id": "M03",
+      "teste": "Reaplicação com histórico restaurado",
+      "esperado": "Zero migrações novas e nenhum dado/DDL alterado.",
+      "observado": {
+        "applied": [],
+        "unchanged": 3,
+        "estrutura": "Fingerprint idêntico",
+        "contagens": "Preservadas"
+      },
+      "resultado": "aprovado"
+    }
+  ]
+}

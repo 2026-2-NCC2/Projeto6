@@ -1,0 +1,22 @@
+{
+  "dataUtc": "2026-10-18T23:26:54.770Z",
+  "instancia": "MySQL8.0.46 QA34763; diretorio conferido; conexao pessoal nao usada",
+  "resultados": [
+    {
+      "teste": "Inicio unico com conexao local salva",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Segunda abertura reutiliza a execucao sem pedir credencial ou fechar a primeira",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Enter encerra somente API e frontend iniciados",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Fechar a janela pai tambem encerra seus processos; configuracao preservada",
+      "resultado": "aprovado"
+    }
+  ]
+}

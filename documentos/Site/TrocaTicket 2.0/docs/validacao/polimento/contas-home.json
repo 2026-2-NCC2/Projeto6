@@ -1,0 +1,11 @@
+{
+  "dataUtc": "2026-10-18T23:37:24.322Z",
+  "escopo": "Edge isolado com API interceptada; sem acesso a MySQL ou login real",
+  "resultados": [
+    "Seis contas e senha inicial disponíveis na home, com atalho no destaque",
+    "Todos os botões preenchem as contas; login exige confirmação e usa POST normal, sem enviar perfil/admin",
+    "Atalho inválido não preenche dados; cadastro não recebe credenciais administrativas",
+    "Mobile390px com seis cartões, sem rolagem horizontal da página"
+  ],
+  "errosJs": []
+}
