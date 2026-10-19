@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router';
 import Events from '../components/Events';
+import ContasDemonstracao from '../mvp/componentes/ContasDemonstracao';
+import { useI18n } from '../i18n';
 const profiles = [
   {
     id: 'comprador',
     tag: 'Participante',
     name: 'Comprador',
     icon: '♧',
-    description: 'Compre, troque ou revenda ingressos sem risco de golpes.',
+    description: 'Explore compras, reservas e repasses de ingressos fictícios.',
     features: [
-      'Compre ingressos para os seus eventos favoritos',
+      'Simule reservas para os seus eventos favoritos',
       'Interaja com a comunidade e avalie eventos',
-      'Converse com outros usuários pelo chat',
+      'Experimente as mensagens de exemplo da comunidade',
     ],
   },
   {
@@ -40,35 +42,41 @@ const profiles = [
   },
 ];
 export default function Home() {
+  const { t } = useI18n();
   return (
     <>
       <section className="hero">
         <div className="hero-content">
           <p className="hero-badge">
-            <span /> Troca e compra segura de ingressos
+            <span /> {t('Demonstração acadêmica de eventos e ingressos')}
           </p>
           <h1>
-            Compre e troque ingressos para
-            <br className="desktop-break" /> seus eventos <em>favoritos!</em>
+            {t('Compre e troque ingressos para')}
+            <br className="desktop-break" /> {t('seus eventos')} <em>{t('favoritos!')}</em>
           </h1>
           <p className="hero-description">
-            Compre e transfira seus ingressos em poucos cliques com qualquer pessoa.
+            {t('Explore os perfis e simule operações com dados fictícios, sem pagamentos reais.')}
           </p>
           <div className="hero-actions">
-            <Link to="/cadastro" className="button primary">
-              Começar Gratuitamente <span aria-hidden="true">→</span>
+            <Link to="/perfis" className="button primary">
+              {t('Explorar os perfis')} <span aria-hidden="true">→</span>
             </Link>
-            <a className="button secondary" href="#como-funciona">
-              ♧ Como funciona
-            </a>
+            <button
+              type="button"
+              className="button secondary"
+              onClick={() => document.getElementById('como-funciona')?.scrollIntoView()}
+            >
+              ♧ {t('Como funciona')}
+            </button>
           </div>
         </div>
       </section>
+      <ContasDemonstracao somenteNavegador />
       <section className="profiles section" aria-labelledby="profiles-title">
         <div className="section-heading">
-          <p className="eyebrow">Acesso multi-perfil</p>
-          <h2 id="profiles-title">Como você quer usar o Troca Ticket?</h2>
-          <p>Soluções desenhadas para participantes, organizadores e fornecedores.</p>
+          <p className="eyebrow">{t('Acesso multi-perfil')}</p>
+          <h2 id="profiles-title">{t('Como você quer usar o Troca Ticket?')}</h2>
+          <p>{t('Soluções desenhadas para participantes, organizadores e fornecedores.')}</p>
         </div>
         <div className="grid">
           {profiles.map((profile) => (
@@ -77,20 +85,20 @@ export default function Home() {
                 <span className="profile-icon" aria-hidden="true">
                   {profile.icon}
                 </span>
-                <span className="profile-tag">{profile.tag}</span>
+                <span className="profile-tag">{t(profile.tag)}</span>
               </div>
-              <h3>{profile.name}</h3>
-              <p>{profile.description}</p>
+              <h3>{t(profile.name)}</h3>
+              <p>{t(profile.description)}</p>
               <ul>
                 {profile.features.map((feature) => (
                   <li key={feature}>
                     <span aria-hidden="true">✓</span>
-                    {feature}
+                    {t(feature)}
                   </li>
                 ))}
               </ul>
               <Link className="button dark" to={`/cadastro?perfil=${profile.id}`}>
-                Seja um {profile.name}
+                {t('Seja um')} {t(profile.name)}
               </Link>
             </article>
           ))}
@@ -98,9 +106,9 @@ export default function Home() {
       </section>
       <section id="como-funciona" className="how section">
         <div className="section-heading">
-          <p className="eyebrow purple">Simplicidade & velocidade</p>
-          <h2>Como a TROCATICKET funciona?</h2>
-          <p>Protegendo comprador e vendedor do anúncio até o acesso ao evento.</p>
+          <p className="eyebrow purple">{t('Simplicidade & velocidade')}</p>
+          <h2>{t('Como a TROCATICKET funciona?')}</h2>
+          <p>{t('Conheça os fluxos simulados de cada perfil. Nenhum ingresso real é emitido.')}</p>
         </div>
         <div className="grid">
           {[
@@ -119,8 +127,8 @@ export default function Home() {
           ].map(([title, description], index) => (
             <article className="step" key={title}>
               <span className="step-number">{index + 1}</span>
-              <h3>{title}</h3>
-              <p>{description}</p>
+              <h3>{t(title)}</h3>
+              <p>{t(description)}</p>
             </article>
           ))}
         </div>

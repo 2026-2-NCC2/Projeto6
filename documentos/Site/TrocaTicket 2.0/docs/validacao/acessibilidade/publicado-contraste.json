@@ -1,0 +1,62 @@
+{
+  "url": "https://tiago-u12.github.io/projeto-faculdade/#/perfis",
+  "records": [
+    {
+      "theme": "light",
+      "highContrast": false,
+      "width": 1440,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "light",
+      "highContrast": false,
+      "width": 390,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "light",
+      "highContrast": true,
+      "width": 1440,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "light",
+      "highContrast": true,
+      "width": 390,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "dark",
+      "highContrast": false,
+      "width": 1440,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "dark",
+      "highContrast": false,
+      "width": 390,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "dark",
+      "highContrast": true,
+      "width": 1440,
+      "checked": 36,
+      "issues": []
+    },
+    {
+      "theme": "dark",
+      "highContrast": true,
+      "width": 390,
+      "checked": 36,
+      "issues": []
+    }
+  ],
+  "errors": []
+}

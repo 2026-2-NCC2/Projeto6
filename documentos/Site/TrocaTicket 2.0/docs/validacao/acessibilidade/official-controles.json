@@ -1,0 +1,13 @@
+{
+  "dateUtc": "2026-10-19T03:09:15.908Z",
+  "base": "http://127.0.0.1:5198/",
+  "results": [
+    "Todos os ajustes alteram fonte, cores, espaçamento e links do conteúdo; salvar/recarregar e foco de retorno funcionam",
+    "Fechar com Escape cancela alterações não salvas",
+    "Restaurar padrão preserva os dados de negócio",
+    "Tema Sistema reage à mudança de aparência do dispositivo",
+    "Seis idiomas selecionáveis e persistentes",
+    "Mobile com fonte200%, espaçamentos máximos, foco preso no painel e todos os controles alcançáveis"
+  ],
+  "errors": []
+}

@@ -1,0 +1,13 @@
+{
+  "results": [
+    "Preferência salva numa aba é aplicada na segunda aba",
+    "Sincronização entre abas preserva a prévia ativa; cancelar usa o último salvamento da outra aba",
+    "Remover preferências em outra aba restaura o padrão",
+    "Eventos de sessionStorage são ignorados",
+    "Falha de quota mantém aparência/fonte/idioma durante a sessão e o aviso continua após fechar/reabrir",
+    "Salvar após recuperação do storage remove o aviso e persiste todos os ajustes",
+    "localStorage completamente bloqueado não impede o uso ou a alteração das preferências",
+    "VLibras só carrega após clique explícito; falha/repetição funcionam; recarregar não dispara a ferramenta externa automaticamente"
+  ],
+  "errors": []
+}

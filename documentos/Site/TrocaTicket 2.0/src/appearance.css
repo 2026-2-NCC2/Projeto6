@@ -5,12 +5,39 @@
   --ui-surface: #fff;
   --ui-panel: #fff;
   --ui-text: #121b30;
-  --ui-muted: #657997;
+  --ui-muted: #536985;
   --ui-border: #dde5f0;
   --ui-accent: #5746ef;
   --ui-soft: #f2efff;
   --ui-focus: #7650e8;
   --on-action: #fff;
+  --ink: var(--ui-text);
+  --muted: var(--ui-muted);
+  --surface: var(--ui-bg);
+  --line: var(--ui-border);
+  --green: #007653;
+  --surface-soft: #f2f5fa;
+  --action-blue: #2455d4;
+  --action-blue-hover: #1645bc;
+  --action-purple: #5746ef;
+  --action-purple-hover: #4430d7;
+  --error-text: #b42332;
+  --favorite-color: #bd214f;
+  --ui-control-border: #7a8ba4;
+  --status-green-bg: #ecfdf5;
+  --status-green-text: #006b4c;
+  --status-green-border: #69a88e;
+  --status-blue-bg: #eff5ff;
+  --status-blue-text: #214ed0;
+  --status-blue-border: #7495c8;
+  --status-amber-bg: #fffbeb;
+  --status-amber-text: #8b5200;
+  --status-amber-border: #ab8b3f;
+  --status-red-bg: #fff0f3;
+  --status-red-text: #af173b;
+  --status-red-border: #c57688;
+  --status-purple-bg: #f1eeff;
+  --status-purple-text: #5133c9;
 }
 
 html[data-theme='dark'] {
@@ -24,6 +51,7 @@ html[data-theme='dark'] {
   --ui-accent: #c5b6ff;
   --ui-soft: #2c2948;
   --ui-focus: #ffd965;
+  --ui-control-border: #8b9cba;
   --ink: var(--ui-text);
   --muted: var(--ui-muted);
   --surface: var(--ui-bg);
@@ -71,6 +99,7 @@ html[data-contrast='high'] {
   --ui-accent: #ffed4a;
   --ui-soft: #171717;
   --ui-focus: #ffed4a;
+  --ui-control-border: #fff;
   --ink: #fff;
   --muted: #eee;
   --surface: #000;
@@ -109,6 +138,306 @@ html[data-contrast='high'] {
 
 body {
   background: var(--ui-surface);
+  color: var(--ui-text);
+}
+
+/* Fundo e texto são sempre definidos juntos nas superfícies compartilhadas. */
+:is(
+  .panel,
+  .metric,
+  .auth-card,
+  .role-card,
+  .event-card,
+  .managed-event,
+  .discovery-card,
+  .form-card,
+  .detail-card,
+  .wallet-detail,
+  .supplier-check,
+  .person-row,
+  .notification-popover,
+  .demand-card,
+  .discovery-search
+) {
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+:is(
+  .panel.soft,
+  .soft,
+  .agenda-item,
+  .info-note,
+  .empty-state,
+  .decision-panel,
+  .ticket-demo-stamp,
+  .mini-stats > div,
+  .summary-grid > div,
+  .tabs
+) {
+  background: var(--surface-soft);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+:is(.role-card h2, .form-section-title, .field > label) {
+  color: var(--ui-text);
+}
+
+:is(
+  .section-heading > p:last-child,
+  .profile-card > p,
+  .step p,
+  .event-meta,
+  .event-bottom small,
+  .form-card > p,
+  .detail-card > p,
+  .cell-caption,
+  .ticket-demo-stamp p,
+  .tab-content,
+  .info-note,
+  footer
+) {
+  color: var(--ui-muted);
+}
+
+.app-shell footer {
+  background: var(--ui-panel);
+}
+
+:is(.purple, .text-link, .report-title, td code, .ticket-demo-stamp > span) {
+  color: var(--ui-accent);
+}
+
+:is(.primary, .blue-button) {
+  background: var(--action-blue);
+  color: var(--on-action);
+}
+
+.primary {
+  background: var(--action-purple);
+}
+
+.primary:hover {
+  background: var(--action-purple-hover);
+}
+
+.blue-button:hover {
+  background: var(--action-blue-hover);
+}
+
+:is(.outline, .icon-button, .secondary, .pagination button) {
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  border-color: var(--ui-control-border);
+}
+
+:is(.outline, .secondary, .pagination button):hover {
+  background: var(--ui-soft);
+}
+
+:is(.tabs button, .tabs a) {
+  color: var(--ui-muted);
+}
+
+.tabs .active {
+  color: var(--ui-accent);
+  background: var(--ui-panel);
+}
+
+:is(.person-row.active, .selected-row) {
+  background: var(--ui-soft);
+  color: var(--ui-text);
+}
+
+.selected-row td:first-child {
+  box-shadow: inset 3px 0 var(--ui-accent);
+}
+
+.header-cta {
+  background: #fff;
+  color: #101010;
+}
+
+.badge.green {
+  color: var(--status-green-text);
+  background: var(--status-green-bg);
+  border-color: var(--status-green-border);
+}
+.badge.blue {
+  color: var(--status-blue-text);
+  background: var(--status-blue-bg);
+  border-color: var(--status-blue-border);
+}
+.badge.amber {
+  color: var(--status-amber-text);
+  background: var(--status-amber-bg);
+  border-color: var(--status-amber-border);
+}
+.badge.red {
+  color: var(--status-red-text);
+  background: var(--status-red-bg);
+  border-color: var(--status-red-border);
+}
+.badge.light {
+  color: var(--status-purple-text);
+  background: var(--status-purple-bg);
+}
+
+.badge {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.verified {
+  color: var(--status-green-text);
+  background: var(--status-green-bg);
+  border: 1px solid var(--status-green-border);
+}
+
+:is(.profile-icon, .profile-tag, .step-number, .role-symbol, .directory-avatar) {
+  color: var(--ui-accent);
+  background: var(--ui-soft);
+}
+
+:is(
+  .profile-card li span,
+  .step:last-child .step-number,
+  .fornecedor .profile-tag,
+  .fornecedor .profile-icon,
+  .success h2
+) {
+  color: var(--status-green-text);
+  background-color: var(--status-green-bg);
+}
+
+.approve {
+  background: #007653;
+}
+.danger {
+  background: #bc2044;
+}
+.reject {
+  background: #bc2044;
+}
+:is(.text-danger, .field-error) {
+  color: var(--error-text);
+}
+.danger-outline {
+  color: var(--error-text);
+  background: var(--ui-panel);
+  border-color: var(--error-text);
+}
+
+:is(input, select, textarea, .field input, .field select) {
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  border-color: var(--ui-control-border);
+}
+:is(input, textarea)::placeholder {
+  color: var(--ui-muted);
+  opacity: 1;
+}
+:is(
+  .filter-bar input,
+  .filter-bar select,
+  .discovery-search select,
+  .field input[readonly],
+  .cover-upload
+) {
+  background: var(--surface-soft);
+}
+input[aria-invalid='true'] {
+  border-color: var(--error-text);
+}
+
+th {
+  color: var(--ui-muted);
+  background: var(--surface-soft);
+}
+:is(
+  .table-wrap,
+  .panel-heading,
+  td,
+  .card-actions,
+  .supplier-row,
+  .event-summary,
+  .form-footer,
+  .csv-preview,
+  .booking-panel
+) {
+  border-color: var(--ui-border);
+}
+
+.discovery-body .ticket-link,
+.ticket-link {
+  color: var(--status-blue-text);
+  background: var(--status-blue-bg);
+}
+.ticket-link:hover {
+  color: var(--ui-accent);
+  background: var(--ui-soft);
+}
+
+.wallet-ticket-heading {
+  background: #1e3779;
+  color: #fff;
+}
+.wallet-ticket-heading p {
+  color: #d2ddfa;
+}
+.donut > div {
+  background: var(--ui-panel);
+  color: var(--ui-text);
+}
+.divider:before,
+.divider:after {
+  background: var(--ui-border);
+}
+
+.profiles .section-heading > p {
+  color: #d2d2d2;
+}
+
+.stars {
+  color: var(--status-amber-text);
+}
+
+.favorite.saved {
+  color: var(--favorite-color);
+}
+
+progress::-webkit-progress-bar {
+  background: var(--surface-soft);
+}
+progress::-webkit-progress-value {
+  background: var(--ui-accent);
+}
+progress::-moz-progress-bar {
+  background: var(--ui-accent);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .step:last-child {
+  background: var(--surface-soft);
+}
+
+html:is([data-theme='dark'], [data-contrast='high']) .storage-warning {
+  background: var(--status-amber-bg);
+  color: var(--status-amber-text);
+  border-color: var(--status-amber-border);
+}
+
+html[data-contrast='high']
+  :is(.header, .wallet-ticket-heading, .avatar, .inventory-detail .blue-panel, .quote-total) {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+html[data-contrast='high'] :is(.wallet-ticket-heading p, .event-poster > div) {
+  color: #fff;
 }
 
 textarea,
@@ -166,7 +495,8 @@ html[data-theme='dark'][data-contrast='normal'] .header .app-navigation.is-open 
 }
 
 html:is([data-theme='dark'], [data-contrast='high']) .header-cta {
-  color: var(--ui-text);
+  color: #101010;
+  background: #fff;
 }
 
 html:is([data-theme='dark'], [data-contrast='high']) :is(input, select, textarea) {
@@ -528,5 +858,107 @@ html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ampliação e espaçamentos não podem exigir que a página inteira role de lado. */
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(
+    .workspace,
+    .section,
+    .panel,
+    .role-card,
+    .metric,
+    .auth-card,
+    .event-info,
+    .managed-body,
+    .discovery-body,
+    .summary-grid,
+    .page-title,
+    .section-row,
+    .opportunity,
+    .proposal-card,
+    .key-values,
+    .chart-legend
+  ) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(
+    .section-row,
+    .page-title,
+    .panel-heading,
+    .event-summary,
+    .profile-banner,
+    .card-actions,
+    .event-bottom,
+    .quote-total,
+    .mini-stats,
+    .chart-layout
+  ) {
+  flex-wrap: wrap;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(
+    .section-row,
+    .page-title,
+    .panel-heading,
+    .event-summary,
+    .card-actions,
+    .event-bottom,
+    .quote-total,
+    .mini-stats
+  )
+  > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200']) .tabs {
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.tabs button, .tabs a, .ticket-link, .text-link, .button) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.mini-stats > div, .tabs button, .tabs a) {
+  flex: 1 1 10rem;
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
+  :is(.key-values, .summary-grid) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200']) .key-values dd {
+  text-align: left;
+}
+
+@media print {
+  html:is([data-theme], [data-contrast]) {
+    color-scheme: light;
+    --ui-bg: #fff;
+    --ui-surface: #fff;
+    --ui-panel: #fff;
+    --ui-text: #000;
+    --ui-muted: #333;
+    --ui-border: #777;
+    --surface-soft: #fff;
+  }
+  html:is([data-theme], [data-contrast]) .wallet-ticket-heading {
+    color: #000;
+    background: #fff;
+  }
+  html:is([data-theme], [data-contrast]) .wallet-ticket-heading p {
+    color: #000;
   }
 }

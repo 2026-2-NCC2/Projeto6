@@ -1,0 +1,117 @@
+/* Somente a demonstração do navegador; não altera o frontend ligado à API. */
+.demo-browser-shell > .header {
+  position: relative;
+  inset: auto;
+  margin: 12px 6px;
+}
+
+.demo-browser-shell .hero {
+  padding-top: 70px;
+}
+
+.demo-browser-shell .auth-page {
+  padding-top: 60px;
+}
+
+.demo-browser-notice {
+  max-width: none;
+  padding: 14px 24px;
+  margin: 0;
+  align-items: center;
+  border-block: 1px solid var(--ui-border);
+  background: var(--ui-soft);
+  color: var(--ui-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.demo-browser-notice span {
+  display: grid;
+  gap: 3px;
+}
+
+.demo-browser-notice small {
+  font-size: 0.8125rem;
+  color: var(--ui-muted);
+}
+
+.demo-browser-notice button {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.demo-browser-accounts .mvp-demo-tag {
+  color: var(--ui-accent);
+  font-weight: 700;
+}
+
+.demo-browser-accounts .mvp-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.demo-browser-accounts .mvp-demo-account {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.demo-browser-accounts code {
+  overflow-wrap: anywhere;
+}
+
+.demo-browser-accounts .mvp-demo-account code {
+  margin-bottom: auto;
+}
+
+.demo-browser-accounts .mvp-demo-account h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.demo-browser-accounts .mvp-demo-account .button {
+  align-self: flex-start;
+}
+
+.demo-selected-account {
+  background: var(--ui-soft);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  padding: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 850px) {
+  .demo-browser-shell > .header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .demo-browser-shell .header .ui-tools {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .demo-browser-shell .hero {
+    padding-top: 50px;
+  }
+
+  .demo-browser-shell .auth-page {
+    padding-top: 40px;
+  }
+
+  .demo-browser-notice {
+    padding: 12px 18px;
+    flex-wrap: wrap;
+  }
+
+  .demo-browser-notice span {
+    max-width: none;
+  }
+}

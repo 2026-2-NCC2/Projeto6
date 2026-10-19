@@ -88,6 +88,7 @@ export function Catalog({ favorites = false, home = false }) {
   return (
     <div className="workspace">
       <PageTitle
+        as={home ? 'h2' : 'h1'}
         title={t(favorites ? 'Meus favoritos' : 'Encontre seu próximo evento')}
         subtitle={t('Eventos fictícios publicados pelos organizadores da demonstração.')}
       >

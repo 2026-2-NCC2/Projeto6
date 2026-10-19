@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
+    "build:pages": "vite build --mode pages",
     "preview": "vite preview --host 127.0.0.1",
     "format": "prettier --write src scripts tests server/src server/index.js server/scripts server/tests public/data package.json server/package.json index.html README.md",
     "format:check": "prettier --check src scripts tests server/src server/index.js server/scripts server/tests public/data package.json server/package.json index.html README.md",

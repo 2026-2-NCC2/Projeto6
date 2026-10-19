@@ -1,8 +1,11 @@
+import { useI18n } from '../i18n';
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Field, Modal, PageTitle, Panel } from '../components/UI';
 import { roleNames } from '../data/demo';
+import { assetUrl } from '../services/assets.js';
 export default function Profile() {
+  const { t } = useI18n();
   const { data, update, role, notify } = useStore();
   const [form, setForm] = useState(data.profile);
   const [error, setError] = useState('');
@@ -28,11 +31,11 @@ export default function Profile() {
   return (
     <div className="workspace narrow">
       <PageTitle
-        title="Configurações & Perfil"
-        subtitle="Gerencie seus dados de demonstração e suas preferências de comunicação."
+        title={t('Configurações & Perfil')}
+        subtitle={t('Gerencie seus dados de demonstração e suas preferências de comunicação.')}
       >
         <button className="button outline" onClick={() => setHistorico(true)}>
-          Histórico de acesso
+          {t('Histórico de acesso')}
         </button>
       </PageTitle>
       <form
@@ -44,13 +47,13 @@ export default function Profile() {
           }
           update('profile', form);
           setError('');
-          notify('Perfil salvo neste navegador.');
+          notify(t('Perfil salvo neste navegador.'));
         }}
       >
         <Panel className="profile-banner">
           <div className="avatar large">
             {form.photo ? (
-              <img src={form.photo} alt="Foto de perfil" />
+              <img src={assetUrl(form.photo)} alt={t('Foto de perfil')} />
             ) : (
               form.name.slice(0, 2).toUpperCase()
             )}
@@ -58,7 +61,7 @@ export default function Profile() {
           <div>
             <h2>{form.name}</h2>
             <label className="button dark upload-label">
-              ↑ Enviar nova foto
+              {t('↑ Enviar nova foto')}
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={photo} />
             </label>
             <button
@@ -66,31 +69,31 @@ export default function Profile() {
               className="button text-danger"
               onClick={() => setForm({ ...form, photo: '' })}
             >
-              Remover foto
+              {t('Remover foto')}
             </button>
-            <p className="muted">PNG, JPG ou WEBP · até 2 MB</p>
+            <p className="muted">{t('PNG, JPG ou WEBP · até 2 MB')}</p>
           </div>
         </Panel>
         <Panel
-          title="Informações Pessoais & Contato"
-          subtitle="Use dados fictícios: as informações ficam armazenadas neste navegador."
+          title={t('Informações Pessoais & Contato')}
+          subtitle={t('Use dados fictícios: as informações ficam armazenadas neste navegador.')}
         >
           <div className="form-grid">
             <Field
-              label="Nome completo"
+              label={t('Nome completo')}
               name="profile-name"
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <Field
-              label="Tipo de perfil"
+              label={t('Tipo de perfil')}
               name="profile-role"
-              value={roleNames[role] || 'Participante'}
+              value={t(roleNames[role] || 'Participante')}
               readOnly
             />
             <Field
-              label="E-mail"
+              label={t('E-mail')}
               name="profile-email"
               type="email"
               required
@@ -98,39 +101,40 @@ export default function Profile() {
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <Field
-              label="Telefone / WhatsApp"
+              label={t('Telefone / WhatsApp')}
               name="profile-phone"
               type="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
             <Field
-              label="Documento fiscal"
+              label={t('Documento fiscal')}
               name="profile-document"
-              value="Não coletado na demonstração"
+              value={t('Não coletado na demonstração')}
               readOnly
             />
-            <Field label="Fuso horário" name="profile-timezone">
+            <Field label={t('Fuso horário')} name="profile-timezone">
               <select
                 id="profile-timezone"
                 value={form.timezone || 'America/Sao_Paulo'}
                 onChange={(e) => setForm({ ...form, timezone: e.target.value })}
               >
-                <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
-                <option value="America/Manaus">Manaus (GMT-4)</option>
-                <option value="America/Rio_Branco">Rio Branco (GMT-5)</option>
+                <option value="America/Sao_Paulo">{t('Brasília (GMT-3)')}</option>
+                <option value="America/Manaus">{t('Manaus (GMT-4)')}</option>
+                <option value="America/Rio_Branco">{t('Rio Branco (GMT-5)')}</option>
               </select>
             </Field>
           </div>
           <div className="info-note">
-            A autenticação e a alteração de senha estarão disponíveis quando o backend for
-            conectado.
+            {t(
+              'A autenticação e a alteração de senha estarão disponíveis quando o backend for conectado.',
+            )}
           </div>
         </Panel>
         {role !== 'admin' && (
           <Panel
-            title="Opções & Preferências do Sistema"
-            subtitle="Preferências demonstrativas; nenhuma mensagem externa será enviada."
+            title={t('Opções & Preferências do Sistema')}
+            subtitle={t('Preferências demonstrativas; nenhuma mensagem externa será enviada.')}
           >
             {[
               'Notificações por e-mail',
@@ -140,8 +144,8 @@ export default function Profile() {
             ].map((name, i) => (
               <label className="preference" key={name}>
                 <span>
-                  <strong>{name}</strong>
-                  <small>Personalize os avisos que deseja acompanhar.</small>
+                  <strong>{t(name)}</strong>
+                  <small>{t('Personalize os avisos que deseja acompanhar.')}</small>
                 </span>
                 <input
                   type="checkbox"
@@ -159,7 +163,7 @@ export default function Profile() {
         )}
         {error && (
           <p role="alert" className="field-error">
-            {error}
+            {t(error)}
           </p>
         )}
         <div className="actions end">
@@ -171,17 +175,22 @@ export default function Profile() {
               setError('');
             }}
           >
-            Cancelar alterações
+            {t('Cancelar alterações')}
           </button>
-          <button className="button dark">✓ Salvar alterações</button>
+          <button className="button dark">{t('✓ Salvar alterações')}</button>
         </div>
       </form>
       {historico && (
-        <Modal title="Histórico de acesso" onClose={() => setHistorico(false)}>
-          <p>Perfil desta sessão: {roleNames[role] || 'Participante'}.</p>
+        <Modal title={t('Histórico de acesso')} onClose={() => setHistorico(false)}>
           <p>
-            Não há registro de autenticações reais nesta demonstração. O histórico de logins depende
-            da integração com o backend.
+            {t('Perfil desta sessão: {profile}.', {
+              profile: t(roleNames[role] || 'Participante'),
+            })}
+          </p>
+          <p>
+            {t(
+              'Não há registro de autenticações reais nesta demonstração. O histórico de logins depende da integração com o backend.',
+            )}
           </p>
         </Modal>
       )}

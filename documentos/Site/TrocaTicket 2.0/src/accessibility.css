@@ -357,6 +357,9 @@ html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200'])
   .preferences-actions {
   grid-template-columns: minmax(0, 1fr);
 }
+html:is([data-font-size='150'], [data-font-size='175'], [data-font-size='200']) .theme-options {
+  grid-template-columns: minmax(0, 1fr);
+}
 .libras-row > div {
   min-width: 0;
   overflow-wrap: anywhere;

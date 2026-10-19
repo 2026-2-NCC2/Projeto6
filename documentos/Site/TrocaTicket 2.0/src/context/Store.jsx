@@ -3,6 +3,7 @@ import { restoreData } from '../services/rules';
 import { roleNames } from '../data/demo';
 import { initialEvents, initialInventory, initialProposals, initialPeople } from '../data/demo';
 import { StoreContext } from './StoreContext';
+import { useI18n } from '../i18n';
 const defaults = {
   events: initialEvents,
   inventory: initialInventory,
@@ -28,6 +29,7 @@ function read() {
   }
 }
 export function StoreProvider({ children }) {
+  const { t } = useI18n();
   const [data, setData] = useState(read);
   const [role, setRole] = useState(() => {
     try {
@@ -73,15 +75,16 @@ export function StoreProvider({ children }) {
       {children}
       {storageError && (
         <div className="storage-warning" role="alert">
-          Não foi possível salvar no navegador. As alterações desta sessão podem se perder ao
-          recarregar.
+          {t(
+            'Não foi possível salvar no navegador. As alterações desta sessão podem se perder ao recarregar.',
+          )}
         </div>
       )}
       {toast && (
         <div className="toast" role="status">
           <span>✓</span>
-          {toast}
-          <button aria-label="Fechar aviso" onClick={() => setToast('')}>
+          {t(toast)}
+          <button aria-label={t('Fechar aviso')} onClick={() => setToast('')}>
             ×
           </button>
         </div>

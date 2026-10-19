@@ -1,8 +1,10 @@
+import { useI18n } from '../i18n';
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '../context/StoreContext';
 import { Badge, Empty, Field, Modal, PageTitle, Panel, money } from '../components/UI';
 import { normalizeSearch, validAmount } from '../services/rules';
+import { assetUrl } from '../services/assets.js';
 
 // Estes ingressos são exemplos. As reservas feitas no catálogo também aparecem aqui.
 const exemplos = [
@@ -10,7 +12,7 @@ const exemplos = [
     id: 'DEMO-9482',
     eventId: 'rock-in-rio',
     title: 'Rock Festival Brasil 2025',
-    image: '/images/rock-in-rio.jpg',
+    image: assetUrl('/images/rock-in-rio.jpg'),
     type: 'Pista Premium',
     quantity: 1,
     total: 650,
@@ -22,7 +24,7 @@ const exemplos = [
     id: 'DEMO-3312',
     eventId: 'tim-maia',
     title: 'Tim Maia Come Back Musical',
-    image: '/images/asset-14.jpg',
+    image: assetUrl('/images/asset-14.jpg'),
     type: 'Plateia A',
     quantity: 1,
     total: 220,
@@ -35,7 +37,7 @@ const exemplos = [
     id: 'DEMO-7740',
     eventId: 'sunset',
     title: 'Electronic Sunset Festival',
-    image: '/images/asset-5.jpg',
+    image: assetUrl('/images/asset-5.jpg'),
     type: 'Camarote Open Bar',
     quantity: 1,
     total: 480,
@@ -48,7 +50,7 @@ const exemplos = [
     id: 'DEMO-5521',
     eventId: 'comedy',
     title: 'Stand-up Comedy Arena',
-    image: '/images/asset-6.jpg',
+    image: assetUrl('/images/asset-6.jpg'),
     type: 'Meia-entrada',
     quantity: 1,
     total: 80,
@@ -60,7 +62,7 @@ const exemplos = [
     id: 'DEMO-1092',
     eventId: 'final',
     title: 'Final do Campeonato 2024',
-    image: '/images/asset-20.jpg',
+    image: assetUrl('/images/asset-20.jpg'),
     type: 'Cadeira inferior',
     quantity: 1,
     total: 190,
@@ -71,6 +73,7 @@ const exemplos = [
 ];
 
 export default function Wallet() {
+  const { t } = useI18n();
   const { data, update, notify } = useStore();
   const [busca, setBusca] = useState('');
   const [status, setStatus] = useState('Todos');
@@ -111,7 +114,7 @@ export default function Wallet() {
     setPagina(1);
     setStatus('Todos');
     setAcao('');
-    notify('Ingresso atualizado na demonstração.');
+    notify(t('Ingresso atualizado na demonstração.'));
   }
   function abrirAcao(nome) {
     setAcao(nome);
@@ -139,25 +142,31 @@ export default function Wallet() {
     <div className="workspace wallet-page">
       <Panel>
         <PageTitle
-          title="MEUS INGRESSOS"
-          subtitle="Carteira digital · gerencie suas entradas de demonstração."
+          title={t('MEUS INGRESSOS')}
+          subtitle={t('Carteira digital · gerencie suas entradas de demonstração.')}
         >
           <Badge>
-            {ingressos.filter((item) => item.status === 'Reservado (demo)').length} ativos
+            {t('{count} ativos', {
+              count: ingressos.filter((item) => item.status === 'Reservado (demo)').length,
+            })}
           </Badge>
           <Badge tone="blue">
-            {ingressos.filter((item) => item.status === 'Anunciado').length} anunciados
+            {t('{count} anunciados', {
+              count: ingressos.filter((item) => item.status === 'Anunciado').length,
+            })}
           </Badge>
           <Badge tone="amber">
-            {ingressos.filter((item) => item.status === 'Utilizado').length} utilizados
+            {t('{count} utilizados', {
+              count: ingressos.filter((item) => item.status === 'Utilizado').length,
+            })}
           </Badge>
         </PageTitle>
       </Panel>
       <Panel>
         <div className="filter-bar no-margin">
           <input
-            aria-label="Buscar ingressos"
-            placeholder="Buscar por evento ou local…"
+            aria-label={t('Buscar ingressos')}
+            placeholder={t('Buscar por evento ou local…')}
             value={busca}
             onChange={(e) => {
               setBusca(e.target.value);
@@ -165,7 +174,7 @@ export default function Wallet() {
             }}
           />
           <select
-            aria-label="Status do ingresso"
+            aria-label={t('Status do ingresso')}
             value={status}
             onChange={(e) => {
               setStatus(e.target.value);
@@ -181,7 +190,9 @@ export default function Wallet() {
               'Cancelado',
               'Evento cancelado',
             ].map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {t(item)}
+              </option>
             ))}
           </select>
           <button
@@ -192,28 +203,28 @@ export default function Wallet() {
               setPagina(1);
             }}
           >
-            Limpar filtros
+            {t('Limpar filtros')}
           </button>
           <Link className="button blue-button" to="/eventos">
-            + Adicionar ingresso
+            {t('+ Adicionar ingresso')}
           </Link>
         </div>
       </Panel>
       <div className="wallet-grid">
         <Panel
-          title="INGRESSOS DISPONÍVEIS"
-          subtitle={`${filtrados.length} registros encontrados na carteira`}
+          title={t('INGRESSOS DISPONÍVEIS')}
+          subtitle={t('{count} registros encontrados na carteira', { count: filtrados.length })}
         >
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Ingresso & evento</th>
-                  <th>Data & local</th>
-                  <th>Setor / tipo</th>
-                  <th>Valor</th>
-                  <th>Status</th>
-                  <th>Ações</th>
+                  <th>{t('Ingresso & evento')}</th>
+                  <th>{t('Data & local')}</th>
+                  <th>{t('Setor / tipo')}</th>
+                  <th>{t('Valor')}</th>
+                  <th>{t('Status')}</th>
+                  <th>{t('Ações')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -224,8 +235,10 @@ export default function Wallet() {
                       <small className="cell-caption">{item.id}</small>
                     </td>
                     <td>
-                      {item.date || 'Consultar evento'}
-                      <small className="cell-caption">{item.location || 'Local do evento'}</small>
+                      {item.date || t('Consultar evento')}
+                      <small className="cell-caption">
+                        {item.location || t('Local do evento')}
+                      </small>
                     </td>
                     <td>
                       {item.quantity} × {item.type}
@@ -237,10 +250,10 @@ export default function Wallet() {
                     <td>
                       <button
                         className="button outline"
-                        aria-label={`Ver ingresso ${item.title}`}
+                        aria-label={t('Ver ingresso {event}', { event: item.title })}
                         onClick={() => setSelecionadoId(item.id)}
                       >
-                        Ver
+                        {t('Ver')}
                       </button>
                     </td>
                   </tr>
@@ -249,28 +262,26 @@ export default function Wallet() {
             </table>
           </div>
           {!visiveis.length && (
-            <Empty title="Nenhum ingresso encontrado">
-              Altere os filtros ou adicione uma reserva pelo catálogo.
+            <Empty title={t('Nenhum ingresso encontrado')}>
+              {t('Altere os filtros ou adicione uma reserva pelo catálogo.')}
             </Empty>
           )}
           <div className="form-footer">
-            <span>
-              Página {paginaAtual} de {totalPaginas}
-            </span>
+            <span>{t('Página {page} de {total}', { page: paginaAtual, total: totalPaginas })}</span>
             <div className="actions">
               <button
                 className="button outline"
                 disabled={paginaAtual === 1}
                 onClick={() => setPagina(paginaAtual - 1)}
               >
-                Anterior
+                {t('Anterior')}
               </button>
               <button
                 className="button outline"
                 disabled={paginaAtual === totalPaginas}
                 onClick={() => setPagina(paginaAtual + 1)}
               >
-                Próxima
+                {t('Próxima')}
               </button>
             </div>
           </div>
@@ -278,7 +289,7 @@ export default function Wallet() {
         {selecionado && (
           <aside className="wallet-detail">
             <div className="wallet-ticket-heading">
-              <Badge tone="blue">INGRESSO SELECIONADO</Badge>
+              <Badge tone="blue">{t('INGRESSO SELECIONADO')}</Badge>
               <h2>{selecionado.title}</h2>
               <p>{selecionado.type}</p>
               <div className="card-actions">
@@ -289,39 +300,40 @@ export default function Wallet() {
             <div className="wallet-ticket-body">
               <div className="ticket-demo-stamp">
                 <span aria-hidden="true">▦</span>
-                <strong>INGRESSO DEMONSTRATIVO</strong>
-                <p>Sem QR Code válido. Não permite entrada em eventos.</p>
+                <strong>{t('INGRESSO DEMONSTRATIVO')}</strong>
+                <p>{t('Sem QR Code válido. Não permite entrada em eventos.')}</p>
               </div>
-              <h3>Detalhes de titularidade</h3>
+              <h3>{t('Detalhes de titularidade')}</h3>
               <dl className="key-values">
-                <dt>Titular</dt>
+                <dt>{t('Titular')}</dt>
                 <dd>{data.profile.name}</dd>
-                <dt>Quantidade</dt>
+                <dt>{t('Quantidade')}</dt>
                 <dd>{selecionado.quantity}</dd>
-                <dt>Status</dt>
-                <dd>{selecionado.status}</dd>
+                <dt>{t('Status')}</dt>
+                <dd>{t(selecionado.status)}</dd>
                 {selecionado.recipient && (
                   <>
-                    <dt>Convidado</dt>
+                    <dt>{t('Convidado')}</dt>
                     <dd>{selecionado.recipient}</dd>
                   </>
                 )}
               </dl>
               <div className="info-note">
-                Revenda e transferência alteram apenas esta carteira local. Nenhuma pessoa recebe
-                mensagens ou ingressos reais.
+                {t(
+                  'Revenda e transferência alteram apenas esta carteira local. Nenhuma pessoa recebe mensagens ou ingressos reais.',
+                )}
               </div>
               <div className="wallet-actions">
                 {ativo && (
                   <>
                     <button className="button blue-button" onClick={() => abrirAcao('revender')}>
-                      + Anunciar para revenda
+                      {t('+ Anunciar para revenda')}
                     </button>
                     <button className="button outline" onClick={() => abrirAcao('transferir')}>
-                      Transferir para amigo
+                      {t('Transferir para amigo')}
                     </button>
                     <button className="button danger-outline" onClick={() => abrirAcao('cancelar')}>
-                      Cancelar reserva
+                      {t('Cancelar reserva')}
                     </button>
                   </>
                 )}
@@ -333,12 +345,12 @@ export default function Wallet() {
                     }
                   >
                     {selecionado.status === 'Anunciado'
-                      ? 'Retirar anúncio'
-                      : 'Desfazer transferência'}
+                      ? t('Retirar anúncio')
+                      : t('Desfazer transferência')}
                   </button>
                 )}
                 <button className="button outline" onClick={() => window.print()}>
-                  Imprimir / salvar PDF
+                  {t('Imprimir / salvar PDF')}
                 </button>
               </div>
             </div>
@@ -358,11 +370,11 @@ export default function Wallet() {
         >
           <form onSubmit={confirmar} noValidate>
             <p>
-              {selecionado.title} · {selecionado.quantity} ingresso(s)
+              {selecionado.title} · {t('{count} ingresso(s)', { count: selecionado.quantity })}
             </p>
             {acao === 'revender' && (
               <Field
-                label="Preço total do anúncio (R$)"
+                label={t('Preço total do anúncio (R$)')}
                 name="resale-value"
                 type="number"
                 min="0.01"
@@ -373,23 +385,23 @@ export default function Wallet() {
             )}
             {acao === 'transferir' && (
               <Field
-                label="Nome fictício do convidado"
+                label={t('Nome fictício do convidado')}
                 name="recipient"
                 value={destinatario}
                 onChange={(e) => setDestinatario(e.target.value)}
               />
             )}
-            <p>Esta operação é apenas uma simulação local.</p>
+            <p>{t('Esta operação é apenas uma simulação local.')}</p>
             {erro && (
               <p className="field-error" role="alert">
-                {erro}
+                {t(erro)}
               </p>
             )}
             <div className="actions">
               <button type="button" className="button outline" onClick={() => setAcao('')}>
-                Voltar
+                {t('Voltar')}
               </button>
-              <button className="button blue-button">Confirmar simulação</button>
+              <button className="button blue-button">{t('Confirmar simulação')}</button>
             </div>
           </form>
         </Modal>

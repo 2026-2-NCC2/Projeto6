@@ -31,7 +31,7 @@ Senha inicial das contas abaixo: **`Demo-Academica-2026!`**. É a senha do site,
 
 Depois de entrar como administrador, clique em **Administração** no cabeçalho. Use sessões separadas do navegador para demonstrar usuários simultâneos. As senhas já alteradas no perfil são preservadas.
 
-## Onde está cada coisaD
+## Onde está cada coisa
 
 - `src/`: telas e componentes React.
 - `server/`: API, regras e acesso ao MySQL.
@@ -45,4 +45,6 @@ Este é o único guia necessário para abrir o sistema. Para estudar o código, 
 
 A janela mostra a etapa que falhou. Confira se o MySQL está iniciado e se a conexão informada funciona no Workbench. Detalhes ficam em `logs/`. Se uma porta estiver ocupada, feche a execução anterior do projeto e tente novamente. O iniciador não encerra programas desconhecidos.
 
-A aplicação usa `trocaticket_mvp_academico`; o banco M1 antigo é preservado. Configuração, senhas locais, logs, dependências e histórico não são enviados no ZIP. Não houve publicação ou alteração no GitHub.
+A aplicação usa `trocaticket_mvp_academico`; o banco M1 antigo é preservado. Configuração, senhas locais, logs, dependências e histórico não são enviados no ZIP.
+
+Para compartilhar o frontend de demonstração, use [o site no GitHub Pages](https://tiago-u12.github.io/projeto-faculdade/). Nessa versão, os dados são fictícios e ficam apenas no navegador de cada visitante; o sistema completo com API e MySQL continua nesta pasta. Os ajustes de acessibilidade, idiomas e aparência são compartilhados entre as duas versões.

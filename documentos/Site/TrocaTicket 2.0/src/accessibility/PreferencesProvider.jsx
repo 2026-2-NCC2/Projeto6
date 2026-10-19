@@ -37,22 +37,21 @@ export default function PreferencesProvider({ children }) {
   useEffect(() => {
     const changed = (event) => {
       if (event.key !== STORAGE_KEY && event.key !== null) return;
-      setSaved(readPreferences(storage()));
-      setDraft(null);
+      if (event.storageArea && event.storageArea !== storage()) return;
+      setSaved(readPreferences({ getItem: () => (event.key === null ? null : event.newValue) }));
+      // Uma alteração de outra aba atualiza o salvo sem descartar a prévia em edição.
     };
     window.addEventListener('storage', changed);
     return () => window.removeEventListener('storage', changed);
   }, []);
   function beginPreview() {
     setDraft({ ...saved });
-    setStorageError(false);
   }
   function preview(key, value) {
     setDraft((current) => sanitizePreferences({ ...(current || saved), [key]: value }));
   }
   function cancelPreview() {
     setDraft(null);
-    setStorageError(false);
   }
   function save() {
     const next = sanitizePreferences(draft || saved);

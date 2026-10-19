@@ -1,0 +1,70 @@
+const rows = [
+  [
+    'Este é um protótipo acadêmico. Eventos, empresas, propostas, moderação e reservas são demonstrativos. Nenhuma compra, autenticação ou contratação real é realizada. As informações podem ser alteradas localmente para testar os fluxos.',
+    'This is an academic prototype. Events, companies, proposals, moderation and reservations are examples. No real purchase, authentication or contract takes place. Information can be changed locally to try the workflows.',
+    'Este es un prototipo académico. Los eventos, empresas, propuestas, moderación y reservas son ejemplos. No se realizan compras, autenticación ni contrataciones reales. La información se puede modificar localmente para probar los flujos.',
+    'Il s’agit d’un prototype universitaire. Les événements, entreprises, propositions, modérations et réservations sont des exemples. Aucun achat, authentification ou contrat réel n’est effectué. Les informations peuvent être modifiées localement pour tester les parcours.',
+    'Dies ist ein Hochschulprototyp. Veranstaltungen, Unternehmen, Angebote, Moderation und Reservierungen sind Beispiele. Es finden keine echten Käufe, Anmeldungen oder Vertragsabschlüsse statt. Die Angaben können zum Testen lokal geändert werden.',
+    'Questo è un prototipo accademico. Eventi, aziende, proposte, moderazione e prenotazioni sono esempi. Non vengono effettuati acquisti, autenticazioni o contratti reali. Le informazioni possono essere modificate localmente per provare i flussi.',
+  ],
+  [
+    'As alterações em eventos, propostas, inventário, perfil e preferências ficam no armazenamento local deste navegador. Use apenas dados fictícios. Senhas e documentos dos formulários de acesso não são salvos nem enviados. Limpar os dados do site no navegador remove as alterações.',
+    'Changes to events, proposals, inventory, profile and preferences stay in this browser’s local storage. Use fictional data only. Passwords and documents from the access forms are neither saved nor sent. Clearing the site data in the browser removes these changes.',
+    'Los cambios en eventos, propuestas, inventario, perfil y preferencias se guardan en este navegador. Utilice solo datos ficticios. Las contraseñas y los documentos de los formularios de acceso no se guardan ni se envían. Borrar los datos del sitio elimina estos cambios.',
+    'Les modifications des événements, propositions, inventaire, profil et préférences restent dans le stockage local de ce navigateur. Utilisez uniquement des données fictives. Les mots de passe et documents des formulaires d’accès ne sont ni enregistrés ni envoyés. Effacer les données du site supprime ces modifications.',
+    'Änderungen an Veranstaltungen, Angeboten, Inventar, Profil und Einstellungen bleiben im lokalen Speicher dieses Browsers. Verwenden Sie nur fiktive Daten. Passwörter und Dokumente aus den Anmeldeformularen werden weder gespeichert noch gesendet. Das Löschen der Websitedaten entfernt diese Änderungen.',
+    'Le modifiche a eventi, proposte, inventario, profilo e preferenze rimangono nella memoria locale di questo browser. Usa solo dati fittizi. Le password e i documenti dei moduli di accesso non vengono salvati né inviati. Cancellare i dati del sito rimuove queste modifiche.',
+  ],
+  [
+    'Use “Explorar demo” ou “Trocar perfil” para acessar cada área. O organizador cria e publica eventos; o fornecedor prepara cotações e gerencia itens; o participante salva favoritos e simula reservas; o administrador consulta relatórios e modera cadastros fictícios. A integração com serviços reais ainda não faz parte deste front-end.',
+    'Use “Explore demo” or “Switch role” to access each area. Organizers create and publish events; suppliers prepare quotes and manage items; participants save favorites and simulate reservations; administrators view reports and moderate fictional registrations. This frontend does not integrate with real services.',
+    'Use “Explorar demo” o “Cambiar perfil” para acceder a cada área. El organizador crea y publica eventos; el proveedor prepara presupuestos y gestiona artículos; el participante guarda favoritos y simula reservas; el administrador consulta informes y modera registros ficticios. Este frontend no se integra con servicios reales.',
+    'Utilisez « Explorer la démo » ou « Changer de profil » pour accéder à chaque espace. L’organisateur crée et publie des événements ; le prestataire prépare des devis et gère des articles ; le participant enregistre des favoris et simule des réservations ; l’administrateur consulte des rapports et modère les inscriptions fictives. Ce frontend n’intègre pas de services réels.',
+    'Öffnen Sie die Bereiche über „Demo erkunden“ oder „Profil wechseln“. Veranstalter erstellen Veranstaltungen, Anbieter verwalten Artikel und Angebote, Teilnehmer speichern Favoriten und simulieren Reservierungen. Administratoren prüfen Berichte und moderieren fiktive Konten. Dieses Frontend ist nicht mit echten Diensten verbunden.',
+    'Usa “Esplora la demo” o “Cambia profilo” per accedere alle aree. L’organizzatore crea e pubblica eventi; il fornitore prepara preventivi e gestisce articoli; il partecipante salva preferiti e simula prenotazioni; l’amministratore consulta rapporti e modera registrazioni fittizie. Questo frontend non integra servizi reali.',
+  ],
+  [
+    '/ 1000 caracteres',
+    '/ 1000 characters',
+    '/ 1000 caracteres',
+    '/ 1000 caractères',
+    '/ 1000 Zeichen',
+    '/ 1000 caratteri',
+  ],
+  [
+    'Consolidar evento',
+    'Event budget',
+    'Presupuesto del evento',
+    'Budget de l’événement',
+    'Veranstaltungsbudget',
+    'Budget dell’evento',
+  ],
+  ['Desativar', 'Deactivate', 'Desactivar', 'Désactiver', 'Deaktivieren', 'Disattiva'],
+  ['EVENTO', 'EVENT', 'EVENTO', 'ÉVÉNEMENT', 'VERANSTALTUNG', 'EVENTO'],
+  ['ID:', 'ID:', 'ID:', 'ID :', 'ID:', 'ID:'],
+  ['Reativar', 'Reactivate', 'Reactivar', 'Réactiver', 'Reaktivieren', 'Riattiva'],
+  [
+    'fornecedores vinculados',
+    'linked suppliers',
+    'proveedores vinculados',
+    'prestataires associés',
+    'verknüpfte Anbieter',
+    'fornitori collegati',
+  ],
+  ['item', 'item', 'elemento', 'élément', 'Artikel', 'elemento'],
+  [
+    'propostas encontradas',
+    'proposals found',
+    'propuestas encontradas',
+    'propositions trouvées',
+    'Angebote gefunden',
+    'proposte trovate',
+  ],
+];
+
+export default Object.fromEntries(
+  ['en', 'es', 'fr', 'de', 'it'].map((language, index) => [
+    language,
+    Object.fromEntries(rows.map((row) => [row[0], row[index + 1]])),
+  ]),
+);

@@ -148,16 +148,17 @@ export function Modal({ title, children, onClose }) {
   );
 }
 export function DownloadButton({ name, rows, children = '↓ Exportar CSV' }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
     <>
       <button type="button" className="button outline" onClick={() => setOpen(true)}>
-        {children}
+        {t(children)}
       </button>
       {open && (
-        <Modal title="Exportar relatório" onClose={() => setOpen(false)}>
-          <p>Confira os dados e baixe o arquivo para abrir no Excel ou em outra planilha.</p>
-          <label htmlFor="csv-preview">Conteúdo do arquivo {name}</label>
+        <Modal title={t('Exportar relatório')} onClose={() => setOpen(false)}>
+          <p>{t('Confira os dados e baixe o arquivo para abrir no Excel ou em outra planilha.')}</p>
+          <label htmlFor="csv-preview">{t('Conteúdo do arquivo {name}', { name })}</label>
           <textarea
             id="csv-preview"
             className="csv-preview"
@@ -165,11 +166,12 @@ export function DownloadButton({ name, rows, children = '↓ Exportar CSV' }) {
             value={csvText(rows).replace(/^\ufeff/, '')}
           />
           <p className="muted">
-            Se o navegador impedir o download, selecione e copie o conteúdo acima para um arquivo
-            .csv.
+            {t(
+              'Se o navegador impedir o download, selecione e copie o conteúdo acima para um arquivo .csv.',
+            )}
           </p>
           <button type="button" className="button primary" onClick={() => downloadCSV(name, rows)}>
-            Baixar arquivo CSV
+            {t('Baixar arquivo CSV')}
           </button>
         </Modal>
       )}
@@ -188,11 +190,12 @@ export function downloadCSV(name, rows) {
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 export function NotFound({ title = 'Página não encontrada' }) {
+  const { t } = useI18n();
   return (
     <div className="workspace">
-      <Empty title={title}>O endereço solicitado não está disponível.</Empty>
+      <Empty title={title}>{t('O endereço solicitado não está disponível.')}</Empty>
       <Link className="button primary" to="/perfis">
-        Escolher uma área
+        {t('Escolher uma área')}
       </Link>
     </div>
   );

@@ -3,7 +3,9 @@ import publicMessages from './publicMessages.js';
 import workspaceMessages from './workspaceMessages.js';
 import settingsMessages from './settingsMessages.js';
 import integrationMessages from './integrationMessages.js';
+import legacyFlowMessages from './legacyFlowMessages.js';
 import mvpMessages from '../mvp/texts.js';
+import personalizationMessages from './personalizationMessages.js';
 import { readPreferences } from '../accessibility/preferences.js';
 
 const resources = {};
@@ -13,7 +15,9 @@ for (const language of ['en', 'es', 'fr', 'de', 'it'])
     ...workspaceMessages[language],
     ...settingsMessages[language],
     ...integrationMessages[language],
+    ...legacyFlowMessages[language],
     ...mvpMessages[language],
+    ...personalizationMessages[language],
   };
 let locale = 'pt-BR';
 try {

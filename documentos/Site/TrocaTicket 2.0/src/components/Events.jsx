@@ -1,8 +1,10 @@
+import { getLocale, useI18n } from '../i18n';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getEvents } from '../services/events';
+import { assetUrl } from '../services/assets.js';
 export const currency = (value) =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  value.toLocaleString(getLocale(), { style: 'currency', currency: 'BRL' });
 export function useEvents() {
   const [params] = useSearchParams();
   const simulateError = params.get('erro') === '1';
@@ -24,24 +26,26 @@ export function useEvents() {
   return { ...state, retry: () => setAttempt((value) => value + 1) };
 }
 export function LoadState({ loading, error, retry }) {
+  const { t } = useI18n();
   if (loading)
     return (
       <p className="feedback" role="status">
-        Carregando eventos…
+        {t('Carregando eventos…')}
       </p>
     );
   if (error)
     return (
       <div className="feedback" role="alert">
-        <p>{error}</p>
+        <p>{t(error)}</p>
         <button className="button primary" onClick={retry}>
-          Tentar novamente
+          {t('Tentar novamente')}
         </button>
       </div>
     );
   return null;
 }
 export default function Events({ catalog = false }) {
+  const { t } = useI18n();
   const state = useEvents();
   const [query, setQuery] = useState('');
   const events = state.events.filter((event) =>
@@ -53,25 +57,25 @@ export default function Events({ catalog = false }) {
     <section className="events section" aria-labelledby="events-title">
       <div className="section-row">
         <div>
-          <p className="eyebrow purple">Eventos</p>
+          <p className="eyebrow purple">{t('Eventos')}</p>
           <h2 id="events-title">
-            {catalog ? 'Encontre seu próximo evento' : 'Festivais de Música'}
+            {catalog ? t('Encontre seu próximo evento') : t('Festivais de Música')}
           </h2>
         </div>
         {!catalog && (
           <Link className="text-link" to="/eventos">
-            Ver todos os eventos <span aria-hidden="true">›</span>
+            {t('Ver todos os eventos')} <span aria-hidden="true">›</span>
           </Link>
         )}
       </div>
       {catalog && (
         <label className="search">
-          Buscar por evento ou local
+          {t('Buscar por evento ou local')}
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Busque por nome ou cidade"
+            placeholder={t('Busque por nome ou cidade')}
           />
         </label>
       )}
@@ -82,8 +86,8 @@ export default function Events({ catalog = false }) {
             {(catalog ? events : events.slice(0, 3)).map((event) => (
               <article className="event-card" key={event.id}>
                 <div className="event-image">
-                  <img loading="lazy" src={event.image} alt={event.imageAlt} />
-                  <span className="verified">✓ Verificado</span>
+                  <img loading="lazy" src={assetUrl(event.image)} alt={event.imageAlt} />
+                  <span className="verified">{t('Evento demonstrativo')}</span>
                 </div>
                 <div className="event-info">
                   <p className="event-meta">
@@ -92,15 +96,15 @@ export default function Events({ catalog = false }) {
                   <h3>{event.title}</h3>
                   <div className="event-bottom">
                     <div>
-                      <small>A partir de</small>
+                      <small>{t('A partir de')}</small>
                       <strong>{currency(event.price)}</strong>
                     </div>
                     <Link
                       to={`/eventos/${event.id}`}
                       className="ticket-link"
-                      aria-label={`Ver ingressos: ${event.title}`}
+                      aria-label={t('Ver ingressos: {event}', { event: event.title })}
                     >
-                      Ver Ingressos
+                      {t('Ver Ingressos')}
                     </Link>
                   </div>
                 </div>
@@ -108,7 +112,7 @@ export default function Events({ catalog = false }) {
             ))}
           </div>
           {events.length === 0 && (
-            <p role="status">Nenhum evento encontrado. Experimente outro nome ou cidade.</p>
+            <p role="status">{t('Nenhum evento encontrado. Experimente outro nome ou cidade.')}</p>
           )}
         </>
       )}

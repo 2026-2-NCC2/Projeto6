@@ -1,0 +1,13 @@
+{
+  "dateUtc": "2026-10-19T03:16:22.615Z",
+  "base": "https://tiago-u12.github.io/projeto-faculdade/",
+  "results": [
+    "Todos os ajustes alteram fonte, cores, espaçamento e links do conteúdo; salvar/recarregar e foco de retorno funcionam",
+    "Fechar com Escape cancela alterações não salvas",
+    "Restaurar padrão preserva os dados de negócio",
+    "Tema Sistema reage à mudança de aparência do dispositivo",
+    "Seis idiomas selecionáveis e persistentes",
+    "Mobile com fonte200%, espaçamentos máximos, foco preso no painel e todos os controles alcançáveis"
+  ],
+  "errors": []
+}

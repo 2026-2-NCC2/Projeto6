@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n';
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { suppliers } from '../data/demo';
@@ -14,6 +15,7 @@ const locais = {
 };
 
 export default function SupplierDirectory() {
+  const { t } = useI18n();
   const { data } = useStore();
   const [aba, setAba] = useState('Fornecedores');
   const [busca, setBusca] = useState('');
@@ -43,10 +45,10 @@ export default function SupplierDirectory() {
   return (
     <div className="workspace">
       <PageTitle
-        title="Insumos e Fornecedores"
-        subtitle="Consulte parceiros e recursos materiais para seus eventos."
+        title={t('Insumos e Fornecedores')}
+        subtitle={t('Consulte parceiros e recursos materiais para seus eventos.')}
       >
-        <Badge tone="blue">Módulo integrado</Badge>
+        <Badge tone="blue">{t('Módulo integrado')}</Badge>
       </PageTitle>
       <Tabs
         options={['Fornecedores', 'Insumos & Materiais', 'Contratos & Propostas']}
@@ -59,46 +61,50 @@ export default function SupplierDirectory() {
       <Panel>
         <div className="filter-bar no-margin">
           <input
-            aria-label="Buscar no catálogo de fornecedores"
-            placeholder="Buscar por fornecedor, serviço ou insumo…"
+            aria-label={t('Buscar no catálogo de fornecedores')}
+            placeholder={t('Buscar por fornecedor, serviço ou insumo…')}
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
           {aba === 'Fornecedores' && (
             <>
               <select
-                aria-label="Categoria do fornecedor"
+                aria-label={t('Categoria do fornecedor')}
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
               >
-                <option value="Todas">Todas as categorias</option>
+                <option value="Todas">{t('Todas as categorias')}</option>
                 {suppliers.map((item) => (
-                  <option key={item.id}>{item.category}</option>
+                  <option key={item.id} value={item.category}>
+                    {t(item.category)}
+                  </option>
                 ))}
               </select>
               <select
-                aria-label="Status do fornecedor"
+                aria-label={t('Status do fornecedor')}
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
-                <option value="Todos">Todos os status</option>
-                <option>Confirmado</option>
-                <option>Pendente</option>
+                <option value="Todos">{t('Todos os status')}</option>
+                <option value="Confirmado">{t('Confirmado')}</option>
+                <option value="Pendente">{t('Pendente')}</option>
               </select>
               <select
-                aria-label="Região do fornecedor"
+                aria-label={t('Região do fornecedor')}
                 value={regiao}
                 onChange={(e) => setRegiao(e.target.value)}
               >
-                <option value="Todas">Todas as regiões</option>
+                <option value="Todas">{t('Todas as regiões')}</option>
                 {[...new Set(Object.values(locais))].map((local) => (
-                  <option key={local}>{local}</option>
+                  <option key={local} value={local}>
+                    {local}
+                  </option>
                 ))}
               </select>
             </>
           )}
           <button className="button outline" onClick={limparFiltros}>
-            Limpar filtros
+            {t('Limpar filtros')}
           </button>
         </div>
       </Panel>
@@ -108,13 +114,13 @@ export default function SupplierDirectory() {
             <table className="directory-table">
               <thead>
                 <tr>
-                  <th>Fornecedor</th>
-                  <th>Categoria / serviço</th>
-                  <th>Contato comercial</th>
-                  <th>Localidade</th>
-                  <th>Valor de referência</th>
-                  <th>Status</th>
-                  <th>Ações</th>
+                  <th>{t('Fornecedor')}</th>
+                  <th>{t('Categoria / serviço')}</th>
+                  <th>{t('Contato comercial')}</th>
+                  <th>{t('Localidade')}</th>
+                  <th>{t('Valor de referência')}</th>
+                  <th>{t('Status')}</th>
+                  <th>{t('Ações')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,7 +137,7 @@ export default function SupplierDirectory() {
                     <td>{item.category}</td>
                     <td>
                       <span>contato@{item.id}.example.com</span>
-                      <small className="cell-caption">Contato fictício</small>
+                      <small className="cell-caption">{t('Contato fictício')}</small>
                     </td>
                     <td>{locais[item.id]} · SP</td>
                     <td>{money(item.price)}</td>
@@ -140,7 +146,7 @@ export default function SupplierDirectory() {
                     </td>
                     <td>
                       <button className="button outline" onClick={() => setSelecionado(item)}>
-                        Ver detalhes →
+                        {t('Ver detalhes →')}
                       </button>
                     </td>
                   </tr>
@@ -150,24 +156,26 @@ export default function SupplierDirectory() {
           </div>
           {!fornecedores.length && <Empty />}
           <p className="muted">
-            {fornecedores.length} fornecedores encontrados no catálogo demonstrativo.
+            {t('{count} fornecedores encontrados no catálogo demonstrativo.', {
+              count: fornecedores.length,
+            })}
           </p>
         </Panel>
       )}
       {aba === 'Insumos & Materiais' && (
         <Panel
-          title="Recursos cadastrados"
-          subtitle="Itens do inventário do fornecedor disponíveis para consulta."
+          title={t('Recursos cadastrados')}
+          subtitle={t('Itens do inventário do fornecedor disponíveis para consulta.')}
         >
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Categoria</th>
-                  <th>Unidade</th>
-                  <th>Preço</th>
-                  <th>Status</th>
+                  <th>{t('Item')}</th>
+                  <th>{t('Categoria')}</th>
+                  <th>{t('Unidade')}</th>
+                  <th>{t('Preço')}</th>
+                  <th>{t('Status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -193,18 +201,20 @@ export default function SupplierDirectory() {
       )}
       {aba === 'Contratos & Propostas' && (
         <Panel
-          title="Propostas comerciais"
-          subtitle="Consulta local das propostas. Não representa contratação ou assinatura de contrato."
+          title={t('Propostas comerciais')}
+          subtitle={t(
+            'Consulta local das propostas. Não representa contratação ou assinatura de contrato.',
+          )}
         >
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Proposta</th>
-                  <th>Evento</th>
-                  <th>Descrição</th>
-                  <th>Total</th>
-                  <th>Status</th>
+                  <th>{t('Proposta')}</th>
+                  <th>{t('Evento')}</th>
+                  <th>{t('Descrição')}</th>
+                  <th>{t('Total')}</th>
+                  <th>{t('Status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,18 +239,18 @@ export default function SupplierDirectory() {
         <Modal title={selecionado.name} onClose={() => setSelecionado(null)}>
           <img className="supplier-cover" src={selecionado.image} alt={selecionado.name} />
           <p>
-            {selecionado.category} · {locais[selecionado.id]}, SP
+            {t(selecionado.category)} · {locais[selecionado.id]}, SP
           </p>
           <p>
-            Valor de referência: <strong>{money(selecionado.price)}</strong>
+            {t('Valor de referência:')} <strong>{money(selecionado.price)}</strong>
           </p>
           <Badge>{selecionado.status}</Badge>
-          <p>Os dados de contato e os serviços são exemplos para este projeto.</p>
+          <p>{t('Os dados de contato e os serviços são exemplos para este projeto.')}</p>
           <Link
             className="button blue-button"
             to={`/organizador/novo?fornecedor=${selecionado.id}`}
           >
-            Planejar evento com este parceiro
+            {t('Planejar evento com este parceiro')}
           </Link>
         </Modal>
       )}

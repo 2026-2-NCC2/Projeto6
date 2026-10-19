@@ -10,14 +10,16 @@ import { Organizer, EventEditor, Consolidation } from './pages/Organizer';
 import { Opportunities, Proposals, Quote, Inventory } from './pages/Supplier';
 import { Admin, Report, Moderation } from './pages/Admin';
 import { Catalog, EventDetails, Community } from './pages/Participant';
+import { useI18n } from './i18n';
 function Info({ title, children }) {
+  const { t } = useI18n();
   return (
     <div className="workspace narrow">
       <section className="panel">
-        <h1>{title}</h1>
-        <p>{children}</p>
+        <h1>{t(title)}</h1>
+        <p>{typeof children === 'string' ? t(children.replace(/\s+/g, ' ').trim()) : children}</p>
         <Link className="button primary" to="/perfis">
-          Explorar os perfis
+          {t('Explorar os perfis')}
         </Link>
       </section>
     </div>
