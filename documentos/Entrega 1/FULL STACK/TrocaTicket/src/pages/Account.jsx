@@ -73,7 +73,7 @@ export default function Account({ login = false }) {
               <Field
                 label={profile === 'comprador' ? 'CPF' : 'CPF / CNPJ'}
                 name="document"
-                placeholder="Documento fictício"
+                placeholder={profile === 'comprador' ? '000.000.000-00' : '000.000.000-00 ou 00.000.000/0000-00'}
                 error={errors.document}
               />
             </>
