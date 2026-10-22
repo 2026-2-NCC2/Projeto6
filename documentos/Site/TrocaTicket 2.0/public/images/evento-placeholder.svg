@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Evento sem foto cadastrada</title>
+  <desc id="desc">Ilustracao de um ingresso em tons de roxo sobre fundo escuro.</desc>
+  <defs><linearGradient id="ticket" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b4a0ff"/><stop offset="1" stop-color="#7250df"/></linearGradient></defs>
+  <rect width="960" height="540" fill="#161021"/>
+  <circle cx="480" cy="270" r="182" fill="#241a39"/>
+  <g transform="translate(480 270) rotate(-13)">
+    <path d="M-162-91h324v58c-37 0-37 66 0 66v58h-324V33c37 0 37-66 0-66z" fill="url(#ticket)"/>
+    <path d="M63-69v138" stroke="#302249" stroke-width="6" stroke-dasharray="12 12"/>
+    <path d="m-54-42 13 27 30 4-22 22 5 30-26-14-27 14 6-30-22-22 30-4z" fill="#fff" opacity=".9"/>
+  </g>
+</svg>

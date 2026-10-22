@@ -1,0 +1,3565 @@
+{
+  "dateUtc": "2026-10-19T03:09:09.161Z",
+  "scope": "Interface; oficial com API interceptada, sem MySQL",
+  "results": [
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero"
+      ],
+      "checked": 104
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/perfis",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/entrar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 29
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/cadastro",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 95
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/eventos/lollapalooza",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        ""
+      ],
+      "checked": 59
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/favoritos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/ingressos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 99
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/comunidade",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 32
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/perfil",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 53
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 64
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador/eventos/primavera/editar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 65
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador/eventos/primavera/consolidar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 73
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 84
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 68
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 72
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/fornecedor/cotacao/tim-maia",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 75
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "blue-panel"
+      ],
+      "checked": 96
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/admin",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 102
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/admin/relatorios/tim-maia",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "donut"
+      ],
+      "checked": 103
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/admin/moderacao",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 70
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/termos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/privacidade",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/ajuda",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "light",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero"
+      ],
+      "checked": 104
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/perfis",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/entrar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 29
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/cadastro",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 95
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/eventos/lollapalooza",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        ""
+      ],
+      "checked": 59
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/favoritos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/ingressos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 99
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/comunidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 32
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/perfil",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 53
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 64
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador/eventos/primavera/editar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 65
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador/eventos/primavera/consolidar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 73
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 84
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 68
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 72
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/fornecedor/cotacao/tim-maia",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 75
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "blue-panel"
+      ],
+      "checked": 96
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/admin",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 102
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/admin/relatorios/tim-maia",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "donut"
+      ],
+      "checked": 103
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/admin/moderacao",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 70
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/termos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/privacidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/ajuda",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "dark",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero"
+      ],
+      "checked": 104
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/perfis",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/entrar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 29
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/cadastro",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 95
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/eventos/lollapalooza",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        ""
+      ],
+      "checked": 59
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/favoritos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/ingressos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 99
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/comunidade",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 32
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/perfil",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 53
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 64
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos/primavera/editar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 65
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos/primavera/consolidar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 73
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 84
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 68
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 72
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/cotacao/tim-maia",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 75
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 96
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/admin",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 102
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/admin/relatorios/tim-maia",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "donut"
+      ],
+      "checked": 103
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/admin/moderacao",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 70
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/termos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/privacidade",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/ajuda",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-light",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero"
+      ],
+      "checked": 104
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/perfis",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/entrar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 29
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/cadastro",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 95
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/eventos/lollapalooza",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        ""
+      ],
+      "checked": 59
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/favoritos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/ingressos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 99
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/comunidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 32
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/perfil",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 53
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 101
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 64
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos/primavera/editar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 65
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos/primavera/consolidar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 73
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 84
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 68
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 72
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/cotacao/tim-maia",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 75
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 96
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/admin",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 102
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/admin/relatorios/tim-maia",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "donut"
+      ],
+      "checked": 103
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/admin/moderacao",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 70
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/termos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/privacidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/ajuda",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "demo",
+      "scenario": "contrast-dark",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 27
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "hero mvp-home"
+      ],
+      "checked": 79
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/entrar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 34
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/cadastro",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 41
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/eventos/1",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 53
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/favoritos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/ingressos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 63
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/ingressos/10/anunciar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 44
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/ingressos/10/transferir",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/ingressos/10/historico",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/transferencias",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/pedidos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 42
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/pedidos/1",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 60
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/perfil",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 55
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador/eventos/1/editar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 62
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador/eventos/1/consolidar",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 35
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/fornecedor/cotacao/1",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/admin",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 54
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/atendimentos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/portaria",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 33
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/comunidade",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/termos",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/privacidade",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/ajuda",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "light",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "light",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "hero mvp-home"
+      ],
+      "checked": 79
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/entrar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 34
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/cadastro",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 41
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/eventos/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 53
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/favoritos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/ingressos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 63
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/ingressos/10/anunciar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 44
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/ingressos/10/transferir",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/ingressos/10/historico",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/transferencias",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/pedidos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 42
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/pedidos/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 60
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/perfil",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small",
+        "avatar large"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 55
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador/eventos/1/editar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 62
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador/eventos/1/consolidar",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 35
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/fornecedor/cotacao/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/admin",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 54
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/atendimentos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/portaria",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 33
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/comunidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/termos",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/privacidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/ajuda",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "dark",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "dark",
+        "contrast": "normal",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "avatar small"
+      ],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero mvp-home"
+      ],
+      "checked": 79
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/entrar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/cadastro",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 41
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/eventos/1",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 53
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/favoritos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/ingressos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 63
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/ingressos/10/anunciar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 44
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/ingressos/10/transferir",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/ingressos/10/historico",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/transferencias",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/pedidos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 42
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/pedidos/1",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 60
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/perfil",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 55
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos/1/editar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 62
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador/eventos/1/consolidar",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 35
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/cotacao/1",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/admin",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 54
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/atendimentos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/portaria",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 33
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/comunidade",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/termos",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/privacidade",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/ajuda",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-light",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "light",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [
+        "hero mvp-home"
+      ],
+      "checked": 79
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/entrar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 34
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/cadastro",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 41
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/eventos/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 53
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/favoritos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/ingressos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 63
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/ingressos/10/anunciar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 44
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/ingressos/10/transferir",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/ingressos/10/historico",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/transferencias",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/pedidos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 42
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/pedidos/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 60
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/perfil",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador/novo",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 55
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos/1/editar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 62
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador/eventos/1/consolidar",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/organizador/fornecedores",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 35
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/propostas",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 36
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/cotacao/1",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 37
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/fornecedor/inventario",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 43
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/admin",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 54
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/atendimentos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 39
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/portaria",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 33
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/comunidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/termos",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/privacidade",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/ajuda",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    },
+    {
+      "source": "official",
+      "scenario": "contrast-dark",
+      "route": "/nao-existe",
+      "active": {
+        "theme": "dark",
+        "contrast": "high",
+        "fontSize": "100"
+      },
+      "overflow": null,
+      "issues": [],
+      "skipped": [],
+      "checked": 31
+    }
+  ],
+  "errors": []
+}

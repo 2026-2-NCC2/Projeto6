@@ -1,0 +1,66 @@
+{
+  "dataUtc": "2026-10-18T23:24:44.222Z",
+  "instance": {
+    "version": "8.0.46",
+    "port": 34763,
+    "isolation": "Diretório exclusivo conferido; banco pessoal e M1 não acessados"
+  },
+  "resultados": [
+    {
+      "id": "B01",
+      "teste": "Perfil persistente, senha e isolamento",
+      "esperado": "Alterações próprias persistem; senha atual obrigatória; promoção e leitura alheia recusadas.",
+      "observado": "GET/PUT próprios persistidos; acesso por id404; promoção403; senha antiga401 e nova200.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B02",
+      "teste": "Rascunhos privados e criação validada",
+      "esperado": "Rascunho visível só ao dono/admin; publicação sem estoque e capacidade incoerente recusadas.",
+      "observado": "Dono/admin200, visitante/outro404; sem estoque400; estoque acima da capacidade400 com rollback sem evento parcial.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B03",
+      "teste": "Edição própria do evento e categoria",
+      "esperado": "PUT persiste campos e categorias; outro organizador403; capacidade menor que estoque400.",
+      "observado": "Título/imagem/preço atualizados e relidos; data UTC correta; outro403; redução inválida400 preserva capacidade3.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B04",
+      "teste": "Inventário de fornecedor e diretório",
+      "esperado": "Produto próprio persiste; outro fornecedor403; desativado sai do catálogo e fica no inventário.",
+      "observado": "Produto desativado fora do público e mantido no inventário; proprietário correto; reativado aparece no diretório.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B05",
+      "teste": "Propostas, propriedade e orçamento exato",
+      "esperado": "Somente fornecedor dono propõe; dono do evento aceita; orçamento soma centavos das aceitas.",
+      "observado": "Fornecedor alheio403; organizador alheio403; orçamento próprio24690centavos; DECIMAL246.90 e consultas restritas.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B06",
+      "teste": "Aceitação concorrente e estoque contratado",
+      "esperado": "Duas propostas para última unidade produzem somente uma aceitação; estoque contratado não pode ser reduzido.",
+      "observado": "Concorrência HTTP200+409; uma ofertaA no MySQL; estoque0 recusado409; estoque1/disponível0 preservados.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B07",
+      "teste": "Estados finais e validação de escrita",
+      "esperado": "Recusa e cancelamento persistem; estado final não é reaberto; JSON inválido não vaza conteúdo.",
+      "observado": "Propostas R/C persistem; reabrir409; valor negativo400; origem externa403; JSON400 genérico sem senha.",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "B08",
+      "teste": "Avaliação somente após uso e término",
+      "esperado": "Sem uso403; após entrada e término fictícios201; repetição409; tipo com emissão não muda.",
+      "observado": "Sem uso403; emissão e entrada reais no ensaio; categoria alterada409; término da fixture; avaliação201/duplicata409 e uma linha persistida.",
+      "resultado": "aprovado"
+    }
+  ]
+}

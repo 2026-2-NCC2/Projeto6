@@ -1,0 +1,146 @@
+[
+  {
+    "origem": "banco-mysql",
+    "destino": "historico/versoes/banco-mysql"
+  },
+  {
+    "origem": "banco-sqlserver",
+    "destino": "historico/versoes/banco-sqlserver"
+  },
+  {
+    "origem": "editar-evento",
+    "destino": "historico/versoes/editar-evento"
+  },
+  {
+    "origem": "integracao-mysql",
+    "destino": "historico/versoes/integracao-mysql"
+  },
+  {
+    "origem": "inventario-usuario",
+    "destino": "historico/versoes/inventario-usuario"
+  },
+  {
+    "origem": "navbar-home",
+    "destino": "historico/versoes/navbar-home"
+  },
+  {
+    "origem": "perfil-usuario",
+    "destino": "historico/versoes/perfil-usuario"
+  },
+  {
+    "origem": "primeira-entrega-acessivel",
+    "destino": "historico/versoes/primeira-entrega-acessivel"
+  },
+  {
+    "origem": "TrocaTicket-Banco-SQL-Unico",
+    "destino": "historico/versoes/TrocaTicket-Banco-SQL-Unico"
+  },
+  {
+    "origem": "TrocaTicket-Acessibilidade-Idiomas.zip",
+    "destino": "historico/pacotes/TrocaTicket-Acessibilidade-Idiomas.zip"
+  },
+  {
+    "origem": "TrocaTicket-Atualizado-React.zip",
+    "destino": "historico/pacotes/TrocaTicket-Atualizado-React.zip"
+  },
+  {
+    "origem": "TrocaTicket-Banco-SQL-Unico.zip",
+    "destino": "historico/pacotes/TrocaTicket-Banco-SQL-Unico.zip"
+  },
+  {
+    "origem": "TrocaTicket-Completo-React.zip",
+    "destino": "historico/pacotes/TrocaTicket-Completo-React.zip"
+  },
+  {
+    "origem": "TrocaTicket-Editar-Evento.zip",
+    "destino": "historico/pacotes/TrocaTicket-Editar-Evento.zip"
+  },
+  {
+    "origem": "TrocaTicket-Home-Navbar.zip",
+    "destino": "historico/pacotes/TrocaTicket-Home-Navbar.zip"
+  },
+  {
+    "origem": "TrocaTicket-Integracao-MySQL.zip",
+    "destino": "historico/pacotes/TrocaTicket-Integracao-MySQL.zip"
+  },
+  {
+    "origem": "TrocaTicket-Inventario-Usuario.zip",
+    "destino": "historico/pacotes/TrocaTicket-Inventario-Usuario.zip"
+  },
+  {
+    "origem": "TrocaTicket-MVP-Academico.zip",
+    "destino": "historico/pacotes/TrocaTicket-MVP-Academico.zip"
+  },
+  {
+    "origem": "TrocaTicket-MySQL.zip",
+    "destino": "historico/pacotes/TrocaTicket-MySQL.zip"
+  },
+  {
+    "origem": "TrocaTicket-Perfil-Usuario.zip",
+    "destino": "historico/pacotes/TrocaTicket-Perfil-Usuario.zip"
+  },
+  {
+    "origem": "TrocaTicket-Projeto-SQL-Unico.zip",
+    "destino": "historico/pacotes/TrocaTicket-Projeto-SQL-Unico.zip"
+  },
+  {
+    "origem": "TrocaTicket-React.zip",
+    "destino": "historico/pacotes/TrocaTicket-React.zip"
+  },
+  {
+    "origem": "TrocaTicket-Revisado-React.zip",
+    "destino": "historico/pacotes/TrocaTicket-Revisado-React.zip"
+  },
+  {
+    "origem": "TrocaTicket-Revisao-SQLServer.zip",
+    "destino": "historico/pacotes/TrocaTicket-Revisao-SQLServer.zip"
+  },
+  {
+    "origem": "Preparar-Banco-MVP.cmd",
+    "destino": "historico/iniciadores/Preparar-Banco-MVP.cmd"
+  },
+  {
+    "origem": "Iniciar-API-MVP.cmd",
+    "destino": "historico/iniciadores/Iniciar-API-MVP.cmd"
+  },
+  {
+    "origem": "Iniciar-Site-MVP.cmd",
+    "destino": "historico/iniciadores/Iniciar-Site-MVP.cmd"
+  },
+  {
+    "origem": "server/executar-local.ps1",
+    "destino": "historico/iniciadores/executar-local.ps1"
+  },
+  {
+    "origem": "README-MVP.md",
+    "destino": "docs/historico/README-MVP.md"
+  },
+  {
+    "origem": "ANALISE-AULAS-E-REFATORACAO.md",
+    "destino": "docs/historico/ANALISE-AULAS-E-REFATORACAO.md"
+  },
+  {
+    "origem": "GUIA-DO-CODIGO.md",
+    "destino": "docs/historico/GUIA-DO-CODIGO.md"
+  },
+  {
+    "origem": "VALIDACAO.md",
+    "destino": "docs/historico/VALIDACAO.md"
+  },
+  {
+    "origem": "docs/mvp/HISTORICO-FRONTEND.md",
+    "destino": "docs/historico/HISTORICO-FRONTEND.md"
+  },
+  {
+    "origem": "pnpm-lock.yaml",
+    "destino": "historico/configuracoes/pnpm-lock.yaml"
+  },
+  {
+    "origem": "pnpm-workspace.yaml",
+    "destino": "historico/configuracoes/pnpm-workspace.yaml"
+  },
+  {
+    "origem": "MANIFESTO-MVP.sha256",
+    "destino": "historico/configuracoes/MANIFESTO-MVP.sha256"
+  }
+]

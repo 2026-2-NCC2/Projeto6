@@ -10,12 +10,17 @@
 
 ## Integrantes: <a href="https://www.linkedin.com/">Miguel Sanchez Batista</a>, <a href="https://www.linkedin.com/in/gabriel-alves-gabriel">Gabriel Alves Gabriel</a>, <a href="https://www.linkedin.com/">Leonardo</a>, <a href="https://www.linkedin.com/">Rafael Barbosa</a>, <a href="https://www.linkedin.com/">Tiago Urias</a>
 
-## Professores Orientadores: <a href="https://www.linkedin.com/in/victorbarq/">Dr. Victor Von Doom</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Saitama</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Strange</a>, <a href="https://www.linkedin.com/in/victorbarq/">Me. Yoda</a>, <a href="https://www.linkedin.com/in/victorbarq/">Dr. Gero</a>
+## Professores Orientadores: <a href="https://www.linkedin.com/in/francisco-escobar/">Francisco de Souza Escobar</a>,<a href="https://www.linkedin.com/in/dolemes/"> David de Oliveira Lemes</a>, <a href="https://www.linkedin.com/in/katia-bossi/">Kátia M. Lara Bossi</a>, <a href="https://www.linkedin.com/in/paula-astorino-432b5812a/">Paula Astorino</a>, <a href="https://www.linkedin.com/in/jesuslisboagomes/">Jésus Gomes</a>
 
 ## Descrição
 
 <p align="center">
-<img src="https://placehold.co/1000x650" alt="NOME DO JOGO" border="0">
+  <img
+    width="883"
+    height="410"
+    alt="image"
+    src="https://github.com/user-attachments/assets/2641f913-a016-4bdc-886c-93cd03fed811"
+  />
 </p>
 
 

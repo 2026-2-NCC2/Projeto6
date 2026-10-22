@@ -1,0 +1,42 @@
+{
+  "dataUtc": "2026-10-18T23:24:46.181Z",
+  "instance": {
+    "version": "8.0.46",
+    "port": 34763,
+    "database": "trocaticket_mvp_academico",
+    "isolation": "Porta e diretório exclusivos conferidos antes de escrita; conexão pessoal não acessada."
+  },
+  "scope": "Novas fixtures fictícias; reinicialização da aplicação HTTP e reconciliação do servidor, sem reiniciar o processo MySQL.",
+  "resultados": [
+    {
+      "id": "C01",
+      "teste": "Reserva secundária expirada avança a fila após reinicialização da aplicação",
+      "resultado": "aprovado",
+      "observado": "Asserções executadas com HTTP, sessões independentes e MySQL real."
+    },
+    {
+      "id": "C02",
+      "teste": "Convite pendente entra no limite e o aceite não conta a mesma unidade duas vezes",
+      "resultado": "aprovado",
+      "observado": "Asserções executadas com HTTP, sessões independentes e MySQL real."
+    },
+    {
+      "id": "C03",
+      "teste": "Aceite repetido é idempotente, preserva meia-entrada e recusa reuso incompatível da chave",
+      "resultado": "aprovado",
+      "observado": "Asserções executadas com HTTP, sessões independentes e MySQL real."
+    },
+    {
+      "id": "C04",
+      "teste": "Entrada repetida com a mesma chave cria somente uma entrada e um histórico",
+      "resultado": "aprovado",
+      "observado": "Asserções executadas com HTTP, sessões independentes e MySQL real."
+    },
+    {
+      "id": "C05",
+      "teste": "Estorno repetido não duplica registro e uma chave não pode virar nova reserva",
+      "resultado": "aprovado",
+      "observado": "Asserções executadas com HTTP, sessões independentes e MySQL real."
+    }
+  ]
+}

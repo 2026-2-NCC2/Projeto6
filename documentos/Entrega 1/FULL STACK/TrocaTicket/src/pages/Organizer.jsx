@@ -10,7 +10,6 @@ import {
   NotFound,
   PageTitle,
   Panel,
-  Tabs,
   dateLabel,
   money,
   DownloadButton,
@@ -176,11 +175,6 @@ export function Organizer({ list = false }) {
   );
 }
 
-const today = () => {
-  const date = new Date();
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 10);
-};
 const blank = {
   title: '',
   category: 'Show / Cultura',

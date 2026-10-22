@@ -4,9 +4,12 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Account, { Profiles, Recover } from './pages/Account';
 import Profile from './pages/Profile';
-import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organizer';
+import { EventEditor, Consolidation, Suppliers } from './pages/Organizer';
+import OrganizerHome from './pages/OrganizerHome';
 import { Opportunities, Proposals, Quote, Inventory } from './pages/Supplier';
-import { Admin, Report, Moderation } from './pages/Admin';
+import { Admin } from './pages/Admin';
+import Report from './pages/Report';
+import Moderation from './pages/Moderation';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 function Info({ title, children }) {
   return (
@@ -36,8 +39,8 @@ export default function App() {
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
         <Route path="comunidade" element={<Community />} />
-        <Route path="organizador" element={<Organizer />} />
-        <Route path="organizador/eventos" element={<Organizer list />} />
+        <Route path="organizador" element={<OrganizerHome />} />
+        <Route path="organizador/eventos" element={<OrganizerHome list />} />
         <Route path="organizador/novo" element={<EventEditor key="new" />} />
         <Route path="organizador/eventos/:id/editar" element={<EventEditorRoute />} />
         <Route path="organizador/eventos/:id/consolidar" element={<Consolidation />} />

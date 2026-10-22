@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link } from 'react-router';
 import { opportunities } from '../data/demo';
-import { useStore } from '../context/Store';
-import {
-  Badge,
-  DownloadButton,
-  Empty,
-  Field,
-  Modal,
-  NotFound,
-  PageTitle,
-  Panel,
-  Tabs,
-  dateLabel,
-  money,
-} from '../components/UI';
+import { STATUS_TONE, eventReports } from '../data/reports';
+import { Badge, DownloadButton, Empty, Panel, dateLabel, money } from '../components/UI';
+import Pagination from '../components/Pagination';
+import { Icon } from '../components/Icons';
+
+// Tabela de lotes (dados de demonstração).
 const lots = [
   ['LT-2032-TM1', 'tim-maia', 'Pista Premium', 5000, 3420, 'Aprovado'],
   ['LT-2031-LP2', 'lil-peep', 'Camarote Gold', 2500, 1890, 'Em revisão'],
@@ -23,71 +15,214 @@ const lots = [
   ['LT-2031-LP3', 'lil-peep', 'Pista Comum', 4200, 3010, 'Aprovado'],
   ['LT-2028-MJ4', 'michael', 'VIP Lounge', 800, 620, 'Aprovado'],
 ];
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const SORTS = {
+  Data: (a, b) => a.date.localeCompare(b.date),
+  Nome: (a, b) => a.title.localeCompare(b.title),
+  Vendas: (a, b) => b.report.sold - a.report.sold,
+};
+const fmt = (n) => n.toLocaleString('pt-BR');
+const asEvent = (event) => ({ ...event, report: eventReports[event.id] });
+
 export function Admin() {
   const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('Todos');
+  const [sort, setSort] = useState('Data');
+  const [more, setMore] = useState(false);
+  const [minOccupancy, setMinOccupancy] = useState(0);
   const [page, setPage] = useState(1);
-  const filtered = lots.filter((l) =>
-    `${l[0]} ${opportunities.find((e) => e.id === l[1]).title}`
-      .toLowerCase()
-      .includes(query.toLowerCase()),
+  const [updatedAt] = useState(() =>
+    new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
   );
-  const count = Math.max(1, Math.ceil(filtered.length / 4));
-  const current = Math.min(page, count);
+
+  const all = opportunities.map(asEvent);
+  const text = query.trim().toLowerCase();
+  const events = all
+    .filter(
+      (e) =>
+        `${e.title} ${e.subtitle} ${e.organizer}`.toLowerCase().includes(text) &&
+        (status === 'Todos' || e.report.status === status) &&
+        e.report.occupancy >= minOccupancy,
+    )
+    .sort(SORTS[sort]);
+  const active = all.filter((e) => e.report.status !== 'Em auditoria').length;
+  const auditing = all.length - active;
+
+  const filteredLots = lots.filter((l) =>
+    `${l[0]} ${opportunities.find((e) => e.id === l[1]).title}`.toLowerCase().includes(text),
+  );
+  const pages = Math.max(1, Math.ceil(filteredLots.length / 4));
+  const current = Math.min(page, pages);
+
   return (
-    <div className="workspace">
-      <PageTitle
-        title="Painel Geral"
-        subtitle="Visão consolidada dos eventos e relatórios de demonstração."
-      >
-        <Link className="button blue-button" to="/admin/moderacao">
-          Moderar cadastros →
-        </Link>
-        <DownloadButton
-          name="relatorio-geral.csv"
-          rows={[['Lote', 'Evento', 'Setor', 'Emitidos', 'Trocas', 'Status'], ...lots]}
-        />
-      </PageTitle>
-      <div className="filter-bar">
-        <input
-          aria-label="Buscar relatórios"
-          placeholder="Buscar por evento, artista ou código…"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(1);
-          }}
-        />
+    <div className="workspace admin-home">
+      <section className="ah-search" aria-label="Pesquisa de eventos">
+        <div className="ah-search-row">
+          <label className="search-box wide">
+            <Icon name="search" size={18} />
+            <input
+              aria-label="Buscar eventos"
+              placeholder="Buscar por evento, artista ou código..."
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
+            />
+          </label>
+          <div className="ah-filters">
+            <label>
+              Status:
+              <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="Todos">Todos os Eventos ({all.length})</option>
+                {Object.keys(STATUS_TONE).map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Ordenar:
+              <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                {Object.keys(SORTS).map((s) => (
+                  <option key={s} value={s}>
+                    {s === 'Data' ? 'Data do Evento' : s === 'Nome' ? 'Nome' : 'Mais vendidos'}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              className="button soft"
+              aria-expanded={more}
+              onClick={() => setMore(!more)}
+            >
+              <Icon name="filter" size={16} /> Mais Filtros
+            </button>
+          </div>
+        </div>
+        {more && (
+          <div className="ah-more">
+            <label>
+              Ocupação mínima:
+              <select
+                value={minOccupancy}
+                onChange={(e) => setMinOccupancy(Number(e.target.value))}
+              >
+                <option value={0}>Qualquer</option>
+                <option value={80}>A partir de 80%</option>
+                <option value={90}>A partir de 90%</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              className="text-link plain-button"
+              onClick={() => {
+                setStatus('Todos');
+                setMinOccupancy(0);
+                setQuery('');
+              }}
+            >
+              Limpar filtros
+            </button>
+          </div>
+        )}
+        <div className="ah-summary">
+          <span>
+            Eventos em destaque: <strong>{active} ativos</strong>
+          </span>
+          <i aria-hidden="true" />
+          <span>
+            Relatórios em auditoria:{' '}
+            <strong className="amber">
+              {auditing} pendente{auditing === 1 ? '' : 's'}
+            </strong>
+          </span>
+          <span className="ah-updated">Última atualização: Hoje às {updatedAt}</span>
+        </div>
+      </section>
+
+      <div className="ah-heading">
+        <h2>Grade de Eventos</h2>
+        <span className="ah-count">
+          {events.length} {events.length === 1 ? 'Evento' : 'Eventos'}
+        </span>
       </div>
-      <h2 className="subheading">Visão Geral dos Eventos Prioritários</h2>
-      <div className="cards-three">
-        {opportunities.map((event, i) => (
-          <Panel className="admin-event" key={event.id}>
-            <div className="card-actions">
-              <Badge>EVENTO {i + 1}</Badge>
-              <Badge>{['Aprovado / Ativo', 'Em auditoria', 'Pré-venda ativa'][i]}</Badge>
-            </div>
-            <h2>{event.title.toUpperCase()}</h2>
-            <p className="muted">{event.subtitle}</p>
-            <div className="info-note">▦ {dateLabel(event.date)}</div>
-            <div className="mini-stats">
-              <div>
-                <small>Trocas efetuadas</small>
-                <strong>{[3420, 1890, 8950][i].toLocaleString('pt-BR')}</strong>
+      <p className="ah-lead">
+        Selecione um evento para acessar relatórios gerenciais e auditorias.
+      </p>
+
+      <div className="ah-grid">
+        {events.map((event, i) => {
+          const r = event.report;
+          return (
+            <article className="ah-card" key={event.id}>
+              <div className="ah-card-body">
+                <div className="ah-card-top">
+                  <span className="ah-tag">EVENTO {ROMAN[i]}</span>
+                  <span className={`rp-status ${STATUS_TONE[r.status]}`}>
+                    <i aria-hidden="true" />
+                    {r.status}
+                  </span>
+                </div>
+                <h3>{event.title}</h3>
+                <p className="ah-sub">{event.subtitle}</p>
+                <div className="ah-date">
+                  <span className="ah-date-icon">
+                    <Icon name="calendar" size={20} />
+                  </span>
+                  <div>
+                    <small>DATA DO EVENTO</small>
+                    <strong>{dateLabel(event.date)}</strong>
+                  </div>
+                  <span className="ah-chip">{r.city.split(',')[0]}</span>
+                </div>
               </div>
-              <div>
-                <small>Conversão geral</small>
-                <strong className="green-text">{['94,8%', '87,4%', '99,2%'][i]}</strong>
+              <dl className="ah-rows">
+                <div>
+                  <dt>Organizador:</dt>
+                  <dd>{event.organizer}</dd>
+                </div>
+                <div>
+                  <dt>Ingressos vendidos:</dt>
+                  <dd>
+                    <span className="ah-pill">{fmt(r.sold)}</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Ocupação:</dt>
+                  <dd className="green">{String(r.occupancy).replace('.', ',')}%</dd>
+                </div>
+                <div>
+                  <dt>Faturamento bruto:</dt>
+                  <dd>{money(r.revenue)}</dd>
+                </div>
+              </dl>
+              <div className="ah-highlight">
+                <Icon name="chart" size={18} />
+                <span>
+                  {fmt(r.exchanges)} trocas · {r.conversion} de conversão
+                </span>
+                <Link to={`/admin/relatorios/${event.id}`}>Ver painel</Link>
               </div>
-            </div>
-            <Link className="button dark full" to={`/admin/relatorios/${event.id}`}>
-              Visão e relatórios ↗
-            </Link>
-          </Panel>
-        ))}
+              <Link className="ah-cta" to={`/admin/relatorios/${event.id}`}>
+                Visão e Relatórios ↗
+              </Link>
+            </article>
+          );
+        })}
       </div>
+      {!events.length && <Empty>Nenhum evento corresponde aos filtros selecionados.</Empty>}
+
       <Panel
+        className="ah-table"
         title="Lista Consolidada de Relatórios Recentes e Lotes"
         subtitle="Histórico de validação e transferências demonstrativas."
+        action={
+          <DownloadButton
+            name="relatorio-geral.csv"
+            rows={[['Lote', 'Evento', 'Setor', 'Emitidos', 'Trocas', 'Status'], ...lots]}
+          />
+        }
       >
         <div className="table-wrap">
           <table>
@@ -103,7 +238,7 @@ export function Admin() {
               </tr>
             </thead>
             <tbody>
-              {filtered.slice((current - 1) * 4, current * 4).map((l) => {
+              {filteredLots.slice((current - 1) * 4, current * 4).map((l) => {
                 const event = opportunities.find((e) => e.id === l[1]);
                 return (
                   <tr key={l[0]}>
@@ -115,8 +250,8 @@ export function Admin() {
                       <small>{l[2]}</small>
                     </td>
                     <td>{dateLabel(event.date)}</td>
-                    <td>{l[3]}</td>
-                    <td className="green-text">{l[4]}</td>
+                    <td>{fmt(l[3])}</td>
+                    <td className="green-text">{fmt(l[4])}</td>
                     <td>
                       <Badge>{l[5]}</Badge>
                     </td>
@@ -131,378 +266,15 @@ export function Admin() {
             </tbody>
           </table>
         </div>
-        {!filtered.length && <Empty />}
-        <div className="pagination">
-          <span>
-            {filtered.length} registros · página {current} de {count}
-          </span>
-          <button disabled={current === 1} onClick={() => setPage(current - 1)}>
-            Anterior
-          </button>
-          <button disabled={current === count} onClick={() => setPage(current + 1)}>
-            Próxima
-          </button>
-        </div>
+        {!filteredLots.length && <Empty />}
+        <Pagination
+          page={current}
+          pageSize={4}
+          total={filteredLots.length}
+          onPage={setPage}
+          summary={(from, to, total) => `${total} registros · página ${current} de ${pages}`}
+        />
       </Panel>
-    </div>
-  );
-}
-
-export function Report() {
-  const { id } = useParams();
-  const event = opportunities.find((e) => e.id === id);
-  const [group, setGroup] = useState('Por setor');
-  const [selected, setSelected] = useState(null);
-  if (!event) return <NotFound title="Relatório não encontrado" />;
-  const sold = id === 'tim-maia' ? 80000 : id === 'lil-peep' ? 16000 : 42000;
-  const sectors =
-    group === 'Por setor'
-      ? ['Pista Premium', 'Pista Comum', 'Cadeira Inferior', 'Camarote Gold', 'VIP Lounge']
-      : ['Site', 'Aplicativo', 'Parceiros', 'Bilheteria', 'Outros'];
-  const rates = [35, 25, 20, 15, 5];
-  const rows = sectors.map((s, i) => [s, Math.round((sold * rates[i]) / 100), rates[i] + '%']);
-  return (
-    <div className="workspace">
-      <PageTitle
-        title="Relatórios Gerenciais"
-        subtitle={`${event.title} · indicadores de demonstração`}
-      >
-        <Link className="button outline" to="/admin">
-          ← Painel geral
-        </Link>
-        <DownloadButton
-          name={`relatorio-${id}.csv`}
-          rows={[[event.title], ['Canal / Setor', 'Vendidos', 'Participação'], ...rows]}
-        />
-      </PageTitle>
-      <div className="cards-two">
-        <Panel>
-          <Badge>{event.subtitle}</Badge>
-          <h1 className="report-title">{event.title.toUpperCase()}</h1>
-          <p className="muted">Mega produção imersiva · experiência ao vivo</p>
-          <div className="summary-grid">
-            <div>
-              <small>DATA DO EVENTO</small>
-              <strong>{dateLabel(event.date)}</strong>
-            </div>
-            <div>
-              <small>LOCAL / PRAÇA</small>
-              <strong>{event.location}</strong>
-            </div>
-          </div>
-          <div className="info-note">
-            Capacidade: <strong>{Math.ceil(sold / 0.941).toLocaleString('pt-BR')} pessoas</strong> ·
-            Lote 04
-          </div>
-          <Link className="button outline" to="/admin">
-            Gerenciar relatórios de lotes
-          </Link>
-        </Panel>
-        <Panel>
-          <p className="eyebrow muted">Totalizadores de bilheteria</p>
-          <h2 className="sales-title">
-            TICKETS VENDIDOS: <span>{sold.toLocaleString('pt-BR')}</span>
-          </h2>
-          <progress max="100" value="94.1" aria-label="Ocupação de 94,1%" />
-          <div className="summary-grid">
-            <div>
-              <small>Faturamento bruto</small>
-              <strong>{money(sold * 310)}</strong>
-            </div>
-            <div>
-              <small>Ticket médio</small>
-              <strong>{money(310)}</strong>
-            </div>
-          </div>
-          <Tabs options={['Por setor', 'Por canal']} value={group} onChange={setGroup} />
-          <div className="chart-layout">
-            <div className="donut" role="img" aria-label={rows.map((r) => r.join(': ')).join(', ')}>
-              <div>
-                <small>Total</small>
-                <strong>{sold.toLocaleString('pt-BR')}</strong>
-                <small>ingressos</small>
-              </div>
-            </div>
-            <ul className="chart-legend">
-              {rows.map((r, i) => (
-                <li key={r[0]}>
-                  <i
-                    style={{
-                      background: ['#243c91', '#2860ee', '#13a3d7', '#ff7914', '#0cba86'][i],
-                    }}
-                  />
-                  <span>{r[0]}</span>
-                  <strong>{r[2]}</strong>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Panel>
-      </div>
-      <Panel
-        title="Detalhamento de Lotes e Transações Recentes"
-        subtitle="Dados fictícios para avaliação do front-end."
-      >
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID transação</th>
-                <th>Setor / Categoria</th>
-                <th>Quantidade</th>
-                <th>Valor total</th>
-                <th>Status</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sectors.map((name, i) => (
-                <tr key={name}>
-                  <td>
-                    <code>TRX-8923{i}</code>
-                  </td>
-                  <td>
-                    <strong>{name}</strong>
-                    <small>Lote 04 · Entrada padrão</small>
-                  </td>
-                  <td>{i + 1} un.</td>
-                  <td>{money((i + 1) * 310)}</td>
-                  <td>
-                    <Badge>{i === 1 ? 'Pendente' : 'Aprovado'}</Badge>
-                  </td>
-                  <td>
-                    <button
-                      className="text-link plain-button"
-                      onClick={() => setSelected({ name, quantity: i + 1 })}
-                    >
-                      Detalhes
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Panel>
-      {selected && (
-        <Modal title="Detalhes da transação" onClose={() => setSelected(null)}>
-          <h3>{selected.name}</h3>
-          <p>
-            {selected.quantity} ingressos · {money(selected.quantity * 310)}
-          </p>
-          <p>
-            Registro fictício para demonstrar a consulta de transações. Não existe cobrança
-            associada.
-          </p>
-        </Modal>
-      )}
-    </div>
-  );
-}
-
-export function Moderation() {
-  const { data, update, notify } = useStore();
-  const [status, setStatus] = useState('Pendente');
-  const [query, setQuery] = useState('');
-  const [selectedId, setSelectedId] = useState(data.people[0]?.id);
-  const [checks, setChecks] = useState([false, false, false]);
-  const [note, setNote] = useState('');
-  const [error, setError] = useState('');
-  const people = data.people.filter(
-    (p) => p.status === status && p.name.toLowerCase().includes(query.toLowerCase()),
-  );
-  const person = people.find((p) => p.id === selectedId) || people[0];
-  function select(id) {
-    setSelectedId(id);
-    setChecks([false, false, false]);
-    setNote('');
-    setError('');
-  }
-  function decision(next) {
-    if (next === 'Aprovado' && !checks.every(Boolean)) {
-      setError('Confirme os três critérios antes de aprovar.');
-      return;
-    }
-    if (next === 'Recusado' && note.trim().length < 5) {
-      setError('Informe o motivo da recusa (mínimo de 5 caracteres).');
-      return;
-    }
-    update('people', (old) =>
-      old.map((p) => (p.id === person.id ? { ...p, status: next, note } : p)),
-    );
-    select(people.find((p) => p.id !== person.id)?.id);
-    notify(`Cadastro ${next.toLowerCase()} na demonstração.`);
-  }
-  return (
-    <div className="workspace">
-      <PageTitle
-        title="Moderação de Cadastros"
-        subtitle="Fila de validação com pessoas fictícias. Nenhuma consulta externa é realizada."
-      />
-      <div className="filter-bar">
-        <input
-          aria-label="Buscar cadastro"
-          placeholder="Buscar por nome…"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setChecks([false, false, false]);
-            setNote('');
-          }}
-        />
-        <Tabs
-          options={['Pendente', 'Aprovado', 'Recusado']}
-          value={status}
-          onChange={(v) => {
-            setStatus(v);
-            setChecks([false, false, false]);
-            setNote('');
-            setError('');
-          }}
-        />
-      </div>
-      <div className="dashboard-layout">
-        <div>
-          {person ? (
-            <Panel className="moderation-panel">
-              <div className="moderation-banner">
-                <span>MÓDULO DE VALIDAÇÃO · #{person.id}</span>
-                <Badge>{person.status}</Badge>
-              </div>
-              <div className="moderation-content">
-                <div>
-                  <div className="person-heading">
-                    <span className="avatar large">
-                      {person.name
-                        .split(' ')
-                        .map((s) => s[0])
-                        .join('')}
-                    </span>
-                    <div>
-                      <small>NOME</small>
-                      <h2>{person.name}</h2>
-                      <code>@{person.name.toLowerCase().replaceAll(' ', '_')}</code>
-                    </div>
-                  </div>
-                  <div className="info-note">
-                    <small>E-MAIL DE DEMONSTRAÇÃO</small>
-                    <strong>{person.email}</strong>
-                  </div>
-                  <div className="info-note">
-                    <small>DOCUMENTO</small>
-                    <strong>***.***.***-**</strong>
-                    <p>Dados mascarados e fictícios</p>
-                  </div>
-                  <div className="info-note">
-                    A validação oficial de identidade e os controles de segurança serão integrados
-                    ao backend.
-                  </div>
-                </div>
-                <div className="decision-panel">
-                  <h2>{status === 'Pendente' ? 'Deseja aceitar?' : 'Decisão registrada'}</h2>
-                  <p className="muted">Avalie os critérios deste cadastro de demonstração.</p>
-                  {status === 'Pendente' ? (
-                    <>
-                      {[
-                        'Nome confere com o cadastro',
-                        'Dados de contato revisados',
-                        'Critérios de participação conferidos',
-                      ].map((label, i) => (
-                        <label className="check-line" key={label}>
-                          <input
-                            type="checkbox"
-                            checked={checks[i]}
-                            onChange={(e) =>
-                              setChecks((old) =>
-                                old.map((v, j) => (j === i ? e.target.checked : v)),
-                              )
-                            }
-                          />
-                          {label}
-                        </label>
-                      ))}
-                      <Field label="Notas do moderador" name="moderation-note">
-                        <textarea
-                          id="moderation-note"
-                          rows={4}
-                          placeholder="Informe o motivo caso recuse…"
-                          value={note}
-                          onChange={(e) => setNote(e.target.value)}
-                        />
-                      </Field>
-                      {error && (
-                        <p role="alert" className="field-error">
-                          {error}
-                        </p>
-                      )}
-                      <div className="decision-buttons">
-                        <button className="approve" onClick={() => decision('Aprovado')}>
-                          ✓<small>Aprovar</small>
-                        </button>
-                        <button className="reject" onClick={() => decision('Recusado')}>
-                          ×<small>Recusar</small>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <Badge>{person.status}</Badge>
-                      <p>{person.note || 'Sem observações.'}</p>
-                      <button
-                        className="button outline"
-                        onClick={() => {
-                          update('people', (old) =>
-                            old.map((p) => (p.id === person.id ? { ...p, status: 'Pendente' } : p)),
-                          );
-                          setStatus('Pendente');
-                          select(person.id);
-                        }}
-                      >
-                        Reabrir análise
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </Panel>
-          ) : (
-            <Panel>
-              <Empty title="Fila concluída">
-                Nenhum cadastro corresponde aos filtros selecionados.
-              </Empty>
-            </Panel>
-          )}
-        </div>
-        <aside>
-          <Panel title="Fila de Espera" subtitle={`${people.length} cadastros nesta seleção`}>
-            {people.map((p) => (
-              <button
-                key={p.id}
-                className={`person-row ${person?.id === p.id ? 'active' : ''}`}
-                onClick={() => select(p.id)}
-              >
-                <span className="avatar small">
-                  {p.name
-                    .split(' ')
-                    .map((s) => s[0])
-                    .join('')}
-                </span>
-                <span>
-                  <strong>{p.name}</strong>
-                  <small>#{p.id}</small>
-                </span>
-              </button>
-            ))}
-          </Panel>
-          <div className="info-note">
-            <strong>Regras de auditoria</strong>
-            <p>
-              Confira cada critério e documente o motivo das recusas. As decisões ficam salvas
-              apenas neste navegador.
-            </p>
-          </div>
-        </aside>
-      </div>
     </div>
   );
 }

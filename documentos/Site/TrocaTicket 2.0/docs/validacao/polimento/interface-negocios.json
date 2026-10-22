@@ -1,0 +1,15 @@
+{
+  "tipo": "UI com API interceptada, sem MySQL",
+  "passed": [
+    "Lista de eventos usa reexport compatível",
+    "Editor mantém preenchimento, categorias, validação, centavos e datas da API",
+    "Componente de cancelamento mantém motivo, confirmação e retorno",
+    "Inventário mantém lista e formulário controlado de edição",
+    "Oportunidades continuam filtrando os eventos publicados",
+    "Proposta usa preço e estoque do produto e preserva o contrato API",
+    "Minhas propostas reutiliza ListaPropostas com ações de fornecedor",
+    "Orçamento reutiliza lista com decisão do organizador",
+    "Catálogo mantém as três abas e suas ações"
+  ],
+  "errors": []
+}

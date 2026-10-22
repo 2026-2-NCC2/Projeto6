@@ -1,0 +1,47 @@
+{
+  "dataUtc": "2026-10-18T23:26:47.863Z",
+  "escopo": "Edge com contextos novos; API/HTTP/MySQL real de ensaio; somente falha de rede interceptada para verificar ausência de fallback",
+  "resultados": [
+    {
+      "teste": "Cadastro pela interface",
+      "observado": "Três contas fictícias independentes com sessões distintas; nenhum seletor administrativo público",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Compra primária pela interface",
+      "observado": "Reserva, compra simulada e ingresso individual persistido; cobrança real zero",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Repasse entre duas sessões",
+      "observado": "R$400 recusados; venda por R$70, teto70 e credencial anterior revogada",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Gratuidade e persistência",
+      "observado": "Destinatária aceita na própria sessão; custo/teto zero; nova credencial preservada após recarregar",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Responsividade e teclado",
+      "observado": "Mobile390px sem rolagem horizontal; modal com foco contido e Escape",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Preferências e idiomas",
+      "observado": "Tema escuro/fonte125%/inglês persistem; nome do evento preservado; sem token/senha em localStorage",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Portaria pela interface",
+      "observado": "Código manual atual autorizado uma vez; segunda leitura recusada",
+      "resultado": "aprovado"
+    },
+    {
+      "teste": "Erro, recuperação,404 e JavaScript",
+      "observado": "Falha visível sem fallback de exemplos; nova tentativa recuperaAPI; imagem local válida; nenhuma exceção pageerror",
+      "resultado": "aprovado"
+    }
+  ],
+  "errosJs": []
+}

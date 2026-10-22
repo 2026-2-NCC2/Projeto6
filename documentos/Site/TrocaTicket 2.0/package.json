@@ -1,0 +1,29 @@
+{
+  "name": "trocaticket-front",
+  "private": true,
+  "version": "0.4.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "build:pages": "vite build --mode pages",
+    "preview": "vite preview --host 127.0.0.1",
+    "format": "prettier --write src scripts tests server/src server/index.js server/scripts server/tests public/data package.json server/package.json index.html README.md",
+    "format:check": "prettier --check src scripts tests server/src server/index.js server/scripts server/tests public/data package.json server/package.json index.html README.md",
+    "test": "node --test tests/*.test.js",
+    "start": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/iniciar.ps1"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.2.0",
+    "prettier": "^3.9.8",
+    "vite": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

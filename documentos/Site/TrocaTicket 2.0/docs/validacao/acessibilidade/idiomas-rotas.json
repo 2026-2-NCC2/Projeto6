@@ -1,0 +1,205 @@
+{
+  "records": [
+    {
+      "language": "en",
+      "route": "/perfis",
+      "heading": "How would you like to explore?"
+    },
+    {
+      "language": "en",
+      "route": "/entrar",
+      "heading": "Access your account"
+    },
+    {
+      "language": "en",
+      "route": "/perfil",
+      "heading": "Settings & Profile"
+    },
+    {
+      "language": "en",
+      "route": "/ingressos",
+      "heading": "MY TICKETS"
+    },
+    {
+      "language": "en",
+      "route": "/organizador/fornecedores",
+      "heading": "Supplies and suppliers"
+    },
+    {
+      "language": "en",
+      "route": "/admin",
+      "heading": "General Dashboard"
+    },
+    {
+      "language": "en",
+      "route": "/admin/moderacao",
+      "heading": "Registration Moderation"
+    },
+    {
+      "language": "en",
+      "route": "/admin/relatorios/tim-maia",
+      "heading": "Management Reports"
+    },
+    {
+      "language": "es",
+      "route": "/perfis",
+      "heading": "¿Cómo quieres explorar?"
+    },
+    {
+      "language": "es",
+      "route": "/entrar",
+      "heading": "Accede a tu cuenta"
+    },
+    {
+      "language": "es",
+      "route": "/perfil",
+      "heading": "Configuración y perfil"
+    },
+    {
+      "language": "es",
+      "route": "/ingressos",
+      "heading": "MIS ENTRADAS"
+    },
+    {
+      "language": "es",
+      "route": "/organizador/fornecedores",
+      "heading": "Insumos y proveedores"
+    },
+    {
+      "language": "es",
+      "route": "/admin",
+      "heading": "Panel general"
+    },
+    {
+      "language": "es",
+      "route": "/admin/moderacao",
+      "heading": "Moderación de registros"
+    },
+    {
+      "language": "es",
+      "route": "/admin/relatorios/tim-maia",
+      "heading": "Informes de gestión"
+    },
+    {
+      "language": "fr",
+      "route": "/perfis",
+      "heading": "Comment souhaitez-vous explorer ?"
+    },
+    {
+      "language": "fr",
+      "route": "/entrar",
+      "heading": "Accéder à votre compte"
+    },
+    {
+      "language": "fr",
+      "route": "/perfil",
+      "heading": "Paramètres et profil"
+    },
+    {
+      "language": "fr",
+      "route": "/ingressos",
+      "heading": "MES BILLETS"
+    },
+    {
+      "language": "fr",
+      "route": "/organizador/fornecedores",
+      "heading": "Fournitures et fournisseurs"
+    },
+    {
+      "language": "fr",
+      "route": "/admin",
+      "heading": "Tableau de bord général"
+    },
+    {
+      "language": "fr",
+      "route": "/admin/moderacao",
+      "heading": "Modération des inscriptions"
+    },
+    {
+      "language": "fr",
+      "route": "/admin/relatorios/tim-maia",
+      "heading": "Rapports de gestion"
+    },
+    {
+      "language": "de",
+      "route": "/perfis",
+      "heading": "Wie möchtest du die Plattform erkunden?"
+    },
+    {
+      "language": "de",
+      "route": "/entrar",
+      "heading": "Bei deinem Konto anmelden"
+    },
+    {
+      "language": "de",
+      "route": "/perfil",
+      "heading": "Einstellungen und Profil"
+    },
+    {
+      "language": "de",
+      "route": "/ingressos",
+      "heading": "MEINE TICKETS"
+    },
+    {
+      "language": "de",
+      "route": "/organizador/fornecedores",
+      "heading": "Material und Anbieter"
+    },
+    {
+      "language": "de",
+      "route": "/admin",
+      "heading": "Gesamtübersicht"
+    },
+    {
+      "language": "de",
+      "route": "/admin/moderacao",
+      "heading": "Prüfung von Registrierungen"
+    },
+    {
+      "language": "de",
+      "route": "/admin/relatorios/tim-maia",
+      "heading": "Verwaltungsberichte"
+    },
+    {
+      "language": "it",
+      "route": "/perfis",
+      "heading": "Come vuoi esplorare?"
+    },
+    {
+      "language": "it",
+      "route": "/entrar",
+      "heading": "Accedi al tuo account"
+    },
+    {
+      "language": "it",
+      "route": "/perfil",
+      "heading": "Impostazioni e profilo"
+    },
+    {
+      "language": "it",
+      "route": "/ingressos",
+      "heading": "I MIEI BIGLIETTI"
+    },
+    {
+      "language": "it",
+      "route": "/organizador/fornecedores",
+      "heading": "Materiali e fornitori"
+    },
+    {
+      "language": "it",
+      "route": "/admin",
+      "heading": "Pannello generale"
+    },
+    {
+      "language": "it",
+      "route": "/admin/moderacao",
+      "heading": "Moderazione registrazioni"
+    },
+    {
+      "language": "it",
+      "route": "/admin/relatorios/tim-maia",
+      "heading": "Rapporti gestionali"
+    }
+  ],
+  "errors": []
+}

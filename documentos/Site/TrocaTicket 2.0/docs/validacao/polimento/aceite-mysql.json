@@ -1,0 +1,115 @@
+{
+  "dataUtc": "2026-10-18T23:24:42.872Z",
+  "instance": {
+    "version": "8.0.46",
+    "port": 34763,
+    "isolation": "Diretório exclusivo conferido; conexão pessoal não acessada"
+  },
+  "resultados": [
+    {
+      "id": "T01",
+      "teste": "Cadastro, hash, sessão, logout e proteção CSRF",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T02",
+      "teste": "Permissões, aprovação e isolamento entre contas",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T03",
+      "teste": "Reaplicação de migrações e seed preserva definições e dados",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T04",
+      "teste": "Duas reservas simultâneas para a última vaga",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T05",
+      "teste": "Limite considera posse, reservas e fila estável",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T06",
+      "teste": "Preço adulterado, repasse 100 para 70 e teto do adquirente",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T07",
+      "teste": "Um anúncio/reserva ativo e recusa de compra própria",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T08",
+      "teste": "Expiração no servidor e estado persistente após reinício",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T09",
+      "teste": "Idempotência de reserva/pagamento e payload divergente",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T10",
+      "teste": "Aceite somente pelo destinatário e revogação da credencial anterior",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T11",
+      "teste": "Gratuidade, custo zero, recusa e preservação do titular",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T12",
+      "teste": "Duas leituras simultâneas autorizam somente a primeira entrada",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T13",
+      "teste": "Falhas simuladas, entrega pendente, recuperação e estorno único",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T14",
+      "teste": "Cancelamento após repasses reconcilia a cadeia sem duplicar estornos",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    },
+    {
+      "id": "T15",
+      "teste": "Atendimento restrito, resposta persistida e unidade usada não recriada",
+      "esperado": "Asserções do caso satisfeitas",
+      "observado": "Executado com HTTP, sessões e MySQL real",
+      "resultado": "aprovado"
+    }
+  ]
+}

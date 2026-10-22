@@ -1,0 +1,17 @@
+[
+  {
+    "arquivo": "server/migrations/001_m1.sql",
+    "sha256": "ee6cb9a329e38d416ea084524269e708cbfa9a2ef79d406af12b18edba295654",
+    "conteudoOriginalPreservado": true
+  },
+  {
+    "arquivo": "server/migrations/002_mvp.sql",
+    "sha256": "0f18622e9e0ac37c49384cb09793b683309c9fa5a678e59464d12c15aa651ff6",
+    "conteudoOriginalPreservado": true
+  },
+  {
+    "arquivo": "server/migrations/003_perfil_b2b.sql",
+    "sha256": "77395dca193d20c2c9ee051edc36d60b7a0c55c0e9ea4b1639197043aaa4dc0b",
+    "conteudoOriginalPreservado": true
+  }
+]
