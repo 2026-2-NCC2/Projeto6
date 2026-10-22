@@ -13,6 +13,8 @@ const defaults = {
     name: 'Carlos Eduardo Mendes',
     email: 'carlos@example.com',
     phone: '(11) 98452-1100',
+    organizationName: '',
+    cnpj: '',
     preferences: [true, true, true, false],
   },
 };
