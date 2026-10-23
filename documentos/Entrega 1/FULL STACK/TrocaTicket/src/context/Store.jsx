@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { initialEvents, initialInventory, initialProposals, initialPeople } from '../data/demo';
+import { initialEvents, initialPeople } from '../data/demo';
+import { initialSupplierProfile, supplierInventory, supplierProposals } from '../data/supplier';
 const Context = createContext(null);
 const defaults = {
   events: initialEvents,
-  inventory: initialInventory,
-  proposals: initialProposals,
+  inventory: supplierInventory,
+  proposals: supplierProposals,
   people: initialPeople,
   favorites: [],
   tickets: [],
@@ -13,36 +14,14 @@ const defaults = {
     name: 'Carlos Eduardo Mendes',
     email: 'carlos@example.com',
     phone: '(11) 98452-1100',
-    organizationName: '',
-    cnpj: '',
     preferences: [true, true, true, false],
   },
-  // Perfil do administrador. Campos pensados para mapear colunas de uma tabela de usuários.
-  adminProfile: {
-    name: 'Carlos Eduardo Mendes',
-    role: 'admin',
-    email: 'carlos.mendes@organizadoreventos.com.br',
-    emailVerified: true,
-    phone: '(11) 98452-1100',
-    cpf: '123.456.789-00',
-    timezone: 'America/Sao_Paulo',
-    twoFactor: true,
-    photo: '',
-    passwordChangedAt: Date.now() - 45 * 86400000,
-    syncedAt: Date.now(),
-  },
+  supplierProfile: initialSupplierProfile,
 };
 function read() {
   try {
     const saved = JSON.parse(localStorage.getItem('trocaticket-v2'));
-    if (saved?.version !== 2) return defaults;
-    const merged = { ...defaults, ...saved.data };
-    // Cadastros salvos no formato antigo (sem username) são substituídos pela nova fila de demonstração.
-    if (!merged.people.every((p) => p.username)) merged.people = initialPeople;
-    // Eventos de demonstração novos entram sem apagar os que a pessoa já criou ou editou.
-    const known = new Set(merged.events.map((e) => e.id));
-    merged.events = [...merged.events, ...initialEvents.filter((e) => !known.has(e.id))];
-    return merged;
+    return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
   } catch {
     return defaults;
   }
