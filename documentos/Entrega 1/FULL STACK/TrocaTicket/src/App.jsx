@@ -4,12 +4,13 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Account, { Profiles, Recover } from './pages/Account';
 import Profile from './pages/Profile';
-import { EventEditor, Consolidation, Suppliers } from './pages/Organizer';
-import OrganizerHome from './pages/OrganizerHome';
-import { Opportunities, Proposals, Quote, Inventory } from './pages/Supplier';
-import { Admin } from './pages/Admin';
-import Report from './pages/Report';
-import Moderation from './pages/Moderation';
+import SupplierHome from './pages/supplier/SupplierHome';
+import SupplierProposals from './pages/supplier/SupplierProposals';
+import SupplierQuote from './pages/supplier/SupplierQuote';
+import SupplierInventory from './pages/supplier/SupplierInventory';
+import SupplierProfile from './pages/supplier/SupplierProfile';
+import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organizer';
+import { Admin, Report, Moderation } from './pages/Admin';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 function Info({ title, children }) {
   return (
@@ -39,16 +40,17 @@ export default function App() {
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
         <Route path="comunidade" element={<Community />} />
-        <Route path="organizador" element={<OrganizerHome />} />
-        <Route path="organizador/eventos" element={<OrganizerHome list />} />
+        <Route path="organizador" element={<Organizer />} />
+        <Route path="organizador/eventos" element={<Organizer list />} />
         <Route path="organizador/novo" element={<EventEditor key="new" />} />
         <Route path="organizador/eventos/:id/editar" element={<EventEditorRoute />} />
         <Route path="organizador/eventos/:id/consolidar" element={<Consolidation />} />
         <Route path="organizador/fornecedores" element={<Suppliers />} />
-        <Route path="fornecedor" element={<Opportunities />} />
-        <Route path="fornecedor/propostas" element={<Proposals />} />
+        <Route path="fornecedor" element={<SupplierHome />} />
+        <Route path="fornecedor/propostas" element={<SupplierProposals />} />
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
-        <Route path="fornecedor/inventario" element={<Inventory />} />
+        <Route path="fornecedor/inventario" element={<SupplierInventory />} />
+        <Route path="fornecedor/perfil" element={<SupplierProfile />} />
         <Route path="admin" element={<Admin />} />
         <Route path="admin/relatorios/:id" element={<Report />} />
         <Route path="admin/moderacao" element={<Moderation />} />
@@ -103,5 +105,5 @@ function EventEditorRoute() {
 }
 function QuoteRoute() {
   const { id } = useParams();
-  return <Quote key={id} />;
+  return <SupplierQuote key={id} />;
 }
