@@ -14,6 +14,8 @@ const defaults = {
     name: 'Carlos Eduardo Mendes',
     email: 'carlos@example.com',
     phone: '(11) 98452-1100',
+    organizationName: '',
+    cnpj: '',
     preferences: [true, true, true, false],
   },
   supplierProfile: initialSupplierProfile,
@@ -21,6 +23,7 @@ const defaults = {
 function read() {
   try {
     const saved = JSON.parse(localStorage.getItem('trocaticket-v2'));
+    return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
     return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
   } catch {
     return defaults;
