@@ -175,12 +175,14 @@ export function Organizer({ list = false }) {
   );
 }
 
+const hoje = new Date().toJSON().slice(0, 10);
+
 const blank = {
   title: '',
   category: 'Show / Cultura',
   format: 'Presencial',
-  date: today(),
-  endDate: today(),
+  date: hoje,
+  endDate: hoje,
   time: '16:00',
   endTime: '23:00',
   location: '',
