@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
+import { initialsOf } from '../utils/format';
 const menus = {
   organizador: [
     ['Início', '/organizador'],
@@ -30,7 +31,7 @@ const menus = {
 };
 export default function Layout() {
   const { pathname } = useLocation();
-  const { role, chooseRole } = useStore();
+  const { data, role, chooseRole } = useStore();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
@@ -41,8 +42,9 @@ export default function Layout() {
       : pathname.startsWith('/admin')
         ? 'admin'
         : role || 'comprador';
+  const supplier = activeRole === 'fornecedor' ? data.supplierProfile : null;
+  const supplierName = supplier ? supplier.tradeName || supplier.name : '';
   const publicPage = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
-  const authPage = ['/entrar', '/cadastro'].includes(pathname);
   useEffect(() => {
     window.scrollTo(0, 0);
     setMenu(false);
@@ -50,13 +52,13 @@ export default function Layout() {
     document.title = 'TrocaTicket — Eventos & ingressos';
   }, [pathname]);
   return (
-    <div className={`${publicPage ? 'public-shell' : 'app-shell'} ${authPage ? 'auth-shell' : ''}`}>
+    <div className={publicPage ? 'public-shell' : 'app-shell'}>
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
-      <header className={`header ${!publicPage ? 'app-header' : ''} ${authPage ? 'auth-header' : ''}`}>
+      <header className={`header ${!publicPage ? 'app-header' : ''}`}>
         <Link className="brand" to="/" aria-label="TrocaTicket, início">
-          <img src="/images/trocaticket-mark.svg" alt="" />
+          <img src="/images/logo.png" alt="" />
           <span>
             TrocaTicket<small>EVENTOS & INGRESSOS</small>
           </span>
@@ -102,13 +104,19 @@ export default function Layout() {
               >
                 ♧<i />
               </button>
-              <Link to="/perfil" aria-label="Configurações do perfil">
+              <Link
+                to={activeRole === 'fornecedor' ? '/fornecedor/perfil' : '/perfil'}
+                aria-label="Configurações do perfil"
+              >
                 ⚙
               </Link>
               <Link className="user-chip" to="/perfis">
-                <span className="avatar small">CM</span>
+                <span className="avatar small">
+                  {supplier?.photo ? <img src={supplier.photo} alt="" /> : supplier ? initialsOf(supplierName) : 'CM'}
+                </span>
                 <span>
-                  MINHA CONTA<small>{roleNames[activeRole]}</small>
+                  {supplier ? supplierName.toUpperCase() : 'MINHA CONTA'}
+                  <small>{roleNames[activeRole]}</small>
                 </span>
               </Link>
             </div>

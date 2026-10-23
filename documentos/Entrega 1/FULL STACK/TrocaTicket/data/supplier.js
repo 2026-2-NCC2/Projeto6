@@ -1,0 +1,602 @@
+/*
+ * Dados de demonstração das telas do FORNECEDOR.
+ * Os nomes dos campos seguem as tabelas que um fornecedor normalmente tem
+ * (usuário, fornecedor, endereço, item de catálogo, cotação, proposta).
+ * Quando o modelo relacional final for definido, ajuste aqui — as telas só leem estes objetos.
+ */
+import { opportunities } from './demo';
+import { isoDaysAgo } from '../utils/format';
+
+/* ------------------------------------------------------------------ */
+/* Perfil                                                              */
+/* ------------------------------------------------------------------ */
+export const supplierCategories = [
+  'Bebidas & Bar',
+  'Iluminação',
+  'Estrutura & Palco',
+  'Alimentação & Buffet',
+  'Som & Acústica',
+  'Segurança & Apoio',
+];
+export const brazilStates = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
+  'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+];
+export const supplierNotificationOptions = [
+  {
+    key: 'email',
+    title: 'Notificações por e-mail',
+    description: 'Receba atualizações quando propostas forem aprovadas ou contratos forem assinados.',
+  },
+  {
+    key: 'whatsapp',
+    title: 'Alertas críticos no celular / WhatsApp',
+    description: 'Avisos urgentes de prazos expirando, divergência de orçamento ou pendências técnicas.',
+  },
+  {
+    key: 'quotes',
+    title: 'Novas oportunidades de cotação',
+    description: 'Aviso quando um organizador abrir uma cotação na sua categoria.',
+  },
+  {
+    key: 'contracts',
+    title: 'Lembretes de homologação de contratos',
+    description: 'Lembretes antes do vencimento de documentos e etapas de homologação.',
+  },
+];
+export const initialSupplierProfile = {
+  photo: '',
+  // usuário
+  name: 'Carlos Eduardo Mendes',
+  email: 'carlos.mendes@organizadoreventos.com.br',
+  emailVerified: true,
+  phone: '(11) 98452-1100',
+  // fornecedor
+  legalName: 'CEM Eventos e Produções Ltda',
+  tradeName: 'CEM Eventos',
+  document: '12.345.678/0001-90',
+  category: 'Bebidas & Bar',
+  website: '',
+  description: '',
+  // endereço
+  address: {
+    zip: '01310-100',
+    street: 'Avenida Paulista',
+    number: '1000',
+    complement: '',
+    district: 'Bela Vista',
+    city: 'São Paulo',
+    state: 'SP',
+  },
+  // segurança e preferências
+  twoFactor: true,
+  notifications: { email: true, whatsapp: true, quotes: true, contracts: false },
+  lastSync: '14:32',
+};
+
+/* ------------------------------------------------------------------ */
+/* Oportunidades (home) e cotações (nova proposta)                     */
+/* ------------------------------------------------------------------ */
+const docs = [
+  { type: 'PDF', name: 'Rider Técnico', size: '2,4 MB' },
+  { type: 'DWG', name: 'Planta do Palco', size: '107 MB' },
+  { type: 'DOC', name: 'Memorial Descritivo', size: '920 KB' },
+];
+
+const extras = {
+  'tim-maia': {
+    requesterLabel: 'Organizador solicitante',
+    services: ['Bebidas', 'Bar & Catering'],
+    deadline: { label: 'Prazo de submissão', value: 'Até 15/02/2032', tone: 'danger' },
+    quote: {
+      code: '#COT-2032-094',
+      lot: 'Operação de Bebidas & Bar',
+      venue: 'Estádio Olímpico | Rio Arena',
+      audience: '45.000 pessoas',
+      window: { state: 'open', pill: 'Aberto para propostas', note: 'Prazo: até 15/02/2032' },
+      closesIn: 'Restam 11 dias',
+      closesAt: 'Encerra às 18:00 (Brasília)',
+      scope:
+        'Contratação de empresa especializada para gestão integral dos pontos de bar, incluindo logística de armazenamento refrigerado, fornecimento de chopeiras modulares, montagem de ilhas de autosserviço e fornecimento de equipe uniformizada e treinada para atendimento premium e pista.',
+      organizer: { city: 'Rio de Janeiro, RJ', reliability: '98,4% de confiabilidade' },
+      items: [
+        {
+          name: 'Ilhas de Bares Modulares (Pista & Premium)',
+          spec: 'Estrutura metálica envelopada, balcão inox anti-vazamento, ponto de recarga de maquininhas.',
+          qty: 12,
+          unit: 'Módulos',
+          ref: 3800,
+          offer: 3750,
+        },
+        {
+          name: 'Logística Térmica & Abastecimento de Chopp',
+          spec: 'Câmara fria portátil refrigerada, 24 barris de extração a frio e reposição contínua durante todo o show.',
+          qty: 3,
+          unit: 'Diárias',
+          ref: 14500,
+          offer: 14200,
+        },
+        {
+          name: 'Staff Operacional Treinado (Bartenders e Caixas)',
+          spec: '65 atendentes certificados em manuseio higiênico, 4 supervisores bilíngues e coordenador geral de A&B.',
+          qty: 70,
+          unit: 'Diárias/Pax',
+          ref: 380,
+          offer: 380,
+        },
+      ],
+      docs,
+    },
+  },
+  'lil-peep': {
+    requesterLabel: 'Produtora solicitante',
+    services: ['Iluminação', 'Rider Técnico'],
+    proposal: { sentAt: '12/01', protocol: '#882', value: 184500 },
+    quote: {
+      code: '#COT-2031-051',
+      lot: 'Iluminação Cênica & Rider Técnico',
+      venue: 'Memorial World Arena',
+      audience: '28.000 pessoas',
+      window: { state: 'submitted', pill: 'Proposta enviada', note: 'Protocolo #882' },
+      closesIn: 'Prazo encerrado',
+      closesAt: 'Proposta em análise pela produtora',
+      scope:
+        'Fornecimento de sistema de iluminação cênica completo, com mesas de controle, fixtures móveis e equipe técnica para montagem, operação e desmontagem durante toda a turnê.',
+      organizer: { city: 'São Paulo, SP', reliability: '96,1% de confiabilidade' },
+      items: [
+        {
+          name: 'Sistema de Iluminação Cênica (Mesas GrandMA3)',
+          spec: 'Pacote completo com duas mesas de controle, rack de dimmers e cabeamento redundante.',
+          qty: 1,
+          unit: 'Pacote',
+          ref: 96000,
+          offer: 96000,
+        },
+        {
+          name: 'Moving Heads Beam 380W',
+          spec: 'Fixtures de alta intensidade para tamanho de arena, com flight cases e acessórios.',
+          qty: 48,
+          unit: 'Unidades',
+          ref: 1200,
+          offer: 1200,
+        },
+        {
+          name: 'Equipe Técnica de Iluminação & Rider',
+          spec: 'Designer, operadores e técnicos de montagem certificados em trabalho em altura.',
+          qty: 12,
+          unit: 'Profissionais',
+          ref: 2575,
+          offer: 2575,
+        },
+      ],
+      docs,
+    },
+  },
+  michael: {
+    requesterLabel: 'Produtora solicitante',
+    services: ['Palco', 'Led', 'Pyro Efeitos'],
+    deadline: { label: 'Prazo de resposta', value: 'Restam 48 horas', tone: 'warning' },
+    highlight: 'Mega Oportunidade VIP',
+    quote: {
+      code: '#COT-2028-017',
+      lot: 'Palco, Led & Efeitos Pirotécnicos',
+      venue: 'Estádio Nacional',
+      audience: '72.000 pessoas',
+      window: { state: 'closing', pill: 'Encerrando em 48h', note: 'Faltam 2 dias' },
+      closesIn: 'Restam 48 horas',
+      closesAt: 'Encerra às 18:00 (Brasília)',
+      scope:
+        'Estrutura de palco principal, coberturas geodésicas para áreas de hospitalidade e equipe de montagem e desmontagem, com certificação de segurança e laudo estrutural.',
+      organizer: { city: 'Brasília, DF', reliability: '99,0% de confiabilidade' },
+      items: [
+        {
+          name: 'Estrutura de Palco Principal 24 x 16 m',
+          spec: 'Palco modular com cobertura, laterais de vídeo e laudo estrutural assinado.',
+          qty: 1,
+          unit: 'Pacote',
+          ref: 120000,
+          offer: 120000,
+        },
+        {
+          name: 'Coberturas Geodésicas Hospitality',
+          spec: 'Domos de alta resistência para camarotes e áreas VIP, com piso e climatização.',
+          qty: 4,
+          unit: 'Unidades',
+          ref: 18500,
+          offer: 18500,
+        },
+        {
+          name: 'Montagem & Desmontagem (equipe certificada)',
+          spec: 'Equipe NR-35, supervisão de segurança e plano de contingência.',
+          qty: 1,
+          unit: 'Pacote',
+          ref: 51000,
+          offer: 51000,
+        },
+      ],
+      docs,
+    },
+  },
+};
+
+export const supplierOpportunities = opportunities.map((event) => ({ ...event, ...extras[event.id] }));
+// Propostas salvas antes desta versão não têm dados do evento: completa a partir da oportunidade.
+export function withEventInfo(proposal) {
+  const event = supplierOpportunities.find((e) => e.id === proposal.eventId);
+  return {
+    eventDate: event?.date,
+    location: event?.location || '—',
+    organizer: event?.organizer || '—',
+    category: event?.category,
+    ...proposal,
+  };
+}
+export const quoteTotal = (items, prices) =>
+  items.reduce((sum, item, i) => sum + item.qty * (Number(prices[i]) || 0), 0);
+
+/* ------------------------------------------------------------------ */
+/* Propostas (estático — novas propostas entram pela tela de cotação)  */
+/* ------------------------------------------------------------------ */
+export const supplierProposals = [
+  {
+    id: 'PRP-2032-088',
+    eventId: 'tim-maia',
+    title: 'Tim Maia Come Back — Show Holográfico 2032',
+    date: isoDaysAgo(3),
+    eventDate: '2032-02-28',
+    location: 'Rio Arena (Rio de Janeiro - RJ)',
+    organizer: 'Brasil Shows & Entretenimento',
+    category: 'Bebidas & Bar',
+    description: 'Gestão integral de bar (12 ilhas modulares + 3 câmaras frias + 70 bartenders/caixas)',
+    total: 114200,
+    payment: '50% sinal + 50% D+10',
+    status: 'Em análise',
+    outcome: { tone: 'amber', title: 'Em análise pelo organizador', detail: 'Previsão: até 15/02/2032' },
+  },
+  {
+    id: 'PRP-2031-042',
+    eventId: 'lil-peep',
+    title: 'Lil Peep Tour — Memorial Arena',
+    date: isoDaysAgo(30),
+    eventDate: '2031-06-18',
+    location: 'São Paulo - SP',
+    organizer: 'SoundWave Live Latam',
+    category: 'Iluminação',
+    description: 'Iluminação cênica & rider técnico especializado (mesas GrandMA3 + moving heads)',
+    total: 184500,
+    payment: 'Faturamento 28 DDL',
+    status: 'Aprovada',
+    outcome: {
+      tone: 'green',
+      title: 'Proposta aprovada — fornecedor selecionado',
+      detail: 'Contrato homologado: aguardando envio do cronograma de montagem pela contratante.',
+    },
+    secondaryAction: 'Ver cronograma',
+  },
+  {
+    id: 'PRP-2031-019',
+    eventId: 'rock-festival',
+    title: 'Rock Festival Brasil 2031',
+    date: isoDaysAgo(45),
+    eventDate: '2031-10-15',
+    location: 'Autódromo Interlagos (São Paulo - SP)',
+    organizer: 'Live Music Group B2B',
+    category: 'Bebidas & Bar',
+    description: '4 módulos de bares premium + insumos de coquetelaria fria e chopp',
+    total: 68900,
+    payment: '50% sinal + 50% D+10',
+    status: 'Aprovada',
+    outcome: { tone: 'green', title: 'Homologado & faturado', detail: 'OS #8812 gerada' },
+    aside: { label: 'Classificação de entrega', value: '★ 5,0 (Excelente)' },
+    secondaryAction: 'Ver comprovante',
+  },
+  {
+    id: 'PRP-2032-097',
+    eventId: 'noites-jazz',
+    title: 'Noites de Jazz — Especial Carnaval 2032',
+    date: isoDaysAgo(6),
+    eventDate: '2032-02-12',
+    location: 'Theatro Municipal (São Paulo - SP)',
+    organizer: 'Cultura Viva Produções',
+    category: 'Som & Acústica',
+    description: 'Sonorização de câmara e monitoramento in-ear para 6 apresentações',
+    total: 41300,
+    payment: 'Faturamento 28 DDL',
+    status: 'Em análise',
+    outcome: { tone: 'amber', title: 'Em análise pelo organizador', detail: 'Previsão: até 20/01/2032' },
+  },
+  {
+    id: 'PRP-2028-112',
+    eventId: 'michael',
+    title: 'Michael Jackson — The Last Dance Experience',
+    date: isoDaysAgo(60),
+    eventDate: '2028-12-31',
+    location: 'Estádio Nacional (Brasília - DF)',
+    organizer: 'Legacy Global Entertainment',
+    category: 'Estrutura & Palco',
+    description: 'Estruturas de palco e coberturas geodésicas de alta resistência',
+    total: 245000,
+    payment: 'Faturamento 28 DDL',
+    status: 'Não selecionada',
+    outcome: {
+      tone: 'gray',
+      title: 'Não selecionada (menor preço concorrente)',
+      detail:
+        'Processo encerrado. Proposta arquivada no histórico para fins de auditoria de preços e indicadores de concorrência.',
+    },
+    aside: { label: 'Motivo', value: 'Critério de menor preço' },
+  },
+  {
+    id: 'PRP-2029-031',
+    eventId: 'festival-brasa',
+    title: 'Festival Brasa 2029',
+    date: isoDaysAgo(120),
+    eventDate: '2029-03-10',
+    location: 'Parque da Cidade (Brasília - DF)',
+    organizer: 'Brasa Entretenimento',
+    category: 'Alimentação & Buffet',
+    description: 'Camarins, catering de produção e praça de alimentação para 3 dias',
+    total: 57800,
+    payment: '50% sinal + 50% D+10',
+    status: 'Encerrada',
+    outcome: {
+      tone: 'gray',
+      title: 'Evento concluído',
+      detail: 'Proposta arquivada no histórico do fornecedor.',
+    },
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Inventário                                                          */
+/* ------------------------------------------------------------------ */
+export const inventoryTypes = ['Produto', 'Serviço', 'Equipamento', 'Insumo'];
+export const inventoryStatuses = ['Disponível', 'Alocado', 'Manutenção', 'Inativo'];
+
+export const supplierInventory = [
+  {
+    id: 'BAR-012',
+    sku: 'PRD-BAR-012',
+    name: 'Ilhas de Bares Modulares (Pista & Premium)',
+    version: 'Versão Standard (Pista) & Black Wood (VIP/Camarote)',
+    category: 'Bebidas & Bar',
+    type: 'Produto / Estrutura',
+    unit: 'Módulo / Diária',
+    price: 3800,
+    cost: 2584,
+    status: 'Disponível',
+    description: 'Estrutura modular de 4,00 m x 2,20 m. Montagem em 3 horas.',
+    specs: [
+      ['Dimensões montadas', '4,00 m x 2,20 m x 1,80 m alt.'],
+      ['Tempo de montagem', '3h (equipe de 3 pessoas)'],
+      ['Alimentação elétrica', '2 pontos 220V 20A'],
+      ['Capacidade de fluxo', 'Até 650 atendimentos/hora'],
+    ],
+    usage: [
+      { event: 'Tim Maia Come Back', detail: 'Brasil Shows & Entretenimento', tag: '4 módulos cotados', tone: 'blue' },
+      { event: 'Rock Festival 2031', detail: 'Concluído & faturado', tag: 'Avaliação 5,0 ★', tone: 'green' },
+    ],
+  },
+  {
+    id: 'BAR-008',
+    sku: 'SRV-BAR-008',
+    name: 'Equipe de Bartenders Profissionais (Turno 8h)',
+    version: 'Equipe certificada com uniforme e EPIs',
+    category: 'Bebidas & Bar',
+    type: 'Serviço / Mão de obra',
+    unit: 'Diária / Profissional',
+    price: 380,
+    cost: 247,
+    status: 'Disponível',
+    description: 'Equipe especializada em atendimento de eventos. Turno de 8 horas.',
+    specs: [
+      ['Turno', '8 horas com 1h de intervalo'],
+      ['Formação', 'Curso de coquetelaria e manipulação de alimentos'],
+      ['Supervisão', '1 supervisor para cada 15 profissionais'],
+      ['Idiomas', 'Português e inglês'],
+    ],
+    usage: [{ event: 'Tim Maia Come Back', detail: 'Brasil Shows & Entretenimento', tag: '70 diárias cotadas', tone: 'blue' }],
+  },
+  {
+    id: 'BAR-031',
+    sku: 'EQP-BAR-031',
+    name: 'Chopeira Elétrica 2 Vias (Inox 110/220v)',
+    version: 'Com cilindro de CO₂ e kit de higienização',
+    category: 'Bebidas & Bar',
+    type: 'Equipamento',
+    unit: 'Unidade / Diária',
+    price: 550,
+    cost: 380,
+    status: 'Alocado',
+    allocatedEvents: 2,
+    description: 'Inox, 110/220 V, com cilindro de CO₂.',
+    specs: [
+      ['Vazão', 'Até 60 litros/hora por via'],
+      ['Alimentação', '110/220 V (bivolt)'],
+      ['Material', 'Inox escovado'],
+      ['Consumo de CO₂', '1 cilindro a cada 3 barris'],
+    ],
+    usage: [{ event: 'Rock Festival 2031', detail: 'Concluído & faturado', tag: '8 unidades', tone: 'blue' }],
+  },
+  {
+    id: 'BAR-005',
+    sku: 'PKT-BAR-005',
+    name: 'Pacote Insumos Coquetelaria & Gelo Filtrado (1.000 pax)',
+    version: 'Insumos para até 1.000 pessoas, com frete refrigerado',
+    category: 'Bebidas & Bar',
+    type: 'Insumo / Consumível',
+    unit: 'Pacote Fechado',
+    price: 14500,
+    cost: 10200,
+    status: 'Disponível',
+    description: 'Insumos para até 1.000 pessoas, com frete refrigerado.',
+    specs: [
+      ['Capacidade', 'Até 1.000 pessoas'],
+      ['Gelo', '1.200 kg filtrado em barras e cubos'],
+      ['Entrega', 'Frete frigorífico incluso'],
+      ['Validade', 'Lote fechado no dia do evento'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'BAR-019',
+    sku: 'EQP-BAR-019',
+    name: 'Câmara Fria Portátil 10 m³ (Standby)',
+    version: 'Container refrigerado com gerador dedicado',
+    category: 'Bebidas & Bar',
+    type: 'Equipamento / Pesado',
+    unit: 'Diária',
+    price: 2400,
+    cost: 1920,
+    status: 'Manutenção',
+    description: 'Equipamento em revisão semestral.',
+    specs: [
+      ['Volume útil', '10 m³'],
+      ['Faixa de temperatura', '-2 °C a 8 °C'],
+      ['Energia', 'Gerador dedicado a diesel'],
+      ['Revisão', 'Semestral, em andamento'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'LUZ-001',
+    sku: 'EQP-LUZ-001',
+    name: 'Kit Moving Heads (8 refletores + controle)',
+    version: 'Kit beam/spot com mesa de controle',
+    category: 'Iluminação',
+    type: 'Equipamento / Iluminação',
+    unit: 'Kit / Diária',
+    price: 6500,
+    cost: 4200,
+    status: 'Disponível',
+    description: 'Kit com 8 refletores e controle de iluminação.',
+    specs: [
+      ['Refletores', '8 moving heads 300W'],
+      ['Controle', 'Mesa DMX 512 com 48 canais'],
+      ['Cabeamento', 'Incluso (DMX e energia)'],
+      ['Montagem', '2 horas, 2 técnicos'],
+    ],
+    usage: [{ event: 'Lil Peep Tour', detail: 'SoundWave Live Latam', tag: '2 kits cotados', tone: 'blue' }],
+  },
+  {
+    id: 'LUZ-004',
+    sku: 'EQP-LUZ-004',
+    name: 'Mesa de Iluminação GrandMA3 Compact',
+    version: 'Console com licença completa e backup',
+    category: 'Iluminação',
+    type: 'Equipamento / Controle',
+    unit: 'Unidade / Diária',
+    price: 3200,
+    cost: 2100,
+    status: 'Disponível',
+    description: 'Console de iluminação para shows de médio e grande porte.',
+    specs: [
+      ['Universos', '4.096 parâmetros'],
+      ['Saídas', '8 portas DMX / Art-Net'],
+      ['Backup', 'Console reserva em stand-by'],
+      ['Operador', 'Opcional, sob consulta'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'PAL-002',
+    sku: 'PRD-PAL-002',
+    name: 'Palco Modular 12 x 8 m (Piso Antiderrapante)',
+    version: 'Cobertura em treliça Q30 inclusa',
+    category: 'Estrutura & Palco',
+    type: 'Produto / Estrutura',
+    unit: 'Módulo / Diária',
+    price: 18500,
+    cost: 12900,
+    status: 'Disponível',
+    description: 'Palco modular com cobertura e rampa de acesso.',
+    specs: [
+      ['Área útil', '12 m x 8 m x 1,5 m alt.'],
+      ['Carga', 'Até 750 kg/m²'],
+      ['Montagem', '8h, equipe de 6 pessoas'],
+      ['Laudo', 'ART e laudo estrutural inclusos'],
+    ],
+    usage: [{ event: 'Michael Jackson', detail: 'Legacy Global Entertainment', tag: '1 palco cotado', tone: 'blue' }],
+  },
+  {
+    id: 'PAL-007',
+    sku: 'PRD-PAL-007',
+    name: 'Cobertura Geodésica 15 m',
+    version: 'Domo para hospitalidade com piso e climatização',
+    category: 'Estrutura & Palco',
+    type: 'Produto / Estrutura',
+    unit: 'Unidade / Evento',
+    price: 24000,
+    cost: 17300,
+    status: 'Alocado',
+    allocatedEvents: 1,
+    description: 'Domo de alta resistência para áreas VIP.',
+    specs: [
+      ['Diâmetro', '15 m'],
+      ['Capacidade', 'Até 180 pessoas'],
+      ['Climatização', '2 unidades de 60.000 BTU'],
+      ['Montagem', '2 dias, equipe de 8 pessoas'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'BUF-003',
+    sku: 'SRV-BUF-003',
+    name: 'Buffet Premium de Camarim (50 pax)',
+    version: 'Cardápio rider + opções vegetarianas',
+    category: 'Alimentação & Buffet',
+    type: 'Serviço / Alimentação',
+    unit: 'Pacote / Diária',
+    price: 9800,
+    cost: 6500,
+    status: 'Disponível',
+    description: 'Alimentação de produção e artistas, com equipe de apoio.',
+    specs: [
+      ['Capacidade', '50 pessoas por turno'],
+      ['Cardápio', 'Conforme rider do artista'],
+      ['Equipe', '4 profissionais de apoio'],
+      ['Opções', 'Vegetariana, vegana e sem glúten'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'SOM-001',
+    sku: 'EQP-SOM-001',
+    name: 'Line Array 12 Caixas + Subwoofers',
+    version: 'Sistema P.A. para até 10.000 pessoas',
+    category: 'Som & Acústica',
+    type: 'Equipamento / Áudio',
+    unit: 'Sistema / Diária',
+    price: 21000,
+    cost: 14200,
+    status: 'Disponível',
+    description: 'Sistema de áudio profissional com amplificação e processamento.',
+    specs: [
+      ['Caixas', '12 line array + 6 subwoofers'],
+      ['Potência', '48 kW RMS'],
+      ['Processamento', 'Controle remoto via rede'],
+      ['Equipe', '1 operador de P.A. + 2 técnicos'],
+    ],
+    usage: [],
+  },
+  {
+    id: 'SEG-005',
+    sku: 'SRV-SEG-005',
+    name: 'Brigada de Segurança Patrimonial (Turno 12h)',
+    version: 'Equipe uniformizada com rádio comunicador',
+    category: 'Segurança & Apoio',
+    type: 'Serviço / Mão de obra',
+    unit: 'Equipe / Turno',
+    price: 7400,
+    cost: 5200,
+    status: 'Disponível',
+    description: 'Equipe de 12 profissionais para controle de acesso e ronda.',
+    specs: [
+      ['Efetivo', '12 profissionais + 1 líder'],
+      ['Turno', '12 horas'],
+      ['Comunicação', 'Rádios digitais'],
+      ['Certificação', 'Curso de vigilante em dia'],
+    ],
+    usage: [],
+  },
+];
