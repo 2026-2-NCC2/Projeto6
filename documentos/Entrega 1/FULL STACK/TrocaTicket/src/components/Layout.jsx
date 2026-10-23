@@ -17,8 +17,9 @@ const menus = {
   ],
   admin: [
     ['Painel geral', '/admin'],
-    ['Lista de eventos', '/eventos'],
-    ['Aprovações', '/admin/moderacao'],
+    ['Relatórios', '/admin/relatorios/tim-maia'],
+    ['Moderação', '/admin/moderacao'],
+    ['Eventos', '/eventos'],
   ],
   comprador: [
     ['Início', '/eventos'],

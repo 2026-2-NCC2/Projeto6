@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel } from '../components/UI';
 import { roleNames } from '../data/demo';
-import AdminProfile from './ProfileAdmin';
-
-// Administrador usa a tela nova; os demais perfis mantêm a tela atual.
 export default function Profile() {
-  const { role } = useStore();
-  return role === 'admin' ? <AdminProfile /> : <GenericProfile />;
-}
-
-function GenericProfile() {
   const { data, update, role, notify } = useStore();
   const [form, setForm] = useState(data.profile);
   const [error, setError] = useState('');
@@ -109,6 +101,31 @@ function GenericProfile() {
             conectado.
           </div>
         </Panel>
+        {role === 'organizador' && (
+          <Panel
+            title="Dados da organização"
+            subtitle="Informações opcionais para identificar a empresa ou produtora responsável pelos eventos."
+          >
+            <div className="form-grid">
+              <Field
+                label="Nome da organização"
+                name="profile-organization"
+                placeholder="Ex.: Produções Horizonte"
+                value={form.organizationName || ''}
+                onChange={(e) => setForm({ ...form, organizationName: e.target.value })}
+              />
+              <Field
+                label="CNPJ"
+                name="profile-cnpj"
+                placeholder="00.000.000/0000-00"
+                value={form.cnpj || ''}
+                onChange={(e) => setForm({ ...form, cnpj: e.target.value })}
+              />
+            </div>
+            <p className="muted">Preencha esses dados se o organizador representar uma empresa. O protótipo salva as alterações apenas neste navegador.</p>
+          </Panel>
+        )}
+        {role !== 'organizador' && (
         <Panel
           title="Opções & Preferências do Sistema"
           subtitle="Preferências demonstrativas; nenhuma mensagem externa será enviada."
@@ -137,6 +154,7 @@ function GenericProfile() {
             </label>
           ))}
         </Panel>
+        )}
         {error && (
           <p role="alert" className="field-error">
             {error}
