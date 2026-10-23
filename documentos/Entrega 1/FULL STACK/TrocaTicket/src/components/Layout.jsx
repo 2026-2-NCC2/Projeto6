@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
+import { initialsOf } from '../utils/format';
 const menus = {
   organizador: [
     ['Início', '/organizador'],
@@ -17,8 +18,9 @@ const menus = {
   ],
   admin: [
     ['Painel geral', '/admin'],
-    ['Lista de eventos', '/eventos'],
-    ['Aprovações', '/admin/moderacao'],
+    ['Relatórios', '/admin/relatorios/tim-maia'],
+    ['Moderação', '/admin/moderacao'],
+    ['Eventos', '/eventos'],
   ],
   comprador: [
     ['Início', '/eventos'],
@@ -29,7 +31,7 @@ const menus = {
 };
 export default function Layout() {
   const { pathname } = useLocation();
-  const { role, chooseRole } = useStore();
+  const { data, role, chooseRole } = useStore();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
@@ -40,6 +42,8 @@ export default function Layout() {
       : pathname.startsWith('/admin')
         ? 'admin'
         : role || 'comprador';
+  const supplier = activeRole === 'fornecedor' ? data.supplierProfile : null;
+  const supplierName = supplier ? supplier.tradeName || supplier.name : '';
   const publicPage = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -100,13 +104,19 @@ export default function Layout() {
               >
                 ♧<i />
               </button>
-              <Link to="/perfil" aria-label="Configurações do perfil">
+              <Link
+                to={activeRole === 'fornecedor' ? '/fornecedor/perfil' : '/perfil'}
+                aria-label="Configurações do perfil"
+              >
                 ⚙
               </Link>
               <Link className="user-chip" to="/perfis">
-                <span className="avatar small">CM</span>
+                <span className="avatar small">
+                  {supplier?.photo ? <img src={supplier.photo} alt="" /> : supplier ? initialsOf(supplierName) : 'CM'}
+                </span>
                 <span>
-                  MINHA CONTA<small>{roleNames[activeRole]}</small>
+                  {supplier ? supplierName.toUpperCase() : 'MINHA CONTA'}
+                  <small>{roleNames[activeRole]}</small>
                 </span>
               </Link>
             </div>
