@@ -10,7 +10,9 @@ import SupplierQuote from './pages/supplier/SupplierQuote';
 import SupplierInventory from './pages/supplier/SupplierInventory';
 import SupplierProfile from './pages/supplier/SupplierProfile';
 import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organizer';
-import { Admin, Report, Moderation } from './pages/Admin';
+import Admin from './pages/Admin';
+import Moderation  from './pages/Moderation';
+import Report from './pages/Report';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 function Info({ title, children }) {
   return (
