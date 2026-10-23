@@ -24,7 +24,7 @@ const SORTS = {
 const fmt = (n) => n.toLocaleString('pt-BR');
 const asEvent = (event) => ({ ...event, report: eventReports[event.id] });
 
-export function Admin() {
+export default function Admin() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Todos');
   const [sort, setSort] = useState('Data');
