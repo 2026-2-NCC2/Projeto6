@@ -5,6 +5,7 @@ import { latestSuppliers, suppliers } from '../data/demo';
 import { Empty, Modal, Tabs } from '../components/UI';
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
+import EventCard from '../components/EventCard';
 
 const FINALIZED_THIS_YEAR = 42; // sem eventos finalizados nos dados de demonstração
 const PAGE_SIZE = 3;
@@ -16,12 +17,14 @@ const STATUS_CLASS = {
   Rascunho: 'gray',
   Cancelado: 'red',
 };
+
 const CATEGORY_CLASS = {
   Corporativo: 'blue',
   'Show / Cultura': 'purple',
   Workshop: 'teal',
   Social: 'pink',
 };
+
 const CHIP_TONES = ['blue', 'amber', 'purple'];
 const VIEWS = ['Grade', 'Lista', 'Calendário'];
 const STATUS_FILTERS = ['Todos', 'Confirmado', 'Em andamento', 'Agendado', 'Rascunho', 'Publicado'];
@@ -192,13 +195,15 @@ function MyEvents({ events, list }) {
         aria-label={list ? undefined : 'Meus eventos (role para o lado)'}
       >
         {events.map((event) => (
-          <article className="oh-event" key={event.id}>
-            <div className="oh-event-image">
-              <img src={event.image} alt="" loading="lazy" />
-              <span className={`oh-status ${STATUS_CLASS[event.status] || 'blue'}`}>
-                {event.status}
-              </span>
-              <div className="oh-menu" onKeyDown={(e) => e.key === 'Escape' && setMenu(null)}>
+          <EventCard
+            key={event.id}
+            event={{
+              ...event,
+              date: rangeLabel(event), 
+            }}
+            variant="organizer"
+            actions={
+              <>
                 <button
                   type="button"
                   aria-label={`Mais ações: ${event.title}`}
@@ -215,27 +220,9 @@ function MyEvents({ events, list }) {
                     </Link>
                   </div>
                 )}
-              </div>
-            </div>
-            <div className="oh-event-body">
-              <p className={`oh-category ${CATEGORY_CLASS[event.category] || 'blue'}`}>
-                {event.category}
-              </p>
-              <h3>{event.title}</h3>
-              <p className="oh-meta">
-                <Icon name="calendar" size={16} /> {rangeLabel(event)}
-              </p>
-              <p className="oh-meta">
-                <Icon name="pin" size={16} /> {event.location}
-              </p>
-              <footer>
-                <span>
-                  Capacidade: <strong>{event.capacity.toLocaleString('pt-BR')}</strong>
-                </span>
-                <Link to={`/organizador/eventos/${event.id}/consolidar`}>Detalhes →</Link>
-              </footer>
-            </div>
-          </article>
+              </>
+            }
+          />
         ))}
       </div>
     </section>

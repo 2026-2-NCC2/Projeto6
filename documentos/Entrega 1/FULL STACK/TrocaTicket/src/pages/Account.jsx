@@ -3,41 +3,64 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
 import { Field, Tabs } from '../components/UI';
+
 export default function Account({ login = false }) {
-  const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { chooseRole, notify } = useStore();
-  const [profile, setProfile] = useState(
-    ['comprador', 'organizador', 'fornecedor'].includes(params.get('perfil'))
-      ? params.get('perfil')
-      : 'comprador',
-  );
+
+  const [params] = useSearchParams();
+  const [profile, setProfile] = useState(['comprador', 'organizador', 'fornecedor'].includes(params.get('perfil')) ? params.get('perfil') : 'comprador');
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
+  const { chooseRole, notify } = useStore();
+
   async function submit(event) {
+
     event.preventDefault();
+
     const data = Object.fromEntries(new FormData(event.currentTarget));
     const next = {};
-    if (!login && data.name.trim().length < 2) next.name = 'Informe seu nome completo.';
-    if (!login && ![11, 14].includes(data.document.replace(/\D/g, '').length))
+
+    if (!login && data.name.trim().length < 2) {
+      next.name = "Informe seu nome completo.";
+    }
+
+    if (!login && ![11, 14].includes(data.document.replace(/\D/g, '').length)) {
       next.document = 'Use 11 dígitos para CPF ou 14 para CNPJ (fictício).';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) next.email = 'Informe um e-mail válido.';
-    if (data.password.length < 8) next.password = 'Use pelo menos 8 caracteres.';
-    if (!login && data.confirm !== data.password) next.confirm = 'As senhas não conferem.';
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      next.email = 'Informe um e-mail válido.';
+    }
+
+    if (data.password.length < 8) {
+      next.password = 'Use pelo menos 8 caracteres.';
+    }
+      
+    if (!login && data.confirm !== data.password) {
+      next.confirm = 'As senhas não conferem.';
+    }
+
     setErrors(next);
+    
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
+    
     setBusy(true);
+   
     await new Promise((resolve) => setTimeout(resolve, 450));
+    
     chooseRole(profile);
+    
     notify(
       login ? 'Acesso de demonstração iniciado.' : 'Cadastro validado. Bem-vindo à demonstração!',
     );
+    
     navigate(login ? '/perfis' : destinations[profile]);
   }
+
   return (
     <section className="auth-page">
       <div className="auth-card">
@@ -125,6 +148,7 @@ export default function Account({ login = false }) {
     </section>
   );
 }
+
 export function Profiles() {
   const { chooseRole } = useStore();
   const navigate = useNavigate();
