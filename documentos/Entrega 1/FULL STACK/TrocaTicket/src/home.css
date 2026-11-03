@@ -921,3 +921,28 @@
     display: block;
   }
 }
+
+.hero h1 em.breathing-glow {
+  font-style: normal;
+  display: inline-block;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Garante que a cor permaneça branca */
+  animation: whiteBreatheGlow 3s ease-in-out infinite;
+}
+
+@keyframes whiteBreatheGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 4px rgba(255, 255, 255, 0.8),
+      0 0 12px rgba(255, 255, 255, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 
+      0 0 6px #ffffff,
+      0 0 18px rgba(255, 255, 255, 0.9),
+      0 0 32px rgba(168, 85, 247, 0.7), /* Halo neon roxo suave para destacar o brilho branco */
+      0 0 45px rgba(236, 72, 153, 0.5);
+    transform: scale(1.04);
+  }
+}
