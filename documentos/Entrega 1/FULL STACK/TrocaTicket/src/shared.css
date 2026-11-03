@@ -1,0 +1,162 @@
+/* Peças compartilhadas pelas telas novas: busca, paginação, selos e botões */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  background: white;
+  border: 1px solid #c9d6ea;
+  border-radius: 10px;
+  padding: 0 14px;
+  color: #6c7f9d;
+}
+.search-box:focus-within {
+  outline: 3px solid #b8c9ff;
+  outline-offset: 2px;
+}
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  padding: 10px 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+.search-box.wide {
+  flex: 1 1 320px;
+}
+.search-box.wide input {
+  padding: 13px 0;
+  font-size: 15px;
+}
+
+.button.soft,
+.button.dark svg,
+.button.outline svg {
+  flex-shrink: 0;
+}
+.button.soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f1f4f8;
+  color: #243148;
+  font-weight: 600;
+  font-size: 14px;
+}
+.button.soft:hover {
+  background: #e7ecf4;
+}
+.page-title .actions .button,
+.rp-tools .button,
+.fc-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Selo de situação com ponto colorido */
+.rp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border: 1px solid #a5efcf;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #00855f;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rp-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.rp-status.blue {
+  border-color: #cfe0ff;
+  background: #eff5ff;
+  color: #2357e5;
+}
+.rp-status.amber {
+  border-color: #fde69a;
+  background: #fffbeb;
+  color: #b46b00;
+}
+
+/* Paginação */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 4px 0;
+  font-size: 14px;
+  color: #506583;
+}
+.pager-summary strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.pager-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pager-nav button {
+  min-width: 36px;
+  padding: 7px 12px;
+  border: 1px solid #cbd7e8;
+  border-radius: 6px;
+  background: white;
+  color: #243148;
+  font-size: 14px;
+}
+.pager-nav button:hover:not(:disabled):not(.active) {
+  background: #f1f4f8;
+}
+.pager-nav button.active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: white;
+  font-weight: 700;
+}
+.pager-nav button:disabled {
+  color: #9aa6b8;
+}
+.pager-gap {
+  padding: 0 4px;
+  color: #9aa6b8;
+}
+.pager-nav button:focus-visible {
+  outline: 3px solid #b8c9ff;
+  outline-offset: 2px;
+}
+
+.icon-action {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #6c7f9d;
+}
+.icon-action:hover {
+  background: #eef1f6;
+  color: var(--ink);
+}
+.icon-action:focus-visible {
+  outline: 3px solid #b8c9ff;
+}
