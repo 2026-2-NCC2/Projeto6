@@ -19,10 +19,19 @@ export default function EventCard({
   actions,
   metrics,
 }) {
-  const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value) =>
+    Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // Mapeia as classes originais do CSS para manter as regras de Grid, Flexbox e sombras intactas
+  const getArticleClasses = () => {
+    const base = `event-card-unified variant-${variant}`;
+    if (variant === 'admin') return `${base} ah-card`;
+    if (variant === 'organizer') return `${base} oh-event managed-event`;
+    return `${base} event-card`;
+  };
 
   return (
-    <article className={`event-card-unified variant-${variant}`}>
+    <article className={getArticleClasses()}>
       {/* --- ADMIN --- */}
       {variant === 'admin' && (
         <div className="ah-card-body">
@@ -74,33 +83,41 @@ export default function EventCard({
       {/* --- ORGANIZADOR --- */}
       {variant === 'organizer' && (
         <>
-          <div className="oh-event-image">
+          <div className="oh-event-image managed-image">
             <img src={event.image} alt={event.imageAlt || event.title} loading="lazy" />
-            {event.status && <span className={`oh-status ${event.statusTone || 'blue'}`}>{event.status}</span>}
+            {event.status && (
+              <span className={`oh-status ${event.statusTone || 'blue'}`}>
+                {event.status}
+              </span>
+            )}
             {actions && <div className="oh-menu">{actions}</div>}
           </div>
-          <div className="oh-event-body">
-            {event.category && <p className="oh-category">{event.category}</p>}
+          <div className="oh-event-body managed-body">
+            {event.category && <p className="oh-category eyebrow purple">{event.category}</p>}
             <h3>{event.title}</h3>
             <p className="oh-meta">📅 {event.date} {event.time ? `• ${event.time}` : ''}</p>
             <p className="oh-meta">📍 {event.location}</p>
             <footer>
-              {event.capacity && (
-                <span>Capacidade: <strong>{event.capacity.toLocaleString('pt-BR')}</strong></span>
-              )}
-              <Link to={`/organizador/eventos/${event.id}/consolidar`}>Detalhes →</Link>
+              {event.capacity ? (
+                <span>
+                  Capacidade: <strong>{typeof event.capacity === 'number' ? event.capacity.toLocaleString('pt-BR') : event.capacity}</strong>
+                </span>
+              ) : <span />}
+              <Link className="text-link" to={`/organizador/eventos/${event.id}/consolidar`}>
+                Detalhes →
+              </Link>
             </footer>
           </div>
         </>
       )}
 
-      {/* --- PARTICIPANTE --- */}
+      {/* --- PARTICIPANTE / PÚBLICO --- */}
       {(variant === 'public' || variant === 'participant') && (
         <>
           <div className="event-image">
             <img loading="lazy" src={event.image} alt={event.imageAlt || event.title} />
-            <span className="verified">✓ Verificado</span>
-            {variant === 'participant' && onToggleFavorite && (
+            <span className="event-tag">{event.tag || 'Ingresso demonstrativo'}</span>
+            {onToggleFavorite && (
               <button
                 type="button"
                 className={`favorite ${isFavorite ? 'saved' : ''}`}
@@ -113,22 +130,23 @@ export default function EventCard({
             )}
           </div>
           <div className="event-info">
-            <p className="event-meta">
-              {event.date} • {event.location}
-            </p>
             <h3>{event.title}</h3>
+            {event.date && <p className="event-meta">📅 {event.date}</p>}
+            {event.location && <p className="event-meta">📍 {event.location}</p>}
             <div className="event-bottom">
               <div>
                 <small>A partir de</small>
                 <strong>{formatCurrency(event.price)}</strong>
               </div>
-              <Link
-                to={`/eventos/${event.id}`}
-                className="ticket-link"
-                aria-label={`Ver ingressos: ${event.title}`}
-              >
-                Ver Ingressos
-              </Link>
+              {actions || (
+                <Link
+                  to={`/eventos/${event.id}`}
+                  className="ticket-link"
+                  aria-label={`Ver opções: ${event.title}`}
+                >
+                  Ver opções →
+                </Link>
+              )}
             </div>
           </div>
         </>
