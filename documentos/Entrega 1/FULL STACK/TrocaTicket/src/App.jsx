@@ -1,7 +1,10 @@
 import React from 'react';
-import { Routes, Route, Link } from 'react-router';
+import { Routes, Route, Link, useParams } from 'react-router';
+import { useStore } from './context/Store'; // 1. Importa o useStore
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import HomeProfile from './pages/home_profile'; // 2. Importa a home_profile correta
+import ConhecaForum from './pages/conheca_forum';
 import Account, { Profiles, Recover } from './pages/Account';
 import Profile from './pages/Profile';
 import { EventEditor, Consolidation, Suppliers } from './pages/Organizer';
@@ -11,6 +14,7 @@ import { Admin } from './pages/Admin';
 import Report from './pages/Report';
 import Moderation from './pages/Moderation';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
+
 function Info({ title, children }) {
   return (
     <div className="workspace narrow">
@@ -24,11 +28,16 @@ function Info({ title, children }) {
     </div>
   );
 }
+
 export default function App() {
+  const { role } = useStore(); // 3. Lê o role atual do utilizador
+
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Home />} />
+        {/* 4. Se tiver role logado, mostra HomeProfile; se não, mostra Home pública */}
+        <Route index element={role ? <HomeProfile /> : <Home />} />
+
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
         <Route path="recuperar" element={<Recover />} />
@@ -39,6 +48,7 @@ export default function App() {
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
         <Route path="comunidade" element={<Community />} />
+        <Route path="conheca_forum" element={<ConhecaForum />} />
         <Route path="organizador" element={<OrganizerHome />} />
         <Route path="organizador/eventos" element={<OrganizerHome list />} />
         <Route path="organizador/novo" element={<EventEditor key="new" />} />
@@ -96,11 +106,12 @@ export default function App() {
     </Routes>
   );
 }
-import { useParams } from 'react-router';
+
 function EventEditorRoute() {
   const { id } = useParams();
   return <EventEditor key={id} />;
 }
+
 function QuoteRoute() {
   const { id } = useParams();
   return <Quote key={id} />;

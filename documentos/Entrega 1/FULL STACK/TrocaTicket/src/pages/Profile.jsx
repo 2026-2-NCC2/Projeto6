@@ -1,161 +1,167 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/Store';
-import { Field, PageTitle, Panel } from '../components/UI';
-import { roleNames } from '../data/demo';
-import AdminProfile from './ProfileAdmin';
 
-// Administrador usa a tela nova; os demais perfis mantêm a tela atual.
 export default function Profile() {
-  const { role } = useStore();
-  return role === 'admin' ? <AdminProfile /> : <GenericProfile />;
-}
+  const { notify } = useStore();
 
-function GenericProfile() {
-  const { data, update, role, notify } = useStore();
-  const [form, setForm] = useState(data.profile);
-  const [error, setError] = useState('');
-  function photo(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (
-      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) ||
-      file.size > 2 * 1024 * 1024
-    ) {
-      setError('Escolha uma imagem PNG, JPG ou WEBP de até 2 MB.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => setForm((old) => ({ ...old, photo: reader.result }));
-    reader.readAsDataURL(file);
-  }
+  // Puxa estritamente o que foi salvo no localStorage ou usa vazios para depurar
+  const [name, setName] = useState(localStorage.getItem('userName') || 'Felipe');
+  const [email, setEmail] = useState(
+    localStorage.getItem('userEmail') || localStorage.getItem('user_email') || 'felipe@exemplo.com',
+  );
+  const [phone, setPhone] = useState(localStorage.getItem('userPhone') || '(11) 98452-1100');
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userEmail', email);
+    localStorage.setItem('userPhone', phone);
+    notify('Perfil atualizado com sucesso!');
+  };
+
+  const userInitials = name
+    .split(' ')
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+
   return (
-    <div className="workspace narrow">
-      <PageTitle
-        title="Configurações & Perfil"
-        subtitle="Gerencie seus dados de demonstração e suas preferências de comunicação."
-      />
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (form.name.trim().length < 2) {
-            setError('Informe um nome válido.');
-            return;
-          }
-          update('profile', form);
-          setError('');
-          notify('Perfil salvo neste navegador.');
-        }}
-      >
-        <Panel className="profile-banner">
-          <div className="avatar large">
-            {form.photo ? (
-              <img src={form.photo} alt="Foto de perfil" />
-            ) : (
-              form.name.slice(0, 2).toUpperCase()
-            )}
-          </div>
-          <div>
-            <h2>{form.name}</h2>
-            <label className="button dark upload-label">
-              ↑ Enviar nova foto
-              <input type="file" accept="image/png,image/jpeg,image/webp" onChange={photo} />
-            </label>
-            <button
-              type="button"
-              className="button text-danger"
-              onClick={() => setForm({ ...form, photo: '' })}
-            >
-              Remover foto
-            </button>
-            <p className="muted">PNG, JPG ou WEBP · até 2 MB</p>
-          </div>
-        </Panel>
-        <Panel
-          title="Informações Pessoais & Contato"
-          subtitle="Use dados fictícios: as informações ficam armazenadas neste navegador."
+    <section className="inner-page">
+      <div className="detail-card" style={{ maxWidth: '700px' }}>
+        <h1>Configurações & Perfil</h1>
+        <p>Gerencie seus dados de demonstração e suas preferências de comunicação.</p>
+
+        {/* Card do Avatar e Nome Principal */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            background: '#f8f9fc',
+            padding: '20px',
+            borderRadius: '12px',
+            margin: '24px 0',
+            border: '1px solid #dce2ed',
+          }}
         >
-          <div className="form-grid">
-            <Field
-              label="Nome completo"
-              name="profile-name"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            <Field
-              label="Tipo de perfil"
-              name="profile-role"
-              value={roleNames[role] || 'Participante'}
-              readOnly
-            />
-            <Field
-              label="E-mail"
-              name="profile-email"
-              type="email"
-              required
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <Field
-              label="Telefone / WhatsApp"
-              name="profile-phone"
-              type="tel"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            />
-          </div>
-          <div className="info-note">
-            A autenticação e a alteração de senha estarão disponíveis quando o backend for
-            conectado.
-          </div>
-        </Panel>
-        <Panel
-          title="Opções & Preferências do Sistema"
-          subtitle="Preferências demonstrativas; nenhuma mensagem externa será enviada."
-        >
-          {[
-            'Notificações por e-mail',
-            'Alertas críticos no celular / WhatsApp',
-            'Relatórios financeiros semanais',
-            'Lembretes de homologação de contratos',
-          ].map((name, i) => (
-            <label className="preference" key={name}>
-              <span>
-                <strong>{name}</strong>
-                <small>Personalize os avisos que deseja acompanhar.</small>
-              </span>
-              <input
-                type="checkbox"
-                checked={form.preferences[i]}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    preferences: form.preferences.map((v, j) => (j === i ? e.target.checked : v)),
-                  })
-                }
-              />
-            </label>
-          ))}
-        </Panel>
-        {error && (
-          <p role="alert" className="field-error">
-            {error}
-          </p>
-        )}
-        <div className="actions end">
-          <button
-            className="button outline"
-            type="button"
-            onClick={() => {
-              setForm(data.profile);
-              setError('');
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: '#5440eb',
+              color: 'white',
+              display: 'grid',
+              placeItems: 'center',
+              fontSize: '22px',
+              fontWeight: 'bold',
             }}
           >
-            Cancelar alterações
-          </button>
-          <button className="button dark">✓ Salvar alterações</button>
+            {userInitials || 'U'}
+          </div>
+          <div>
+            <h2 style={{ fontSize: '20px', margin: '0 0 4px 0' }}>{name}</h2>
+            <p style={{ margin: 0, color: '#697991', fontSize: '13px' }}>{email}</p>
+          </div>
         </div>
-      </form>
-    </div>
+
+        {/* Formulário de Edição de Perfil */}
+        <form
+          onSubmit={handleSave}
+          style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '20px' }}
+        >
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontWeight: '600',
+                fontSize: '12px',
+                textTransform: 'uppercase',
+                marginBottom: '6px',
+                color: '#697991',
+              }}
+            >
+              Nome Completo
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '7px',
+                border: '1px solid #c9d2e1',
+                fontSize: '14px',
+              }}
+            />
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontWeight: '600',
+                fontSize: '12px',
+                textTransform: 'uppercase',
+                marginBottom: '6px',
+                color: '#697991',
+              }}
+            >
+              E-mail
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '7px',
+                border: '1px solid #c9d2e1',
+                fontSize: '14px',
+              }}
+            />
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: 'block',
+                fontWeight: '600',
+                fontSize: '12px',
+                textTransform: 'uppercase',
+                marginBottom: '6px',
+                color: '#697991',
+              }}
+            >
+              Telefone / WhatsApp
+            </label>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '7px',
+                border: '1px solid #c9d2e1',
+                fontSize: '14px',
+              }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="button primary"
+            style={{ marginTop: '10px', justifyContent: 'center' }}
+          >
+            Salvar Alterações
+          </button>
+        </form>
+      </div>
+    </section>
   );
 }

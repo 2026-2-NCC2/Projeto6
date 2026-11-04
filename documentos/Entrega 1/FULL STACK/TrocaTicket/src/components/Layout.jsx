@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
+
 const menus = {
   organizador: [
     ['Início', '/organizador'],
@@ -21,18 +22,20 @@ const menus = {
     ['Aprovações', '/admin/moderacao'],
   ],
   comprador: [
-    ['Início', '/eventos'],
+    ['Início', '/'],
     ['Comunidade', '/comunidade'],
     ['Meus ingressos', '/ingressos'],
     ['Favoritos', '/favoritos'],
   ],
 };
+
 export default function Layout() {
   const { pathname } = useLocation();
   const { role, chooseRole } = useStore();
   const navigate = useNavigate();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
+
   const activeRole = pathname.startsWith('/organizador')
     ? 'organizador'
     : pathname.startsWith('/fornecedor')
@@ -40,13 +43,17 @@ export default function Layout() {
       : pathname.startsWith('/admin')
         ? 'admin'
         : role || 'comprador';
-  const publicPage = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
+
+  const publicRoutes = ['/entrar', '/cadastro', '/perfis', '/recuperar'];
+  const publicPage = publicRoutes.includes(pathname) || (pathname === '/' && !role);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     setMenu(false);
     setNotifications(false);
     document.title = 'TrocaTicket — Eventos & ingressos';
   }, [pathname]);
+
   return (
     <div className={publicPage ? 'public-shell' : 'app-shell'}>
       <a className="skip-link" href="#conteudo">

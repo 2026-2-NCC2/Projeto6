@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useStore } from '../context/Store';
-import { destinations, roleNames } from '../data/demo';
+import { roleNames } from '../data/demo';
 import { Field, Tabs } from '../components/UI';
+
 export default function Account({ login = false }) {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { chooseRole, notify } = useStore();
+  const { chooseRole, updateProfile, notify } = useStore();
   const [profile, setProfile] = useState(
     ['comprador', 'organizador', 'fornecedor'].includes(params.get('perfil'))
       ? params.get('perfil')
@@ -15,29 +16,60 @@ export default function Account({ login = false }) {
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
+
   async function submit(event) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
     const next = {};
+
     if (!login && data.name.trim().length < 2) next.name = 'Informe seu nome completo.';
     if (!login && ![11, 14].includes(data.document.replace(/\D/g, '').length))
       next.document = 'Use 11 dígitos para CPF ou 14 para CNPJ (fictício).';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) next.email = 'Informe um e-mail válido.';
     if (data.password.length < 8) next.password = 'Use pelo menos 8 caracteres.';
     if (!login && data.confirm !== data.password) next.confirm = 'As senhas não conferem.';
+
     setErrors(next);
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
+
     setBusy(true);
     await new Promise((resolve) => setTimeout(resolve, 450));
+
+    // 1. Descobre o nome real digitado ou extrai do e-mail (ex: felipe@email.com -> Felipe)
+    let finalName = 'Felipe';
+    if (!login && data.name && data.name.trim()) {
+      finalName = data.name.trim();
+    } else if (data.email) {
+      const emailUser = data.email.split('@')[0];
+      finalName = emailUser.charAt(0).toUpperCase() + emailUser.slice(1);
+    }
+
+    // 2. Grava no localStorage para persistir de verdade mesmo se der F5
+    localStorage.setItem('userName', finalName);
+
+    // 3. Atualiza o estado da Store
+    if (updateProfile) {
+      updateProfile({
+        name: finalName,
+        email: data.email,
+      });
+    }
+
+    // 4. Atribui o perfil escolhido
     chooseRole(profile);
+
     notify(
-      login ? 'Acesso de demonstração iniciado.' : 'Cadastro validado. Bem-vindo à demonstração!',
+      login
+        ? `Bem-vindo de volta, ${finalName}!`
+        : `Conta criada com sucesso! Bem-vindo, ${finalName}!`,
     );
-    navigate(login ? '/perfis' : destinations[profile]);
+
+    navigate('/');
   }
+
   return (
     <section className="auth-page">
       <div className="auth-card">
@@ -67,7 +99,7 @@ export default function Account({ login = false }) {
                 label="Nome completo"
                 name="name"
                 autoComplete="name"
-                placeholder="João da Silva"
+                placeholder="Ex: Felipe Alves"
                 error={errors.name}
               />
               <Field
@@ -117,14 +149,11 @@ export default function Account({ login = false }) {
         <p className="auth-note">
           Demonstração: use dados fictícios. Senhas e documentos não são armazenados.
         </p>
-        <div className="divider">OU EXPLORE SEM CADASTRO</div>
-        <Link className="button outline full" to="/perfis">
-          Escolher perfil de demonstração →
-        </Link>
       </div>
     </section>
   );
 }
+
 export function Profiles() {
   const { chooseRole } = useStore();
   const navigate = useNavigate();
@@ -142,7 +171,7 @@ export function Profiles() {
             key={id}
             onClick={() => {
               chooseRole(id);
-              navigate(destinations[id]);
+              navigate('/');
             }}
           >
             <span className="role-symbol">{['♧', '⚑', '▣', '◇'][i]}</span>
@@ -167,6 +196,7 @@ export function Profiles() {
     </section>
   );
 }
+
 export function Recover() {
   const [done, setDone] = useState(false);
   return (
