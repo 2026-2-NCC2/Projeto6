@@ -5,6 +5,7 @@ import { STATUS_TONE, eventReports } from '../data/reports';
 import { Badge, DownloadButton, Empty, Panel, dateLabel, money } from '../components/UI';
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
+import EventCard from '../components/EventCard';
 
 // Tabela de lotes (dados de demonstração).
 const lots = [
@@ -155,59 +156,37 @@ export default function Admin() {
         {events.map((event, i) => {
           const r = event.report;
           return (
-            <article className="ah-card" key={event.id}>
-              <div className="ah-card-body">
-                <div className="ah-card-top">
-                  <span className="ah-tag">EVENTO {ROMAN[i]}</span>
-                  <span className={`rp-status ${STATUS_TONE[r.status]}`}>
-                    <i aria-hidden="true" />
-                    {r.status}
-                  </span>
-                </div>
-                <h3>{event.title}</h3>
-                <p className="ah-sub">{event.subtitle}</p>
-                <div className="ah-date">
-                  <span className="ah-date-icon">
-                    <Icon name="calendar" size={20} />
-                  </span>
-                  <div>
-                    <small>DATA DO EVENTO</small>
-                    <strong>{dateLabel(event.date)}</strong>
-                  </div>
-                  <span className="ah-chip">{r.city.split(',')[0]}</span>
-                </div>
-              </div>
-              <dl className="ah-rows">
-                <div>
-                  <dt>Organizador:</dt>
-                  <dd>{event.organizer}</dd>
-                </div>
-                <div>
-                  <dt>Ingressos vendidos:</dt>
-                  <dd>
-                    <span className="ah-pill">{fmt(r.sold)}</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Ocupação:</dt>
-                  <dd className="green">{String(r.occupancy).replace('.', ',')}%</dd>
-                </div>
-                <div>
-                  <dt>Faturamento bruto:</dt>
-                  <dd>{money(r.revenue)}</dd>
-                </div>
-              </dl>
-              <div className="ah-highlight">
-                <Icon name="chart" size={18} />
-                <span>
-                  {fmt(r.exchanges)} trocas · {r.conversion} de conversão
-                </span>
-                <Link to={`/admin/relatorios/${event.id}`}>Ver painel</Link>
-              </div>
-              <Link className="ah-cta" to={`/admin/relatorios/${event.id}`}>
-                Visão e Relatórios ↗
-              </Link>
-            </article>
+            <EventCard
+              key={event.id}
+              event={event}
+              variant="admin"
+              metrics={{
+                tag: `EVENTO ${ROMAN[i]}`,
+                status: r.status,
+                statusTone: STATUS_TONE[r.status],
+                city: r.city.split(',')[0],
+                rows: [
+                  { label: 'Organizador', value: event.organizer },
+                  { label: 'Ingressos vendidos', value: fmt(r.sold), tone: 'ah-pill' },
+                  { label: 'Ocupação', value: `${String(r.occupancy).replace('.', ',')}%`, tone: 'green' },
+                  { label: 'Faturamento bruto', value: money(r.revenue) },
+                ],
+                highlightText: (
+                  <>
+                    <Icon name="chart" size={18} />
+                    <span>
+                      {fmt(r.exchanges)} trocas · {r.conversion} de conversão
+                    </span>
+                    <Link to={`/admin/relatorios/${event.id}`}>Ver painel</Link>
+                  </>
+                ),
+              }}
+              actions={
+                <Link className="ah-cta" to={`/admin/relatorios/${event.id}`}>
+                  Visão e Relatórios ↗
+                </Link>
+              }
+            />
           );
         })}
       </div>

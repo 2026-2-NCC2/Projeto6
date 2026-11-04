@@ -3,41 +3,22 @@ import { Link, useParams } from 'react-router';
 import { useEvents, LoadState } from '../components/Events';
 import { useStore } from '../context/Store';
 import { Badge, Empty, Modal, PageTitle, Panel, Tabs, money } from '../components/UI';
+import EventCard from '../components/EventCard';
 
-export function EventCard({ event }) {
+export function EventCardWrapper({ event }) {
   const { data, toggleFavorite } = useStore();
   const saved = data.favorites.includes(event.id);
+  
   return (
-    <article className="discovery-card">
-      <div className="discovery-image">
-        <img src={event.image} alt={event.imageAlt || event.title} loading="lazy" />
-        <Badge tone="light">Ingresso demonstrativo</Badge>
-        <button
-          className={`favorite ${saved ? 'saved' : ''}`}
-          aria-label={`${saved ? 'Remover dos' : 'Adicionar aos'} favoritos: ${event.title}`}
-          aria-pressed={saved}
-          onClick={() => toggleFavorite(event.id)}
-        >
-          {saved ? '♥' : '♡'}
-        </button>
-      </div>
-      <div className="discovery-body">
-        <h3>{event.title}</h3>
-        <p>▦ {event.date}</p>
-        <p>⌖ {event.location}</p>
-        <div className="card-actions">
-          <div>
-            <small>A partir de</small>
-            <strong>{money(event.price)}</strong>
-          </div>
-          <Link className="ticket-link" to={`/eventos/${event.id}`}>
-            Ver opções →
-          </Link>
-        </div>
-      </div>
-    </article>
+    <EventCard 
+      event={event} 
+      variant="participant" 
+      isFavorite={saved} 
+      onToggleFavorite={toggleFavorite} 
+    />
   );
 }
+
 export function Catalog({ favorites = false }) {
   const state = useEvents();
   const { data } = useStore();
@@ -85,7 +66,7 @@ export function Catalog({ favorites = false }) {
           />
           <div className="discovery-grid">
             {filtered.slice(0, 4).map((e) => (
-              <EventCard event={e} key={e.id} />
+              <EventCardWrapper event={e} key={e.id}/>
             ))}
           </div>
           {filtered.length > 4 && (
@@ -96,7 +77,7 @@ export function Catalog({ favorites = false }) {
               />
               <div className="discovery-grid">
                 {filtered.slice(4).map((e) => (
-                  <EventCard event={e} key={e.id} />
+                  <EventCardWrapper event={e} key={e.id}/>
                 ))}
               </div>
             </>
