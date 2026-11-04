@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useStore } from '../context/Store';
 import { suppliers } from '../data/demo';
+import EventCard from '../../src/components/EventCard';
 import {
   Badge,
   Empty,
@@ -98,28 +99,14 @@ export function Organizer({ list = false }) {
           </div>
           <div className={view === 'Grade' ? 'organizer-grid' : 'event-list'}>
             {events.map((event) => (
-              <article className="managed-event" key={event.id}>
-                <div className="managed-image">
-                  <img src={event.image} alt={event.title} />
-                  <Badge>{event.status}</Badge>
-                </div>
-                <div className="managed-body">
-                  <p className="eyebrow purple">{event.category}</p>
-                  <h3>{event.title}</h3>
-                  <p>
-                    ▦ {dateLabel(event.date)} · {event.time}
-                  </p>
-                  <p>⌖ {event.location}</p>
-                  <div className="card-actions">
-                    <span>
-                      Capacidade: <strong>{event.capacity}</strong>
-                    </span>
-                    <Link className="text-link" to={`/organizador/eventos/${event.id}/consolidar`}>
-                      Detalhes →
-                    </Link>
-                  </div>
-                </div>
-              </article>
+              <EventCard
+                key={event.id}
+                event={{
+                  ...event,
+                  date: dateLabel(event.date),
+                }}
+                variant="organizer"
+              />
             ))}
           </div>
           {!events.length && <Empty />}
