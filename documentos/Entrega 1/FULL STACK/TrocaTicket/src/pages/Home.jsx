@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 import Events from '../components/Events';
+import '../home.css'
+
 const profiles = [
   {
     id: 'comprador',
@@ -39,6 +41,7 @@ const profiles = [
     ],
   },
 ];
+
 export default function Home() {
   return (
     <>
@@ -49,7 +52,8 @@ export default function Home() {
           </p>
           <h1>
             Compre e troque ingressos para
-            <br className="desktop-break" /> seus eventos <em>favoritos!</em>
+            <br className="desktop-break" /> seus eventos{' '}
+            <em className="breathing-glow">favoritos!</em>
           </h1>
           <p className="hero-description">
             Compre e transfira seus ingressos em poucos cliques com qualquer pessoa.
@@ -64,6 +68,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <section className="profiles section" aria-labelledby="profiles-title">
         <div className="section-heading">
           <p className="eyebrow">Acesso multi-perfil</p>
@@ -96,6 +101,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+
       <section id="como-funciona" className="how section">
         <div className="section-heading">
           <p className="eyebrow purple">Simplicidade & velocidade</p>
@@ -125,6 +131,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+
       <Events />
     </>
   );
