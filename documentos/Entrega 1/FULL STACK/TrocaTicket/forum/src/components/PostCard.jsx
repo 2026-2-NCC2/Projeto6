@@ -5,7 +5,7 @@ import { Avatar, LinkComunidade, Selo, Usuario, Votos, compartilhar } from "./Co
 import { useForum } from "../store/ForumContext.jsx";
 import { tempoRelativo } from "../utils/format.js";
 
-export const urlPublicacao = (p) => `/r/${p.comunidade}/post/${p.id}`;
+export const urlPublicacao = (p) => `/t/${p.comunidade}/post/${p.id}`;
 
 function MenuMais({ p }) {
   const f = useForum();

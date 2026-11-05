@@ -10,7 +10,18 @@ export function Avatar({ username, size = 28, online = false }) {
   const ehContaAtual = username === f.usuario.username;
   return (
     <span className="avatar" style={{ width: size, height: size, background: u.cor || (ehContaAtual ? "#3155df" : "#334155"), fontSize: size * 0.38 }} aria-hidden="true">
-      {(ehContaAtual && f.usuario.iniciais) || u.iniciais || iniciais(username)}
+      {ehContaAtual && f.usuario.photo ? (
+        <img
+          src={f.usuario.photo}
+          alt=""
+          className="avatar-foto"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      ) : (
+        (ehContaAtual && f.usuario.iniciais) || u.iniciais || iniciais(username)
+      )}
       {online && <span className="avatar-online" />}
     </span>
   );
@@ -78,8 +89,8 @@ export function Usuario({ username, prefixo = "u/" }) {
 
 export function LinkComunidade({ slug }) {
   return (
-    <Link className="link-comunidade" to={`/r/${slug}`} onClick={(e) => e.stopPropagation()}>
-      r/{slug}
+    <Link className="link-comunidade" to={`/t/${slug}`} onClick={(e) => e.stopPropagation()}>
+      t/{slug}
     </Link>
   );
 }

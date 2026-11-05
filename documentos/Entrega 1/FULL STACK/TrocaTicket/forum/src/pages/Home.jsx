@@ -1,20 +1,12 @@
 import { useMemo } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import Icon from "../components/Icon.jsx";
 import { Vazio } from "../components/Common.jsx";
 import { PostCardFeed } from "../components/PostCard.jsx";
-import { ComunidadesDestaque, DiscussoesRecentes, GarantiaTrocaTicket, LinksLegais } from "../components/Widgets.jsx";
+import { DiscussoesRecentes, GarantiaTrocaTicket, LinksLegais } from "../components/Widgets.jsx";
 import { categorias } from "../data/forum.js";
 import { useForum } from "../store/ForumContext.jsx";
 import { filtrarPorBusca, ordenar } from "../utils/feed.js";
-
-const abas = [
-  { id: "para-voce", rotulo: "Para você", icone: "flame" },
-  { id: "seguindo", rotulo: "Seguindo", icone: "heart" },
-  { id: "em-alta", rotulo: "Em alta", icone: "trending" },
-  { id: "recentes", rotulo: "Recentes", icone: "clock" },
-  { id: "mais-votados", rotulo: "Mais votados", icone: "arrowUp" },
-];
 
 const titulosEspeciais = {
   salvas: { titulo: "Publicações salvas", vazio: "Você ainda não salvou nenhuma publicação.", icone: "bookmark" },
@@ -41,12 +33,6 @@ export default function Home() {
     return ordenar(l, modo, f.pontuacao, { fixarOficiais: aba === "para-voce" && !busca });
   }, [f, aba, categoria, busca]);
 
-  const trocarAba = (id) => {
-    const p = new URLSearchParams(params);
-    if (id === "para-voce") p.delete("aba");
-    else p.set("aba", id);
-    setParams(p);
-  };
   const limpar = (chave) => {
     const p = new URLSearchParams(params);
     p.delete(chave);
@@ -56,33 +42,10 @@ export default function Home() {
   return (
     <>
       <main className="col-principal" tabIndex={-1}>
-        {!especial && (
-          <section className="hero">
-            <div>
-              <span className="hero-selo">
-                <Icon name="chat" size={14} /> Fórum Colaborativo
-              </span>
-              <h1>Tire dúvidas sobre ingressos, setores e reputação</h1>
-              <p>Conecte-se com mais de 35 mil fãs verificados em todo o Brasil.</p>
-            </div>
-            <Link to="/criar" className="btn btn-branco">
-              Publicar Agora
-            </Link>
-          </section>
-        )}
-
-        {especial ? (
+        {especial && (
           <h1 className="titulo-pagina">
             <Icon name={especial.icone} size={22} /> {especial.titulo}
           </h1>
-        ) : (
-          <div className="abas-feed" role="tablist" aria-label="Ordenar feed">
-            {abas.map((a) => (
-              <button key={a.id} type="button" role="tab" aria-selected={aba === a.id} className={aba === a.id ? "ativo" : ""} onClick={() => trocarAba(a.id)}>
-                <Icon name={a.icone} size={17} /> {a.rotulo}
-              </button>
-            ))}
-          </div>
         )}
 
         {(cat || busca) && (
@@ -123,7 +86,6 @@ export default function Home() {
 
       <aside className="col-direita">
         <GarantiaTrocaTicket />
-        <ComunidadesDestaque />
         <DiscussoesRecentes />
         <LinksLegais />
       </aside>

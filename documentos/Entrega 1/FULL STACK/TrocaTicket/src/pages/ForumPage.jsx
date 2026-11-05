@@ -15,12 +15,14 @@ export default function ForumPage() {
       name: perfil.name || 'Visitante TrocaTicket',
       email: perfil.email || '',
       role: role || 'comprador',
+      photo: perfil.photo || '/images/avatar-default.png',
+      username: perfil.username || '',
     },
   };
 
   const enviarIdentidade = useCallback(() => {
     frame.current?.contentWindow?.postMessage(identidade, window.location.origin);
-  }, [perfil.name, perfil.email, role]);
+  }, [perfil.name, perfil.email, perfil.photo, perfil.username, role]);
 
   useEffect(() => {
     const aplicarTema = (dark) => {
@@ -40,6 +42,7 @@ export default function ForumPage() {
       if (event.data?.type === 'TROCATICKET_THEME_CHANGED') aplicarTema(Boolean(event.data.dark));
     };
     window.addEventListener('message', aoReceber);
+    enviarIdentidade();
     return () => window.removeEventListener('message', aoReceber);
   }, [enviarIdentidade]);
 

@@ -69,10 +69,10 @@ export function ForumProvider({ children }) {
     if (!identidadeSite) return usuarioAtual;
     const nome = identidadeSite.name || "Visitante TrocaTicket";
     const emailBase = (identidadeSite.email || "").split("@")[0];
-    const username = (emailBase || nome.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_"))
+    const username = (identidadeSite.username || emailBase || nome.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_"))
       .replace(/^_+|_+$/g, "").toLowerCase() || "participante";
     const iniciais = nome.split(/\\s+/).filter(Boolean).slice(0, 2).map((parte) => parte[0]).join("").toUpperCase();
-    return { ...usuarioAtual, username, nome, iniciais, role: identidadeSite.role };
+    return { ...usuarioAtual, username, nome, iniciais, role: identidadeSite.role, photo: identidadeSite.photo || "" };
   }, [identidadeSite]);
   const idToast = useRef(0);
 
@@ -152,7 +152,7 @@ export function ForumProvider({ children }) {
       alternarSeguir: (slug) => {
         const segue = estado.seguindo.includes(slug);
         atualizar((e) => ({ seguindo: segue ? e.seguindo.filter((x) => x !== slug) : [...e.seguindo, slug] }));
-        toast(segue ? `Você deixou de seguir r/${slug}` : `Agora você segue r/${slug}`);
+        toast(segue ? `Você deixou de seguir t/${slug}` : `Agora você segue t/${slug}`);
       },
       removerPublicacao: (id) => {
         const publicacao = estado.minhasPublicacoes.find((item) => item.id === String(id));

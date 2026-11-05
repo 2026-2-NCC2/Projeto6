@@ -147,8 +147,8 @@ export default function PostDetail() {
     <>
       <main className="col-principal" tabIndex={-1}>
         <div className="trilha">
-          <button type="button" className="link-btn cinza" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(`/r/${c.slug}`))}>
-            <Icon name="arrowLeft" size={16} /> Voltar para o Feed / r/{c.slug}
+          <button type="button" className="link-btn cinza" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(`/t/${c.slug}`))}>
+            <Icon name="arrowLeft" size={16} /> Voltar para o Feed / t/{c.slug}
           </button>
           <nav aria-label="Trilha" className="trilha-direita">
             <Link to="/">Início</Link> &gt; <Link to={`/?categoria=${c.categoria}`}>{c.titulo.split(",")[0]}</Link> &gt; <span>Discussão #{p.id}</span>
@@ -211,7 +211,7 @@ export default function PostDetail() {
               <Icon name="chat" size={16} /> {f.totalComentarios(p)} comentários
             </a>
             <span className="espaco" />
-            <button type="button" className="acao" onClick={() => compartilhar(`#/r/${c.slug}/post/${p.id}`, f.toast)}>
+            <button type="button" className="acao" onClick={() => compartilhar(`#/t/${c.slug}/post/${p.id}`, f.toast)}>
               <Icon name="share" size={16} /> Compartilhar
             </button>
             <button type="button" className={`acao ${f.estaSalvo(p.id) ? "ativo" : ""}`} onClick={() => f.alternarSalvo(p.id)}>

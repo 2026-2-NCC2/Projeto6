@@ -82,7 +82,7 @@ export default function Community() {
                   className={`icone-btn redondo ${sino ? "ativo" : ""}`}
                   aria-pressed={sino}
                   aria-label="Notificações da comunidade"
-                  onClick={() => (setSino(!sino), f.toast(sino ? "Notificações desativadas" : `Você será avisado sobre novidades em r/${c.slug}`))}
+                  onClick={() => (setSino(!sino), f.toast(sino ? "Notificações desativadas" : `Você será avisado sobre novidades em t/${c.slug}`))}
                 >
                   <Icon name="bell" size={17} />
                 </button>
@@ -92,7 +92,7 @@ export default function Community() {
               </div>
             </div>
             <h1 className="com-nome">
-              r/{c.slug} <span className="selo selo-cinza">Comunidade {c.oficial ? "Oficial" : "Pública"}</span>
+              t/{c.slug} <span className="selo selo-cinza">Comunidade {c.oficial ? "Oficial" : "Pública"}</span>
             </h1>
             <p className="texto-suave">{c.titulo}</p>
             <p className="com-descricao">{c.descricao}</p>
@@ -117,7 +117,7 @@ export default function Community() {
 
         {aba === "sobre" ? (
           <section className="card card-texto sobre-detalhado">
-            <h2>Sobre r/{c.slug}</h2>
+            <h2>Sobre t/{c.slug}</h2>
             <p>{c.sobre}</p>
             <p>{c.descricao}</p>
             <h3>Regras</h3>
@@ -137,7 +137,7 @@ export default function Community() {
           <>
             <button type="button" className="card compositor" onClick={() => navigate(`/criar?r=${c.slug}`)}>
               <Avatar username={f.usuario.username} size={34} />
-              <span className="compositor-input">Publique algo ou tire uma dúvida em r/{c.slug}...</span>
+              <span className="compositor-input">Publique algo ou tire uma dúvida em t/{c.slug}...</span>
               <span className="compositor-icones" aria-hidden="true">
                 <Icon name="image" size={19} />
                 <Icon name="link" size={19} />
@@ -171,7 +171,7 @@ export default function Community() {
                     <Icon name="x" size={12} stroke={3} />
                   </button>
                 </span>
-                <span className="texto-suave">{lista.length} resultado(s) em r/{c.slug}</span>
+                <span className="texto-suave">{lista.length} resultado(s) em t/{c.slug}</span>
               </div>
             )}
 

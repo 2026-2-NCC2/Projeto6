@@ -37,7 +37,7 @@ export function GarantiaTrocaTicket() {
         Todas as negociações autenticadas contam com retenção do pagamento até a validação na portaria. Nunca compre ingressos transferidos por WhatsApp ou links
         suspeitos.
       </p>
-      <Link to="/r/AvisosESeguranca/post/8901" className="link-forte">
+      <Link to="/t/AvisosESeguranca/post/8901" className="link-forte">
         Conheça a blindagem P2P →
       </Link>
     </Card>
@@ -55,8 +55,8 @@ export function ComunidadesDestaque() {
       <ul className="lista-comunidades">
         {lista.map((c) => (
           <li key={c.slug}>
-            <Link to={`/r/${c.slug}`}>
-              <b>r/{c.slug}</b>
+            <Link to={`/t/${c.slug}`}>
+              <b>t/{c.slug}</b>
               <small>{numeroCompacto(c.membros)} membros</small>
             </Link>
             <BotaoSeguir slug={c.slug} pequeno />
@@ -87,7 +87,7 @@ export function DiscussoesRecentes() {
           {lista.map((p) => (
             <li key={p.id}>
               <Link to={urlPublicacao(p)}>
-                <small>r/{p.comunidade}</small>
+                <small>t/{p.comunidade}</small>
                 <b>{p.titulo}</b>
                 <span>
                   {f.pontuacao(p)} upvotes • {f.totalComentarios(p)} comentários
@@ -105,9 +105,9 @@ export function LinksLegais() {
   return (
     <div className="links-legais">
       <nav>
-        <Link to="/r/AvisosESeguranca">Diretrizes</Link>
-        <Link to="/r/ShowsEFestivais?aba=sobre">Privacidade</Link>
-        <Link to="/r/ShowsEFestivais?aba=sobre">Termos de Uso</Link>
+        <Link to="/t/AvisosESeguranca">Diretrizes</Link>
+        <Link to="/t/ShowsEFestivais?aba=sobre">Privacidade</Link>
+        <Link to="/t/ShowsEFestivais?aba=sobre">Termos de Uso</Link>
         <Link to="/?categoria=golpes">Denúncias</Link>
       </nav>
       <small>TrocaTicket Brasil © {new Date().getFullYear()}</small>
@@ -169,7 +169,7 @@ export function Regras({ c, compacto = false }) {
   const [aberta, setAberta] = useState(null);
   return (
     <Card>
-      <div className="card-titulo-pequeno">REGRAS DE R/{c.slug.toUpperCase()}</div>
+      <div className="card-titulo-pequeno">REGRAS DE T/{c.slug.toUpperCase()}</div>
       <ol className={`regras ${compacto ? "compacto" : ""}`}>
         {c.regras.map((r, i) => (
           <li key={r.titulo}>
@@ -197,8 +197,8 @@ export function ComunidadesRelacionadas({ atual }) {
         {lista.map((c) => (
           <li key={c.slug}>
             <ComunidadeIcone comunidade={c} size={30} />
-            <Link to={`/r/${c.slug}`}>
-              <b>r/{c.slug}</b>
+            <Link to={`/t/${c.slug}`}>
+              <b>t/{c.slug}</b>
               <small>{numeroCompacto(c.membros)} membros</small>
             </Link>
             <BotaoSeguir slug={c.slug} pequeno mais />
@@ -217,8 +217,8 @@ export function CartaoComunidade({ c }) {
         <ComunidadeIcone comunidade={c} size={44} />
         <BotaoSeguir slug={c.slug} pequeno />
       </div>
-      <Link to={`/r/${c.slug}`} className="cartao-comunidade-nome">
-        r/{c.slug}
+      <Link to={`/t/${c.slug}`} className="cartao-comunidade-nome">
+        t/{c.slug}
       </Link>
       <small className="texto-suave">Comunidade oficial TrocaTicket</small>
       <p className="texto-medio">{c.descricao}</p>

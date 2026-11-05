@@ -1614,3 +1614,103 @@ html[data-theme="dark"] .account-shell .header {
     animation-duration: .01ms !important;
   }
 }
+
+
+
+/* ==========================================================
+   HEADER GLOBAL — correção de posicionamento em TODAS as telas
+   O mesmo capsule é aplicado à homepage, cadastro, login,
+   seleção de perfis e áreas autenticadas.
+   ========================================================== */
+.public-shell > .header,
+.account-shell > .header,
+.app-shell > .header,
+.app-shell > .app-header.header {
+  position: fixed !important;
+  z-index: 1100 !important;
+  top: 10px !important;
+  left: 50% !important;
+  right: auto !important;
+  width: min(1370px, calc(100% - 32px)) !important;
+  max-width: 1370px !important;
+  min-height: 66px !important;
+  height: 66px !important;
+  padding: 10px 28px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 42px !important;
+  transform: translateX(-50%) !important;
+  background: #080c14 !important;
+  color: #f7f9ff !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  box-shadow: 0 9px 28px rgba(9,16,29,.18), 0 2px 7px rgba(9,16,29,.10) !important;
+  transition: box-shadow .22s ease, background-color .22s ease !important;
+}
+.public-shell > .header:hover,
+.account-shell > .header:hover,
+.app-shell > .header:hover {
+  box-shadow: 0 12px 32px rgba(9,16,29,.22), 0 3px 8px rgba(9,16,29,.12) !important;
+}
+.public-shell > .header .brand,
+.account-shell > .header .brand,
+.app-shell > .header .brand,
+.public-shell > .header .brand span,
+.account-shell > .header .brand span,
+.app-shell > .header .brand span {
+  color: #f7f9ff !important;
+}
+.public-shell > .header .brand small,
+.account-shell > .header .brand small,
+.app-shell > .header .brand small {
+  color: #b3bfd2 !important;
+}
+.public-shell > .header nav a,
+.account-shell > .header nav a,
+.app-shell > .header nav a,
+.app-shell > .header .header-tools > a,
+.app-shell > .header .header-tools > button {
+  transition: color .18s ease, background-color .18s ease, transform .18s ease !important;
+}
+.public-shell > .header nav a:hover,
+.account-shell > .header nav a:hover,
+.app-shell > .header nav a:hover,
+.app-shell > .header .header-tools > a:hover,
+.app-shell > .header .header-tools > button:hover {
+  transform: translateY(-1px);
+}
+@media (max-width: 850px) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .app-shell > .app-header.header {
+    top: 8px !important;
+    width: calc(100% - 20px) !important;
+    min-height: 60px !important;
+    height: 60px !important;
+    padding: 8px 18px !important;
+    border-radius: 34px !important;
+  }
+}
+@media (max-width: 620px) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .app-shell > .app-header.header {
+    top: 8px !important;
+    width: calc(100% - 16px) !important;
+    min-height: 56px !important;
+    height: 56px !important;
+    padding: 7px 14px !important;
+    border-radius: 30px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .public-shell > .header *,
+  .account-shell > .header *,
+  .app-shell > .header * {
+    transition-duration: .01ms !important;
+  }
+}
