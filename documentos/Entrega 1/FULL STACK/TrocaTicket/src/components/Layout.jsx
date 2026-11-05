@@ -5,29 +5,23 @@ import { destinations, roleNames } from '../data/demo';
 import Icon from './Icon';
 const menus = {
   organizador: [
-    ['Início', '/organizador'],
     ['Fornecedores', '/organizador/fornecedores'],
     ['Meus eventos', '/organizador/eventos'],
     ['Novo evento', '/organizador/novo'],
-    ['Comunidade', '/comunidade'],
   ],
   fornecedor: [
-    ['Início', '/fornecedor'],
     ['Minhas propostas', '/fornecedor/propostas'],
     ['Nova proposta', '/fornecedor/cotacao/tim-maia'],
     ['Inventário', '/fornecedor/inventario'],
-    ['Comunidade', '/comunidade'],
   ],
   admin: [
     ['Painel geral', '/admin'],
     ['Relatórios', '/admin/relatorios/tim-maia'],
     ['Moderação', '/admin/moderacao'],
     ['Eventos', '/eventos'],
-    ['Comunidade', '/comunidade'],
   ],
   comprador: [
-    ['Início', '/eventos'],
-    ['Comunidade', '/comunidade'],
+    ['Troca-Papo', '/comunidade'],
     ['Meus ingressos', '/ingressos'],
     ['Favoritos', '/favoritos'],
   ],
@@ -92,7 +86,7 @@ export default function Layout() {
           </span>
         </Link>
         {publicPage ? (
-          pathname === '/' && (
+          pathname === '/' ? (
             <nav aria-label="Navegação principal">
               <Link className="login-link" to="/entrar">
                 Entrar
@@ -101,7 +95,17 @@ export default function Layout() {
                 Criar conta ↗
               </Link>
             </nav>
-          )
+          ) : (
+            <button
+              type="button"
+              className="theme-toggle"
+              aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo noturno'}
+              title={darkMode ? 'Modo claro' : 'Modo noturno'}
+              onClick={() => setDarkMode(!darkMode)}
+            >
+              <Icon name={darkMode ? 'sun' : 'moon'} />
+            </button>
+          ) 
         ) : (
           <>
             <button
@@ -163,7 +167,7 @@ export default function Layout() {
                   />
                 </span>
                 <span>
-                  MINHA CONTA<small>{roleNames[activeRole]}</small>
+                  MINHA CONTA<small>{activeRole === 'comprador' ? 'Usuário' : roleNames[activeRole]}</small>
                 </span>
               </Link>
             </div>

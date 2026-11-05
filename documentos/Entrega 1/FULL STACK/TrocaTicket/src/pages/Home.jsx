@@ -6,7 +6,7 @@ const profiles = [
   {
     id: 'comprador',
     tag: 'Participante',
-    name: 'Comprador',
+    name: 'Usuário',
     icon: 'ticket',
     description: 'Compre, troque ou revenda ingressos sem risco de golpes.',
     features: [

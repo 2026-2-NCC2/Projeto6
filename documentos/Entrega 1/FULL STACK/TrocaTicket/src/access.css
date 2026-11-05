@@ -18,18 +18,6 @@ textarea {
 .account-shell main {
   flex: 1;
 }
-.account-shell .header {
-  left: 0;
-  right: 0;
-  padding: 12px 40px;
-}
-.account-shell .brand {
-  gap: 14px;
-}
-.account-shell .brand img {
-  width: 32px;
-  height: 32px;
-}
 .account-shell footer {
   min-height: 64px;
   background: white;
@@ -330,10 +318,6 @@ textarea {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
-  .account-shell .header {
-    padding: 10px 20px;
-    min-height: 60px;
-  }
   .access-page {
     padding: 96px 16px 32px;
   }
@@ -518,4 +502,133 @@ html[data-theme="dark"] .account-shell label {
 html[data-theme="dark"] .account-shell p,
 html[data-theme="dark"] .account-shell small {
   color: #a5b3c9;
+}
+/* ---------- Seleção de perfil (cards) ---------- */
+.pf-picker {
+  --pf-ink: #121b30; --pf-muted: #6f7e96; --pf-line: #e0e7f1; --pf-surface: #fff;
+  --pf-user: #2860ed; --pf-org: #7565ed; --pf-sup: #0a9e7b; --pf-adm: #d9792b;
+  --pf-shadow: 0 2px 4px rgba(24,40,72,.05), 0 10px 24px -12px rgba(24,40,72,.14);
+  flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 128px 24px 72px;
+}
+html[data-theme="dark"] .pf-picker {
+  --pf-ink: #eef2fa; --pf-muted: #98a7bf; --pf-line: #27354a; --pf-surface: #141d2b;
+  --pf-user: #6b91f5; --pf-org: #a99aff; --pf-sup: #2cc9a1; --pf-adm: #f0a05a;
+  --pf-shadow: 0 2px 4px rgba(0,0,0,.3), 0 10px 24px -12px rgba(0,0,0,.5);
+}
+.pf-picker .pf-intro { display: grid; gap: 10px; justify-items: center; text-align: center; }
+.pf-picker .pf-intro h1 {
+  margin: 0; color: var(--pf-ink); font-size: clamp(26px, 4vw, 36px);
+  letter-spacing: -.04em; line-height: 1.1; text-wrap: balance;
+}
+.pf-picker .pf-note {
+  display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pf-muted);
+}
+.pf-picker .pf-note::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--pf-adm);
+}
+.pf-picker .pf-grid {
+  margin-top: 48px; display: grid; gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.pf-picker .pf-card {
+  --accent: var(--pf-user);
+  --glow: color-mix(in srgb, var(--accent) 38%, transparent);
+  position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0;
+  padding: 26px 24px 22px; overflow: hidden; text-decoration: none; color: var(--pf-ink);
+  background: var(--pf-surface); border: 1px solid var(--pf-line); border-radius: 20px;
+  box-shadow: var(--pf-shadow); cursor: pointer;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .25s ease;
+}
+.pf-picker .pf-organizador { --accent: var(--pf-org); }
+.pf-picker .pf-fornecedor { --accent: var(--pf-sup); }
+.pf-picker .pf-admin { --accent: var(--pf-adm); }
+.pf-picker .pf-card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(260px circle at 100% 0, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+}
+.pf-picker .pf-card:hover,
+.pf-picker .pf-card:focus-visible {
+  transform: translateY(-8px) scale(1.025);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--pf-line));
+  box-shadow: 0 4px 8px rgba(24,40,72,.06), 0 28px 48px -16px var(--glow);
+}
+.pf-picker .pf-card:hover::before,
+.pf-picker .pf-card:focus-visible::before { opacity: 1; }
+.pf-picker .pf-card:active { transform: translateY(-3px) scale(.99); transition-duration: .1s; }
+.pf-picker .pf-card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 50%, transparent); outline-offset: 3px;
+}
+.pf-picker .pf-icon {
+  width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, var(--pf-surface));
+  transition: transform .4s cubic-bezier(.3,1.6,.5,1), background .25s, color .25s;
+}
+.pf-picker .pf-card:hover .pf-icon,
+.pf-picker .pf-card:focus-visible .pf-icon {
+  transform: rotate(-8deg) scale(1.12); background: var(--accent); color: var(--pf-surface);
+}
+.pf-picker .pf-tag {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent);
+}
+.pf-picker .pf-card h2 {
+  margin: -8px 0 0; font-size: 21px; letter-spacing: -.03em; color: var(--pf-ink); transition: color .25s;
+}
+.pf-picker .pf-card:hover h2,
+.pf-picker .pf-card:focus-visible h2 { color: var(--accent); }
+.pf-picker .pf-desc { font-size: 13.5px; line-height: 1.5; color: var(--pf-muted); }
+.pf-picker .pf-card ul {
+  list-style: none; margin: 2px 0 0; padding: 14px 0 0; display: grid; gap: 8px;
+  border-top: 1px solid var(--pf-line); font-size: 13px;
+}
+.pf-picker .pf-card li {
+  display: flex; gap: 9px; align-items: flex-start; transition: transform .3s ease;
+}
+.pf-picker .pf-card li::before {
+  content: ""; flex: none; width: 6px; height: 6px; margin-top: 6px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 45%, var(--pf-line)); transition: background .25s;
+}
+.pf-picker .pf-card:hover li,
+.pf-picker .pf-card:focus-visible li { transform: translateX(4px); }
+.pf-picker .pf-card:hover li::before,
+.pf-picker .pf-card:focus-visible li::before { background: var(--accent); }
+.pf-picker .pf-cta {
+  margin-top: auto; padding-top: 6px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 13.5px; font-weight: 700; color: var(--pf-muted); transition: color .25s;
+}
+.pf-picker .pf-cta .icon { transition: transform .3s ease; }
+.pf-picker .pf-card:hover .pf-cta,
+.pf-picker .pf-card:focus-visible .pf-cta { color: var(--accent); }
+.pf-picker .pf-card:hover .pf-cta .icon,
+.pf-picker .pf-card:focus-visible .pf-cta .icon { transform: translateX(6px); }
+@media (max-width: 520px) {
+  .pf-picker { padding: 112px 16px 48px; }
+  .pf-picker .pf-grid { margin-top: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-picker .pf-card, .pf-picker .pf-card * { transition-duration: .01ms; }
+  .pf-picker .pf-card:hover, .pf-picker .pf-card:focus-visible { transform: none; }
+}
+
+/* Botão de tema nas telas públicas (entrar, cadastro, perfis) */
+.account-shell .header .theme-toggle { margin-left: auto; color: #fff; }
+/* Cabeçalho: mesma largura e posição em todas as telas do site */
+.public-shell > .header,
+.account-shell .header,
+.app-header.header {
+  left: 0;
+  right: 0;
+  width: min(1480px, calc(100% - 24px));
+  max-width: none;
+  margin-inline: auto;
+}
+@media (min-width: 1151px) {
+  .public-shell > .header,
+  .account-shell .header,
+  .app-header.header {
+    min-height: 66px;
+    padding: 12px 32px;
+  }
+}
+html[data-theme="dark"] .account-shell .header .brand small {
+  color: #f1f5fb;
 }

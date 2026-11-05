@@ -218,36 +218,76 @@ export default function Account({ login = false }) {
     </section>
   );
 }
+const profileCards = [
+  {
+    id: 'comprador',
+    tag: 'Público',
+    title: 'Usuário',
+    icon: 'ticket',
+    text: 'Descubra eventos, salve favoritos e reserve ingressos.',
+    items: ['Busca por nome e cidade', 'Favoritos e reservas', 'Comunidade de fãs'],
+    cta: 'Entrar como usuário',
+  },
+  {
+    id: 'organizador',
+    tag: 'Eventos',
+    title: 'Organizador',
+    icon: 'megaphone',
+    text: 'Crie, publique e acompanhe seus eventos do início ao fim.',
+    items: ['Cadastro e publicação', 'Orçamento de fornecedores', 'Painel de pendências'],
+    cta: 'Entrar como organizador',
+  },
+  {
+    id: 'fornecedor',
+    tag: 'Serviços',
+    title: 'Fornecedor',
+    icon: 'box',
+    text: 'Encontre oportunidades e envie cotações para eventos.',
+    items: ['Oportunidades abertas', 'Cotações em tempo real', 'Gestão de inventário'],
+    cta: 'Entrar como fornecedor',
+  },
+  {
+    id: 'admin',
+    tag: 'Plataforma',
+    title: 'Admin',
+    icon: 'shield',
+    text: 'Modere cadastros, consulte relatórios e exporte dados.',
+    items: ['Moderação de lotes', 'Relatórios por setor', 'Exportação em CSV'],
+    cta: 'Entrar como admin',
+  },
+];
 export function Profiles() {
   const { chooseRole } = useStore();
-  const navigate = useNavigate();
   return (
-    <section className="auth-page profile-picker">
-      <p className="prototype-note">
-        (ESSA TELA SÓ REPRESENTA O REDIRECIONAMENTO POR PERFIL)
-        <br />
-        APENAS PARA PROTÓTIPO!
-      </p>
-      <div className="auth-card profile-picker-card">
+    <section className="pf-picker">
+      <div className="pf-intro">
         <h1>Selecione o tipo de perfil</h1>
-        <div className="divider profile-divider">
-          <span>
-            <Icon name="user" />
-          </span>
-        </div>
-        <div className="tabs profile-tabs" role="group" aria-label="Tipo de perfil">
-          {Object.entries(roleNames).map(([id, name]) => (
-            <button
-              key={id}
-              onClick={() => {
-                chooseRole(id);
-                navigate(destinations[id]);
-              }}
-            >
-              {id === 'comprador' ? 'Usuário' : id === 'admin' ? 'ADMIN' : name}
-            </button>
-          ))}
-        </div>
+        <span className="pf-note">Apenas disponível no Modo demonstração</span>
+      </div>
+      <div className="pf-grid" role="group" aria-label="Tipo de perfil">
+        {profileCards.map((card) => (
+          <Link
+            key={card.id}
+            to={destinations[card.id]}
+            className={`pf-card pf-${card.id}`}
+            onClick={() => chooseRole(card.id)}
+          >
+            <span className="pf-icon">
+              <Icon name={card.icon} size={26} />
+            </span>
+            <span className="pf-tag">{card.tag}</span>
+            <h2>{card.title}</h2>
+            <span className="pf-desc">{card.text}</span>
+            <ul>
+              {card.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <span className="pf-cta">
+              {card.cta} <Icon name="arrow" size={18} />
+            </span>
+          </Link>
+        ))}
       </div>
     </section>
   );
