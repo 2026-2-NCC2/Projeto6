@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router';
 import App from './App';
 import './styles.css';
 import './workspace.css';
-import './supplier.css';
+import './access.css';
 import { StoreProvider } from './context/Store';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -2,69 +2,107 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
-import { Field, Tabs } from '../components/UI';
+import { Field, Tabs, Modal } from '../components/UI';
+import Icon, { ProviderIcon } from '../components/Icon';
 
+function rememberedEmail() {
+  try {
+    return localStorage.getItem('trocaticket-demo-email') || '';
+  } catch {
+    return '';
+  }
+}
+
+function AccessField({ label, name, error, icon, password, ...props }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <Field label={label} name={name} error={error}>
+      <div className="access-input">
+        <Icon name={icon} />
+        <input
+          {...props}
+          id={name}
+          name={name}
+          type={password ? (visible ? 'text' : 'password') : props.type || 'text'}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${name}-error` : undefined}
+        />
+        {password && (
+          <button
+            type="button"
+            className="password-toggle"
+            aria-label={
+              visible ? `Ocultar ${label.toLowerCase()}` : `Mostrar ${label.toLowerCase()}`
+            }
+            aria-pressed={visible}
+            onClick={() => setVisible(!visible)}
+          >
+            <Icon name={visible ? 'eyeOff' : 'eye'} />
+          </button>
+        )}
+      </div>
+    </Field>
+  );
+}
 export default function Account({ login = false }) {
-  const navigate = useNavigate();
-
   const [params] = useSearchParams();
-  const [profile, setProfile] = useState(['comprador', 'organizador', 'fornecedor'].includes(params.get('perfil')) ? params.get('perfil') : 'comprador');
+  const navigate = useNavigate();
+  const { chooseRole, notify, update } = useStore();
+  const [profile, setProfile] = useState(
+    ['comprador', 'organizador', 'fornecedor'].includes(params.get('perfil'))
+      ? params.get('perfil')
+      : 'comprador',
+  );
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
-  const [show, setShow] = useState(false);
-  const { chooseRole, notify } = useStore();
-
+  const [remember, setRemember] = useState(() => !!rememberedEmail());
+  const [provider, setProvider] = useState('');
   async function submit(event) {
-
     event.preventDefault();
-
     const data = Object.fromEntries(new FormData(event.currentTarget));
     const next = {};
-
-    if (!login && data.name.trim().length < 2) {
-      next.name = "Informe seu nome completo.";
-    }
-
-    if (!login && ![11, 14].includes(data.document.replace(/\D/g, '').length)) {
+    if (!login && data.name.trim().length < 2) next.name = 'Informe seu nome completo.';
+    if (!login && ![11, 14].includes(data.document.replace(/\D/g, '').length))
       next.document = 'Use 11 dígitos para CPF ou 14 para CNPJ (fictício).';
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      next.email = 'Informe um e-mail válido.';
-    }
-
-    if (data.password.length < 8) {
-      next.password = 'Use pelo menos 8 caracteres.';
-    }
-      
-    if (!login && data.confirm !== data.password) {
-      next.confirm = 'As senhas não conferem.';
-    }
-
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+    const validUsername = login && /^[a-z\d_.-]{3,}$/i.test(data.email);
+    if (!validEmail && !validUsername)
+      next.email = login ? 'Informe um e-mail ou usuário válido.' : 'Informe um e-mail válido.';
+    if (data.password.length < 8) next.password = 'Use pelo menos 8 caracteres.';
+    if (!login && data.confirm !== data.password) next.confirm = 'As senhas não conferem.';
     setErrors(next);
-    
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
-    
     setBusy(true);
-   
     await new Promise((resolve) => setTimeout(resolve, 450));
-    
+    if (login) {
+      try {
+        if (remember) localStorage.setItem('trocaticket-demo-email', data.email);
+        else localStorage.removeItem('trocaticket-demo-email');
+      } catch {
+        /* O acesso de demonstração também funciona sem armazenamento. */
+      }
+    }
+    // Perfil principal é a fonte única de identidade também para o fórum integrado.
+    update('profile', (old) => ({
+      ...old,
+      ...(data.name?.trim() ? { name: data.name.trim() } : {}),
+      ...(data.email?.includes('@') ? { email: data.email.trim() } : {}),
+    }));
     chooseRole(profile);
-    
     notify(
       login ? 'Acesso de demonstração iniciado.' : 'Cadastro validado. Bem-vindo à demonstração!',
     );
-    
     navigate(login ? '/perfis' : destinations[profile]);
   }
-
   return (
-    <section className="auth-page">
-      <div className="auth-card">
-        <span className="auth-symbol">♙</span>
+    <section className={`auth-page access-page ${login ? 'login-page' : 'signup-page'}`}>
+      <div className="auth-card access-card">
+        <span className={`auth-symbol ${login ? 'login-symbol' : ''}`}>
+          <Icon name="lock" size={24} />
+        </span>
         <h1>{login ? 'Acesse sua Conta' : 'Crie sua Conta'}</h1>
         <div className="tabs auth-tabs">
           <Link className={login ? 'active' : ''} to="/entrar">
@@ -76,118 +114,141 @@ export default function Account({ login = false }) {
         </div>
         {!login && (
           <Tabs
-            options={['Participante', 'Organizador', 'Fornecedor']}
-            value={roleNames[profile]}
+            label="Tipo de conta"
+            options={['Usuário', 'Organizador', 'Fornecedor']}
+            value={profile === 'comprador' ? 'Usuário' : roleNames[profile]}
             onChange={(value) =>
-              setProfile(Object.keys(roleNames).find((key) => roleNames[key] === value))
+              setProfile(
+                value === 'Usuário'
+                  ? 'comprador'
+                  : Object.keys(roleNames).find((key) => roleNames[key] === value),
+              )
             }
           />
         )}
         <form noValidate onSubmit={submit}>
           {!login && (
             <>
-              <Field
+              <AccessField
+                icon="user"
                 label="Nome completo"
                 name="name"
                 autoComplete="name"
                 placeholder="João da Silva"
                 error={errors.name}
               />
-              <Field
+              <AccessField
+                icon="user"
                 label={profile === 'comprador' ? 'CPF' : 'CPF / CNPJ'}
                 name="document"
-                placeholder={profile === 'comprador' ? '000.000.000-00' : '000.000.000-00 ou 00.000.000/0000-00'}
+                placeholder={profile === 'comprador' ? 'XXX.XXX.XXX-XX' : 'XX.XXX.XXX/XXXX-XX'}
+                inputMode="numeric"
                 error={errors.document}
               />
             </>
           )}
-          <Field
-            label="E-mail"
+          <AccessField
+            icon="mail"
+            label={login ? 'E-mail ou usuário' : 'E-mail'}
             name="email"
-            type="email"
-            autoComplete="email"
+            type={login ? 'text' : 'email'}
+            autoComplete={login ? 'username' : 'email'}
             placeholder="exemplo@email.com"
+            defaultValue={login ? rememberedEmail() : ''}
             error={errors.email}
           />
-          <Field
+          <AccessField
+            icon="lock"
+            password
             label="Senha"
             name="password"
-            type={show ? 'text' : 'password'}
             autoComplete={login ? 'current-password' : 'new-password'}
-            placeholder="Mínimo de 8 caracteres"
+            placeholder="••••••••"
             error={errors.password}
           />
           {!login && (
-            <Field
+            <AccessField
+              icon="lock"
+              password
               label="Confirme sua senha"
               name="confirm"
-              type={show ? 'text' : 'password'}
+              placeholder="••••••••"
               autoComplete="new-password"
               error={errors.confirm}
             />
           )}
-          <div className="form-options">
-            <label>
-              <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} />{' '}
-              Mostrar senha
-            </label>
-            {login && <Link to="/recuperar">Esqueceu sua senha?</Link>}
-          </div>
+          {login && (
+            <div className="form-options">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />{' '}
+                Lembrar de mim
+              </label>
+              <Link to="/recuperar">Esqueci minha senha?</Link>
+            </div>
+          )}
           <button className={`button ${login ? 'blue-button' : 'dark'}`} disabled={busy}>
-            {busy ? 'Validando…' : login ? 'Entrar na plataforma' : 'Cadastrar'}
+            {busy ? 'Validando…' : login ? 'Entrar no Sistema' : 'Cadastrar'}
           </button>
         </form>
-        <p className="auth-note">
-          Demonstração: use dados fictícios. Senhas e documentos não são armazenados.
-        </p>
-        <div className="divider">OU EXPLORE SEM CADASTRO</div>
-        <Link className="button outline full" to="/perfis">
-          Escolher perfil de demonstração →
-        </Link>
+        <div className="divider">OU CONTINUE COM</div>
+        <div className="social-access">
+          {['Google', 'Apple'].map((name) => (
+            <button key={name} type="button" onClick={() => setProvider(name)}>
+              <ProviderIcon provider={name} />
+              {name}
+            </button>
+          ))}
+        </div>
       </div>
+      {provider && (
+        <Modal title={`Entrar com ${provider}`} onClose={() => setProvider('')}>
+          <p>
+            O acesso com {provider} ainda não está conectado. Você pode explorar as telas com dados
+            fictícios.
+          </p>
+          <Link className="button blue-button" to="/perfis">
+            Explorar demonstração
+          </Link>
+        </Modal>
+      )}
     </section>
   );
 }
-
 export function Profiles() {
   const { chooseRole } = useStore();
   const navigate = useNavigate();
   return (
-    <section className="auth-page profile-selection">
-      <div className="section-heading">
-        <p className="eyebrow purple">Uma plataforma, muitas possibilidades</p>
-        <h1>Como você quer explorar?</h1>
-        <p>Escolha um perfil para conhecer os fluxos da plataforma.</p>
+    <section className="auth-page profile-picker">
+      <p className="prototype-note">
+        (ESSA TELA SÓ REPRESENTA O REDIRECIONAMENTO POR PERFIL)
+        <br />
+        APENAS PARA PROTÓTIPO!
+      </p>
+      <div className="auth-card profile-picker-card">
+        <h1>Selecione o tipo de perfil</h1>
+        <div className="divider profile-divider">
+          <span>
+            <Icon name="user" />
+          </span>
+        </div>
+        <div className="tabs profile-tabs" role="group" aria-label="Tipo de perfil">
+          {Object.entries(roleNames).map(([id, name]) => (
+            <button
+              key={id}
+              onClick={() => {
+                chooseRole(id);
+                navigate(destinations[id]);
+              }}
+            >
+              {id === 'comprador' ? 'Usuário' : id === 'admin' ? 'ADMIN' : name}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="role-grid">
-        {Object.entries(roleNames).map(([id, name], i) => (
-          <button
-            className="role-card"
-            key={id}
-            onClick={() => {
-              chooseRole(id);
-              navigate(destinations[id]);
-            }}
-          >
-            <span className="role-symbol">{['♧', '⚑', '▣', '◇'][i]}</span>
-            <h2>{name}</h2>
-            <p>
-              {
-                [
-                  'Descubra eventos, salve favoritos e simule seus ingressos.',
-                  'Crie eventos, conecte fornecedores e consolide custos.',
-                  'Gerencie seu catálogo e envie propostas comerciais.',
-                  'Acompanhe relatórios e faça a moderação de cadastros.',
-                ][i]
-              }
-            </p>
-            <strong>Acessar área →</strong>
-          </button>
-        ))}
-      </div>
-      <Link className="text-link" to="/">
-        ← Voltar ao início
-      </Link>
     </section>
   );
 }

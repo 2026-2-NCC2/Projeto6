@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
-import { initialsOf } from '../utils/format';
+import Icon from './Icon';
 const menus = {
   organizador: [
     ['Início', '/organizador'],
     ['Fornecedores', '/organizador/fornecedores'],
     ['Meus eventos', '/organizador/eventos'],
     ['Novo evento', '/organizador/novo'],
+    ['Comunidade', '/comunidade'],
   ],
   fornecedor: [
     ['Início', '/fornecedor'],
     ['Minhas propostas', '/fornecedor/propostas'],
     ['Nova proposta', '/fornecedor/cotacao/tim-maia'],
     ['Inventário', '/fornecedor/inventario'],
+    ['Comunidade', '/comunidade'],
   ],
   admin: [
     ['Painel geral', '/admin'],
     ['Relatórios', '/admin/relatorios/tim-maia'],
     ['Moderação', '/admin/moderacao'],
     ['Eventos', '/eventos'],
+    ['Comunidade', '/comunidade'],
   ],
   comprador: [
     ['Início', '/eventos'],
@@ -31,10 +34,27 @@ const menus = {
 };
 export default function Layout() {
   const { pathname } = useLocation();
-  const { data, role, chooseRole } = useStore();
-  const navigate = useNavigate();
+  const { role, chooseRole, data } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
+  // Primeira visita: tema claro. Depois, respeita a última escolha salva.
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      const savedTheme = localStorage.getItem('trocaticket-theme');
+      return savedTheme === 'dark';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      darkMode ? '#080c14' : '#f4f7fc',
+    );
+    try { localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light'); } catch {}
+  }, [darkMode]);
+  const profilePhoto = data?.profile?.photo;
   const activeRole = pathname.startsWith('/organizador')
     ? 'organizador'
     : pathname.startsWith('/fornecedor')
@@ -42,9 +62,13 @@ export default function Layout() {
       : pathname.startsWith('/admin')
         ? 'admin'
         : role || 'comprador';
-  const supplier = activeRole === 'fornecedor' ? data.supplierProfile : null;
-  const supplierName = supplier ? supplier.tradeName || supplier.name : '';
   const publicPage = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
+  useEffect(() => {
+    const routeRole = ['organizador', 'fornecedor', 'admin'].find((value) =>
+      pathname.startsWith(`/${value}`),
+    );
+    if (routeRole && routeRole !== role) chooseRole(routeRole);
+  }, [pathname, role, chooseRole]);
   useEffect(() => {
     window.scrollTo(0, 0);
     setMenu(false);
@@ -52,7 +76,11 @@ export default function Layout() {
     document.title = 'TrocaTicket — Eventos & ingressos';
   }, [pathname]);
   return (
-    <div className={publicPage ? 'public-shell' : 'app-shell'}>
+    <div
+      className={
+        publicPage ? `public-shell ${pathname !== '/' ? 'account-shell' : ''}` : 'app-shell'
+      }
+    >
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -64,17 +92,16 @@ export default function Layout() {
           </span>
         </Link>
         {publicPage ? (
-          <nav aria-label="Navegação principal">
-            <Link to="/perfis" className="demo-link">
-              Explorar demo
-            </Link>
-            <Link className="login-link" to="/entrar">
-              Entrar
-            </Link>
-            <Link className="header-cta" to="/cadastro">
-              Criar conta ↗
-            </Link>
-          </nav>
+          pathname === '/' && (
+            <nav aria-label="Navegação principal">
+              <Link className="login-link" to="/entrar">
+                Entrar
+              </Link>
+              <Link className="header-cta" to="/cadastro">
+                Criar conta ↗
+              </Link>
+            </nav>
+          )
         ) : (
           <>
             <button
@@ -83,7 +110,7 @@ export default function Layout() {
               aria-expanded={menu}
               onClick={() => setMenu(!menu)}
             >
-              ☰
+              <Icon name="menu" />
             </button>
             <nav
               className={`app-navigation ${menu ? 'is-open' : ''}`}
@@ -102,21 +129,41 @@ export default function Layout() {
                 aria-expanded={notifications}
                 onClick={() => setNotifications(!notifications)}
               >
-                ♧<i />
+                <Icon name="bell" />
+                <i />
               </button>
-              <Link
-                to={activeRole === 'fornecedor' ? '/fornecedor/perfil' : '/perfil'}
-                aria-label="Configurações do perfil"
+              <button
+                type="button"
+                className="theme-toggle"
+                aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo noturno'}
+                title={darkMode ? 'Modo claro' : 'Modo noturno'}
+                onClick={() => {
+                  const next = !darkMode;
+                  setDarkMode(next);
+                  document.querySelector('.forum-frame')?.contentWindow?.postMessage(
+                    { type: 'TROCATICKET_SET_THEME', dark: next },
+                    window.location.origin,
+                  );
+                }}
               >
+                <Icon name={darkMode ? 'sun' : 'moon'} />
+              </button>
+              <Link to="/perfil" aria-label="Configurações do perfil">
                 ⚙
               </Link>
               <Link className="user-chip" to="/perfis">
                 <span className="avatar small">
-                  {supplier?.photo ? <img src={supplier.photo} alt="" /> : supplier ? initialsOf(supplierName) : 'CM'}
+                  <img
+                    src={profilePhoto || '/images/avatar-default.png'}
+                    alt=""
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = '/images/avatar-default.png';
+                    }}
+                  />
                 </span>
                 <span>
-                  {supplier ? supplierName.toUpperCase() : 'MINHA CONTA'}
-                  <small>{roleNames[activeRole]}</small>
+                  MINHA CONTA<small>{roleNames[activeRole]}</small>
                 </span>
               </Link>
             </div>
@@ -132,19 +179,6 @@ export default function Layout() {
           </div>
         )}
       </header>
-      {!publicPage && (
-        <div className="demo-strip">
-          <span>Ambiente de demonstração · alterações salvas neste navegador</span>
-          <button
-            onClick={() => {
-              chooseRole('');
-              navigate('/perfis');
-            }}
-          >
-            Trocar perfil ↗
-          </button>
-        </div>
-      )}
       <main id="conteudo">
         <Outlet />
       </main>

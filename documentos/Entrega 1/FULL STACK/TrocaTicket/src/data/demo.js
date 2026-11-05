@@ -128,74 +128,6 @@ export const initialEvents = [
     description: 'Uma experiência prática de desenvolvimento e liderança.',
     suppliers: ['buffet'],
   },
-  {
-    id: 'gala',
-    title: 'Jantar de Gala Beneficente',
-    category: 'Social',
-    format: 'Presencial',
-    date: '2026-09-04',
-    endDate: '2026-09-04',
-    time: '19:00',
-    endTime: '23:30',
-    location: 'Espaço Villa Bisutti',
-    capacity: 250,
-    price: 350,
-    status: 'Confirmado',
-    image: '/images/asset-21.jpg',
-    description: 'Jantar beneficente com leilão e apresentação musical.',
-    suppliers: ['buffet', 'vibe', 'palco', 'guarda'],
-  },
-  {
-    id: 'startups',
-    title: 'Feira de Startups e Investidores',
-    category: 'Corporativo',
-    format: 'Presencial',
-    date: '2026-09-11',
-    endDate: '2026-09-11',
-    time: '08:30',
-    endTime: '18:00',
-    location: 'Expo Center Norte',
-    capacity: 1500,
-    price: 90,
-    status: 'Agendado',
-    image: '/images/asset-22.jpg',
-    description: 'Estandes, rodadas de investimento e palestras.',
-    suppliers: ['vibe', 'buffet', 'palco', 'lumina', 'guarda'],
-  },
-  {
-    id: 'casamento',
-    title: 'Casamento Marina & Gustavo',
-    category: 'Social',
-    format: 'Presencial',
-    date: '2026-09-19',
-    endDate: '2026-09-19',
-    time: '17:00',
-    endTime: '23:59',
-    location: 'Haras Primavera',
-    capacity: 180,
-    price: 0,
-    status: 'Confirmado',
-    image: '/images/asset-24.jpg',
-    description: 'Cerimônia ao ar livre com buffet e decoração.',
-    suppliers: ['buffet', 'palco', 'lumina'],
-  },
-  {
-    id: 'halloween',
-    title: 'Noite Temática de Halloween',
-    category: 'Show / Cultura',
-    format: 'Presencial',
-    date: '2026-10-31',
-    endDate: '2026-10-31',
-    time: '21:00',
-    endTime: '04:00',
-    location: 'Laroc Club, Valinhos - SP',
-    capacity: 900,
-    price: 120,
-    status: 'Rascunho',
-    image: '/images/asset-30.jpg',
-    description: 'Festa fantasia com DJs convidados.',
-    suppliers: ['vibe'],
-  },
 ];
 export const initialInventory = [
   {
@@ -267,57 +199,19 @@ export const initialProposals = opportunities.map((event, i) => ({
   ][i],
   payment: '50% sinal + 50% D+10',
 }));
-const peopleSeed = [
-  ['Leonardo Neves', 'Pendente', '14:32'],
-  ['Mariana Costa', 'Pendente', '14:28'],
-  ['Rodrigo Alves', 'Pendente', '14:15'],
-  ['Camila Souza', 'Pendente', '13:50'],
-  ['Lucas Silveira', 'Pendente', '13:42'],
-  ['Beatriz Lima', 'Pendente', '13:30'],
-  ['Felipe Rocha', 'Pendente', '13:12'],
-  ['Juliana Martins', 'Pendente', '12:58'],
-  ['Gustavo Pereira', 'Pendente', '12:40'],
-  ['Fernanda Ribeiro', 'Pendente', '12:25'],
-  ['Thiago Barbosa', 'Pendente', '12:10'],
-  ['Patrícia Moreira', 'Pendente', '11:55'],
-  ['Ricardo Teixeira', 'Em revisão', '11:40'],
-  ['Aline Fonseca', 'Em revisão', '11:22'],
-  ['Bruno Cardoso', 'Aprovado', '10:48'],
-  ['Larissa Nunes', 'Aprovado', '10:15'],
-  ['Diego Ramos', 'Aprovado', '09:52'],
-  ['Vanessa Duarte', 'Recusado', '09:30'],
-];
-const devices = [
-  'Chrome / Windows NT 10.0',
-  'Safari / iOS 18',
-  'Firefox / Linux',
-  'Edge / Windows NT 10.0',
-];
-const documents = ['CNH_frente.pdf', 'RG_frente.pdf', 'Passaporte.pdf'];
-const slug = (text) =>
-  text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-export const initialPeople = peopleSeed.map(([name, status, time], i) => {
-  const id = String(42060 + i);
-  const [first, ...rest] = slug(name).split(' ');
-  return {
-    id,
-    name,
-    username: `${first.slice(0, 3)}_${rest.at(-1)}${id}`,
-    email: `demo${i + 1}@example.com`,
-    status,
-    note: '',
-    time,
-    emailVerified: true,
-    cpfStatus: 'Regular',
-    ip: `203.0.113.${10 + i}`,
-    city: 'São Paulo, BR',
-    device: devices[i % devices.length],
-    document: documents[i % documents.length],
-  };
-});
+export const initialPeople = [
+  'Leonardo Neves',
+  'Mariana Costa',
+  'Rodrigo Alves',
+  'Camila Souza',
+  'Lucas Silveira',
+].map((name, i) => ({
+  id: `4206${i}`,
+  name,
+  email: `demo${i + 1}@example.com`,
+  status: 'Pendente',
+  note: '',
+}));
 export const destinations = {
   comprador: '/eventos',
   organizador: '/organizador',
@@ -330,37 +224,3 @@ export const roleNames = {
   fornecedor: 'Fornecedor',
   admin: 'Administrador',
 };
-export const latestSuppliers = [
-  {
-    id: 'vibe',
-    name: 'VibeSound Áudio & Luz',
-    category: 'Som, Palco & Estrutura',
-    image: '/images/asset-14.jpg',
-    status: 'Contrato Assinado',
-    tone: 'green',
-  },
-  {
-    id: 'buffet',
-    name: 'Buffet Grand Gourmet',
-    category: 'Catering & Bebidas VIP',
-    image: '/images/asset-4.jpg',
-    status: 'Pago 1ª Parcela',
-    tone: 'green',
-  },
-  {
-    id: 'guarda',
-    name: 'Vigil Guard Segurança',
-    category: 'Segurança & Bombeiros',
-    image: '/images/asset-7.jpg',
-    status: 'Em Negociação',
-    tone: 'amber',
-  },
-  {
-    id: 'lumina',
-    name: 'Lumina Films & Foto',
-    category: 'Cobertura Audiovisual',
-    image: '/images/asset-26.jpg',
-    status: 'Contrato Assinado',
-    tone: 'green',
-  },
-];

@@ -1,36 +1,49 @@
-# Validação da entrega
+# Validação desta entrega — 31/10/2026
 
-Verificação realizada em 22/09/2026.
+## Resultado
 
-## Build e código
+- `npm ci --no-audit --no-fund`, `npm run build` e `npm run format:check`: concluídos com sucesso.
+- As 21 referências têm páginas/estados correspondentes; veja a tabela de rotas no README.
+- 42 verificações de carregamento: 21 estados no tamanho nativo das referências e os mesmos 21 em 390 × 844.
+- Todos retornaram HTTP 200, renderizaram conteúdo e terminaram sem erros de JavaScript/console, imagens quebradas ou rolagem horizontal da página.
+- O bundle compilado entregue corresponde aos arquivos de código desta pasta.
 
-- Build de produção com Vite concluído, sem avisos.
-- Arquivos React, JavaScript, CSS, JSON e README formatados com Prettier.
-- Plugin oficial React configurado para atualização durante o desenvolvimento.
-- Arquivos e imagens empacotados sem dependências instaladas, cache ou estado pessoal do navegador.
+## Ambiente e limites da verificação
 
-## Fluxos verificados no navegador
+A execução local do ambiente de trabalho não permitiu rede, servidor HTTP ou Chromium. Por isso o build e a inspeção foram executados em uma sessão temporária do Firecrawl, usando Node, Vite e Chromium/Playwright em `http://127.0.0.1:4174`. Nenhum site foi publicado.
 
-- Escolha do perfil e navegação para o painel do organizador.
-- Formulário de evento vazio exibe erros nos campos obrigatórios.
-- Criação de evento, cálculo de custos, consolidação e publicação local.
-- Evento publicado mantém o estado após recarregar a página.
-- Cotação inicial de R$ 114.200,00 recalculada para R$ 117.200,00 após alterar o preço unitário de 12 módulos de R$ 3.750,00 para R$ 4.000,00.
-- Envio da proposta preserva o total calculado na lista de propostas.
-- Adição de item ao inventário e desativação, com opção de reativação.
-- Moderação bloqueia aprovação sem os três critérios conferidos; aprovação válida move o cadastro para o filtro de aprovados.
-- Cadastro vazio exibe erros; formulário preenchido com dados fictícios válidos abre a área do participante.
-- Favorito adicionado e reserva simulada de 2 meias-entradas, total de R$ 540,00, encontrada em Meus Ingressos.
-- Falha de catálogo em `/eventos?erro=1`, recuperação por Tentar novamente, busca sem resultados e página 404.
-- Imagens da página de detalhes carregadas sem erro.
-- Nenhum erro de console observado na inspeção final em uma nova aba após a configuração do plugin React.
+O plugin Browser não estava disponível. Foram capturadas telas completas e inspecionadas visualmente, junto das imagens originais. Os testes de estado usaram preenchimento de campos, seleção de opções e ativação de controles pelo DOM. Cliques físicos e teclas da sessão remota se mostraram inconsistentes; um teste instrumentado confirmou que Escape não entregava eventos keydown ao documento. Portanto, a entrega não declara validação completa de interação física por mouse/teclado ou do fechamento nativo por Escape. O evento de cancelamento do modal foi validado.
 
-## Revisão visual e responsividade
+## Fluxos verificados
 
-Revisão visual em desktop (1280 px) e celular (390 px). Sem transbordamento horizontal do documento nas páginas verificadas: organizador, novo evento, oportunidades, cotação, inventário, propostas, administração, relatório, perfil e cadastro. Tabelas extensas usam rolagem dentro de seu próprio contêiner.
+- Login vazio apresenta erros; mostrar/ocultar senha altera o campo; acesso válido abre os perfis.
+- Lembrar de mim recupera somente o identificador. A senha de teste não apareceu no armazenamento local.
+- A seleção de organizador abre o painel; o perfil mantém o contexto escolhido.
+- Cancelar restaura o nome anterior; salvar fuso horário persiste após recarregar.
+- Google abre o aviso de integração pendente; cancelamento do modal remove a janela.
+- Cadastro rejeita confirmação de senha diferente; cadastro de fornecedor abre oportunidades.
+- Pesquisa por Tim Maia deixa uma oportunidade visível.
+- Duas meias-entradas totalizam R$ 540,00; confirmação cria reserva local na página de ingressos.
+- Alterar o primeiro preço da cotação para R$ 4.000,00 recalcula o total para R$ 117.200,00; enviar inclui a proposta na lista local.
+- Menu móvel foi aberto e a navegação para Novo Evento foi exercitada.
 
-Foram ajustados tamanhos de títulos, espaçamento dos painéis, contraste dos estados, menu móvel, disposição dos formulários, quebra de cartões, indicadores de foco e modais.
+## Conferência visual
 
-## Limites da verificação
+Referências: `reference/screens/01-0.png` a `21-0.png`. Os tamanhos nativos variam de 1280 a 1284 pixels de largura; também foi verificado celular de 390 pixels.
 
-Teste manual dos principais fluxos; não constitui cobertura automatizada completa. O clique de exportação CSV foi executado sem erro de console, mas o navegador integrado não confirmou o evento de download; confirme o salvamento no Chrome/Edge ao avaliar essa função. Não houve teste de autenticação, pagamentos, e-mail ou serviços reais, pois não há backend nesta entrega.
+| Aspecto           | Conferência e ajuste                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Cores             | Fundo claro das áreas internas, cabeçalho preto, azul dos formulários e roxo dos destaques mantidos.                      |
+| Formulários       | Cartão de 460 px, campos com ícones, olhos de senha, abas e opções Google/Apple aproximados das referências 02/03/11/12.  |
+| Cabeçalho         | Navegação extra removida das telas de acesso; logo e barra arredondada preservados.                                       |
+| Seleção de perfil | Os quatro cartões foram substituídos pelo seletor compacto da referência 13.                                              |
+| Ícones            | Símbolos improvisados de acesso, perfis da home e notificações substituídos por SVG.                                      |
+| Perfil            | CPF de demonstração, fuso, campos de senha, preferência 2FA e histórico local incluídos para cobrir as referências 09/10. |
+| Responsividade    | Corrigida a largura mínima do grid dos detalhes, que ultrapassava a tela de 390 px.                                       |
+| Imagens           | Assets originais usados como imagens reais; nenhum screenshot é usado como interface.                                     |
+
+Textos acima da dobra das telas de acesso foram alinhados às referências, incluindo “Entrar no Sistema”, “OU CONTINUE COM” e “Selecione o tipo de perfil”. O resto do projeto mantém adaptações de conteúdo e dados demonstrativos; não é uma reprodução pixel a pixel. Alguns ícones internos, fontes, espaços, totais, contagens, textos e controles diferem das imagens. O rodapé usa TrocaTicket em vez de Ticketboom. A indicação de protótipo tem contraste maior para leitura.
+
+## Escopo funcional
+
+É somente front-end. Autenticação, OAuth, senha, 2FA, reserva, cotação e relatórios não se conectam a sistemas reais. Formulários de senha nunca persistem as senhas. Os dados de navegação e negócio são de demonstração e ficam neste navegador. Os testes não cobrem todos os possíveis dados, tamanhos de tela, navegadores, leitores de tela ou integrações externas.

@@ -5,4 +5,3 @@ reference/assets/
 reference/contact-sheet.jpg
 *.log
 *.zip
-server/.env

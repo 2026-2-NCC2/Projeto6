@@ -1,0 +1,521 @@
+/* Telas 02, 03, 11, 12 e 13: formulários e seleção de perfil. */
+.icon {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+.account-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fb;
+}
+.account-shell main {
+  flex: 1;
+}
+.account-shell .header {
+  left: 0;
+  right: 0;
+  padding: 12px 40px;
+}
+.account-shell .brand {
+  gap: 14px;
+}
+.account-shell .brand img {
+  width: 32px;
+  height: 32px;
+}
+.account-shell footer {
+  min-height: 64px;
+  background: white;
+  padding: 20px 16px;
+}
+.access-page {
+  min-height: calc(100vh - 64px);
+  padding: 105px 24px 40px;
+}
+.access-card {
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 18px 24px -12px #243d6524;
+}
+.access-card > h1 {
+  font-size: 25px;
+  line-height: 30px;
+  margin: 14px 0 26px;
+  letter-spacing: -1px;
+}
+.access-card .login-symbol {
+  color: #2860ed;
+}
+.access-card .auth-tabs {
+  padding: 4px;
+  height: 44px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+}
+.access-card .tabs a,
+.access-card .tabs button {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 8px 5px;
+}
+.access-card .tabs .active {
+  color: #121b30;
+}
+.access-card > .tabs:not(.auth-tabs) {
+  height: 42px;
+  background: #f7f9fb;
+  margin-bottom: 24px;
+}
+.access-card form {
+  margin-top: 0;
+}
+.access-card .field {
+  margin-bottom: 16px;
+}
+.access-card .field > label {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  margin-bottom: 4px;
+}
+.access-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #94a6bf;
+}
+.access-input > .icon {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+}
+.access-input input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #c6d3e7;
+  border-radius: 12px;
+  padding: 10px 42px 10px 40px;
+  font-size: 14px;
+  color: #121b30;
+  background: white;
+}
+.access-input input::placeholder {
+  color: #94a6bf;
+  font-weight: 600;
+  opacity: 1;
+}
+.access-input input[aria-invalid='true'] {
+  border-color: #cc3449;
+}
+.password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 1px;
+  height: 40px;
+  width: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #94a6bf;
+  border-radius: 8px;
+}
+.password-toggle:hover {
+  color: #2860ed;
+}
+.access-card .form-options {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 16px 0 22px;
+  color: #485b76;
+}
+.access-card .form-options input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+}
+.access-card form > .button {
+  min-height: 42px;
+  margin-top: 0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+.access-card .divider {
+  font-size: 12px;
+  color: #92a3bc;
+  margin: 22px 0;
+  line-height: 18px;
+}
+.social-access {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.social-access button {
+  min-height: 40px;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+  color: #34445e;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 2px #15274a07;
+}
+.social-access button:hover {
+  background: #f4f7fc;
+  border-color: #a7b9d7;
+}
+.profile-picker {
+  min-height: calc(100vh - 64px);
+  padding: 126px 24px 80px;
+}
+.prototype-note {
+  text-align: center;
+  font-size: 23px;
+  line-height: 32px;
+  font-weight: 700;
+  color: #758092;
+}
+.profile-picker-card {
+  margin-top: 116px;
+  padding: 40px 32px 32px;
+  box-shadow: 0 18px 24px -12px #243d6524;
+}
+.profile-picker-card > h1 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 30px;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+.profile-divider {
+  margin: 48px 0 26px;
+}
+.profile-divider > span {
+  background: #e3e9f1;
+  color: #52647c;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c9d5e5;
+  border-radius: 50%;
+}
+.profile-tabs {
+  width: 100%;
+  margin: 0;
+  gap: 0;
+  padding: 4px;
+}
+.profile-tabs button {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 5px;
+}
+.profile-tabs button:first-child {
+  background: white;
+  color: #121b30;
+  box-shadow: 0 1px 4px #172d5212;
+}
+.profile-tabs button:hover {
+  background: white;
+  color: #2860ed;
+}
+.profile-card li > .icon {
+  color: #00a87f;
+  margin-top: 3px;
+}
+.profile-card.organizador li > .icon {
+  color: #7563ff;
+}
+.profile-workspace {
+  max-width: 960px;
+}
+.profile-workspace .profile-banner {
+  padding: 24px;
+}
+.profile-workspace .avatar.large {
+  width: 132px;
+  height: 132px;
+  font-size: 32px;
+  border: 4px solid #e3eaff;
+}
+.profile-workspace .panel:not(.profile-banner) {
+  padding: 32px;
+}
+.profile-workspace .panel-heading {
+  border-bottom: 1px solid #edf1f6;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+.profile-workspace .field > label {
+  font-size: 12px;
+}
+.profile-workspace .field input,
+.profile-workspace .field select {
+  min-height: 42px;
+  font-size: 14px;
+}
+.profile-security {
+  border-top: 1px solid #edf1f6;
+  padding-top: 24px;
+}
+.profile-security h3 {
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+.password-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.password-grid .field > label {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.profile-two-factor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #dce4ef;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f7f9fb;
+}
+.profile-two-factor span {
+  flex: 1;
+}
+.profile-two-factor strong {
+  font-size: 12px;
+}
+.profile-two-factor small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.profile-workspace .preference strong {
+  font-size: 14px;
+}
+.profile-workspace .preference small {
+  font-size: 12px;
+}
+.profile-workspace input[type='checkbox'] {
+  accent-color: #111;
+}
+@media (max-width: 600px) {
+  .profile-workspace .panel:not(.profile-banner) {
+    padding: 20px;
+  }
+  .profile-workspace .avatar.large {
+    width: 88px;
+    height: 88px;
+  }
+  .password-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .account-shell .header {
+    padding: 10px 20px;
+    min-height: 60px;
+  }
+  .access-page {
+    padding: 96px 16px 32px;
+  }
+  .access-card {
+    padding: 26px 22px;
+  }
+  .access-card .form-options {
+    gap: 6px;
+    font-size: 11px;
+  }
+  .profile-picker {
+    padding: 112px 16px 60px;
+  }
+  .prototype-note {
+    font-size: 14px;
+    line-height: 22px;
+  }
+  .profile-picker-card {
+    margin-top: 64px;
+    padding: 32px 20px 24px;
+  }
+  .profile-picker-card > h1 {
+    font-size: 22px;
+    white-space: normal;
+  }
+  .profile-tabs {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  .profile-tabs button {
+    flex-basis: 50%;
+    min-height: 44px;
+  }
+  .account-shell footer {
+    gap: 14px;
+  }
+}
+
+
+/* Tema noturno: telas de conta e seleção de perfil (folha carregada por último). */
+html[data-theme="dark"] .account-shell,
+html[data-theme="dark"] .account-shell main,
+html[data-theme="dark"] .account-shell .profile-picker,
+html[data-theme="dark"] .account-shell .auth-page {
+  color: #e8edf6;
+  background: #0b111c;
+}
+html[data-theme="dark"] .account-shell .header {
+  background: #080b11;
+  border-color: #202b3b;
+}
+html[data-theme="dark"] .account-shell footer {
+  color: #a9b7cb;
+  background: #080b11;
+  border-color: #263247;
+}
+html[data-theme="dark"] .account-shell footer a {
+  color: #c1d2f2;
+}
+html[data-theme="dark"] .prototype-note {
+  color: #a9bad4;
+}
+html[data-theme="dark"] .profile-picker-card,
+html[data-theme="dark"] .access-card,
+html[data-theme="dark"] .auth-card {
+  color: #e8edf6;
+  background: #151f2e;
+  border-color: #2b3a50;
+}
+html[data-theme="dark"] .profile-picker-card > h1,
+html[data-theme="dark"] .access-card > h1,
+html[data-theme="dark"] .auth-card > h1 {
+  color: #f4f7fc;
+}
+html[data-theme="dark"] .profile-picker-card .profile-divider > span {
+  color: #dce8fb;
+  background: #26364d;
+}
+html[data-theme="dark"] .profile-picker-card .profile-divider:before,
+html[data-theme="dark"] .profile-picker-card .profile-divider:after {
+  background: #3a4960;
+}
+html[data-theme="dark"] .profile-picker-card .profile-tabs {
+  background: #0f1724;
+  border-color: #46566e;
+}
+html[data-theme="dark"] .profile-picker-card .profile-tabs button,
+html[data-theme="dark"] .profile-picker-card .profile-tabs button:first-child,
+html[data-theme="dark"] .profile-picker-card .profile-tabs button:hover {
+  color: #dce6f5;
+  background: transparent;
+  box-shadow: none;
+}
+html[data-theme="dark"] .profile-picker-card .profile-tabs button:focus-visible,
+html[data-theme="dark"] .profile-picker-card .profile-tabs button.active {
+  color: #fff;
+  background: #29477b;
+}
+html[data-theme="dark"] .access-card .tabs,
+html[data-theme="dark"] .access-card .tabs a,
+html[data-theme="dark"] .access-card .tabs button {
+  color: #dce6f5;
+  background: #101a29;
+  border-color: #34445b;
+}
+html[data-theme="dark"] .access-card .tabs .active {
+  color: #fff;
+  background: #263e69;
+}
+html[data-theme="dark"] .access-input input,
+html[data-theme="dark"] .social-access button {
+  color: #edf2fa;
+  background: #0e1725;
+  border-color: #3a4960;
+}
+html[data-theme="dark"] .access-input input::placeholder {
+  color: #8798b2;
+}
+html[data-theme="dark"] .social-access button:hover {
+  background: #1b2a40;
+}
+
+/* Telas públicas de acesso e perfil com o mesmo sistema visual. */
+.account-shell {
+  background: #f4f7fc;
+  color: #142039;
+}
+.account-shell .auth-card,
+.account-shell .access-card,
+.account-shell .profile-picker-card,
+.account-shell .profile-card {
+  background: #fff;
+  color: #142039;
+  border: 1px solid #dfe6f1;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(23,39,68,.08);
+}
+.account-shell input,
+.account-shell select,
+.account-shell textarea {
+  color: #142039;
+  background: #fff;
+  border: 1px solid #cbd6e6;
+  border-radius: 10px;
+}
+.account-shell input:focus,
+.account-shell select:focus,
+.account-shell textarea:focus {
+  border-color: #4f78e8;
+  box-shadow: 0 0 0 3px rgba(79,120,232,.15);
+}
+html[data-theme="dark"] .account-shell {
+  background: #0c1220;
+  color: #edf2fb;
+}
+html[data-theme="dark"] .account-shell .auth-card,
+html[data-theme="dark"] .account-shell .access-card,
+html[data-theme="dark"] .account-shell .profile-picker-card,
+html[data-theme="dark"] .account-shell .profile-card {
+  background: #151e2c;
+  color: #edf2fb;
+  border-color: #29374d;
+  box-shadow: 0 12px 32px rgba(0,0,0,.24);
+}
+html[data-theme="dark"] .account-shell input,
+html[data-theme="dark"] .account-shell select,
+html[data-theme="dark"] .account-shell textarea {
+  color: #edf2fa;
+  background: #101827;
+  border-color: #3a4a63;
+}
+html[data-theme="dark"] .account-shell input::placeholder {
+  color: #91a0b8;
+}
+html[data-theme="dark"] .account-shell h1,
+html[data-theme="dark"] .account-shell h2,
+html[data-theme="dark"] .account-shell h3,
+html[data-theme="dark"] .account-shell strong,
+html[data-theme="dark"] .account-shell label {
+  color: #f1f5fb;
+}
+html[data-theme="dark"] .account-shell p,
+html[data-theme="dark"] .account-shell small {
+  color: #a5b3c9;
+}

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getEvents } from '../services/events';
-import EventCard from './EventCard';
-
-export const currency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
+export const currency = (value) =>
+  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 export function useEvents() {
   const [params] = useSearchParams();
   const simulateError = params.get('erro') === '1';
@@ -41,7 +39,6 @@ export function LoadState({ loading, error, retry }) {
     );
   return null;
 }
-
 export default function Events({ catalog = false }) {
   const state = useEvents();
   const [query, setQuery] = useState('');
@@ -81,7 +78,31 @@ export default function Events({ catalog = false }) {
         <>
           <div className="grid">
             {(catalog ? events : events.slice(0, 3)).map((event) => (
-              <EventCard key={event.id} event={event} variant="public" />
+              <article className="event-card" key={event.id}>
+                <div className="event-image">
+                  <img loading="lazy" src={event.image} alt={event.imageAlt} />
+                  <span className="verified">✓ Verificado</span>
+                </div>
+                <div className="event-info">
+                  <p className="event-meta">
+                    {event.date} • {event.location}
+                  </p>
+                  <h3>{event.title}</h3>
+                  <div className="event-bottom">
+                    <div>
+                      <small>A partir de</small>
+                      <strong>{currency(event.price)}</strong>
+                    </div>
+                    <Link
+                      to={`/eventos/${event.id}`}
+                      className="ticket-link"
+                      aria-label={`Ver ingressos: ${event.title}`}
+                    >
+                      Ver Ingressos
+                    </Link>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
           {events.length === 0 && (

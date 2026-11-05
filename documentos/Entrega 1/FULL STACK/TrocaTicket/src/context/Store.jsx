@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { initialEvents, initialPeople } from '../data/demo';
-import { initialSupplierProfile, supplierInventory, supplierProposals } from '../data/supplier';
+import { initialEvents, initialInventory, initialProposals, initialPeople } from '../data/demo';
 const Context = createContext(null);
 const defaults = {
   events: initialEvents,
-  inventory: supplierInventory,
-  proposals: supplierProposals,
+  inventory: initialInventory,
+  proposals: initialProposals,
   people: initialPeople,
   favorites: [],
   tickets: [],
@@ -14,16 +13,12 @@ const defaults = {
     name: 'Carlos Eduardo Mendes',
     email: 'carlos@example.com',
     phone: '(11) 98452-1100',
-    organizationName: '',
-    cnpj: '',
     preferences: [true, true, true, false],
   },
-  supplierProfile: initialSupplierProfile,
 };
 function read() {
   try {
     const saved = JSON.parse(localStorage.getItem('trocaticket-v2'));
-    return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
     return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
   } catch {
     return defaults;
