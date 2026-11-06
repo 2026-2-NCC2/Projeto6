@@ -27,7 +27,8 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-      <Route path="inicio" element={<UserHome />} />
+        <Route index element={<Home />} />
+        <Route path="inicio" element={<UserHome />} />
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
         <Route path="recuperar" element={<Recover />} />

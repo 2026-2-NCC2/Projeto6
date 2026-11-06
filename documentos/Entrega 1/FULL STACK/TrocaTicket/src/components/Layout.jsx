@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
 import Icon from './Icon';
@@ -27,8 +27,9 @@ const menus = {
   ],
 };
 export default function Layout() {
-  const { pathname } = useLocation();
-  const { role, chooseRole, data } = useStore();
+  const { pathname, state } = useLocation();
+  const navigate = useNavigate();
+  const { role, chooseRole, logout, notify, data } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
   // Primeira visita: tema claro. Depois, respeita a última escolha salva.
@@ -63,6 +64,13 @@ export default function Layout() {
     );
     if (routeRole && routeRole !== role) chooseRole(routeRole);
   }, [pathname, role, chooseRole]);
+    useEffect(() => {
+    if (pathname === '/' && state?.loggedOut) {
+      logout();
+      notify('Você saiu da conta.');
+      navigate('/', { replace: true });
+    }
+  }, [pathname, state]);
   useEffect(() => {
     window.scrollTo(0, 0);
     setMenu(false);
@@ -174,6 +182,15 @@ export default function Layout() {
                   MINHA CONTA<small>{activeRole === 'comprador' ? 'Usuário' : roleNames[activeRole]}</small>
                 </span>
               </Link>
+                            <button
+                type="button"
+                className="logout-button"
+                aria-label="Sair da conta"
+                title="Sair da conta"
+                onClick={() => navigate('/', { replace: true, state: { loggedOut: true } })}
+              >
+                <Icon name="logout" />
+              </button>
             </div>
           </>
         )}

@@ -198,7 +198,7 @@ h1 {
 .workspace {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 28px 34px 64px;
+  padding: 104px 34px 64px;
 }
 .workspace.narrow {
   max-width: 980px;
@@ -1795,7 +1795,7 @@ td code {
     display: none;
   }
   .workspace {
-    padding: 24px 22px 50px;
+      padding: 96px 22px 50px;
   }
   .dashboard-layout {
     grid-template-columns: minmax(0, 1fr) 280px;
@@ -1965,7 +1965,7 @@ td code {
 }
 @media (max-width: 620px) {
   .workspace {
-    padding: 24px 16px 45px;
+    padding: 92px 16px 45px;
   }
   .app-header.header {
     margin: 8px 10px 0;
@@ -2975,6 +2975,9 @@ html[data-theme="dark"] .button:disabled {
   color: #fff;
   background: rgba(255,255,255,.10);
   transform: translateY(-1px);
+}
+.app-header .header-tools > .logout-button:hover {
+  color: #ff6b87;
 }
 .app-header .user-chip {
   gap: 9px;

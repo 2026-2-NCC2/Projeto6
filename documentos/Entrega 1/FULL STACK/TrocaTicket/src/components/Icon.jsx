@@ -68,6 +68,12 @@ const paths = {
   ),
   menu: <path d="M3 6h18M3 12h18M3 18h18" />,
   arrow: <path d="M4 12h16m-6-6 6 6-6 6" />,
+    logout: (
+    <>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5M21 12H9" />
+    </>
+  ),
   check: (
     <>
       <circle cx="12" cy="12" r="9" />

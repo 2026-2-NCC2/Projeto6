@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel, Modal } from '../components/UI';
 import Icon from '../components/Icon';
 import { roleNames } from '../data/demo';
 export default function Profile() {
   const { data, update, role, notify } = useStore();
+  const navigate = useNavigate();
   const [form, setForm] = useState(data.profile);
   const [error, setError] = useState('');
   const [history, setHistory] = useState(false);
@@ -217,6 +219,15 @@ export default function Profile() {
               />
             </label>
           ))}
+        </Panel>
+                <Panel title="IV. Sessão" subtitle="Encerre o acesso a esta conta neste navegador.">
+          <button
+            type="button"
+            className="button outline"
+            onClick={() => navigate('/', { replace: true, state: { loggedOut: true } })}
+          >
+            <Icon name="logout" size={18} /> Sair da conta
+          </button>
         </Panel>
         {error && (
           <p role="alert" className="field-error">

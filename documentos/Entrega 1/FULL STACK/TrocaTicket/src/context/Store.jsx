@@ -54,6 +54,12 @@ export function StoreProvider({ children }) {
       sessionStorage.setItem('trocaticket-role', value);
     } catch {}
   }
+    function logout() {
+    setRole('');
+    try {
+      sessionStorage.removeItem('trocaticket-role');
+    } catch {}
+  }
   function update(key, value) {
     setData((old) => ({ ...old, [key]: typeof value === 'function' ? value(old[key]) : value }));
   }
@@ -61,7 +67,9 @@ export function StoreProvider({ children }) {
     update('favorites', (old) => (old.includes(id) ? old.filter((x) => x !== id) : [...old, id]));
   }
   return (
-    <Context.Provider value={{ data, update, role, chooseRole, notify: setToast, toggleFavorite }}>
+<Context.Provider
+  value={{ data, update, role, chooseRole, logout, notify: setToast, toggleFavorite }}
+>
       {children}
       {storageError && (
         <div className="storage-warning" role="alert">

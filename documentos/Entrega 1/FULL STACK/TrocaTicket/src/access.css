@@ -634,7 +634,7 @@ html[data-theme="dark"] .account-shell .header .brand small {
 }
 /* ---------- Home do usuário logado ---------- */
 .user-home .hero {
-  margin-top: -80px;
+  margin-top: 0;
 }
 .user-home .hero h1 em {
   color: #a99aff;
@@ -734,7 +734,7 @@ html[data-theme="dark"] .account-shell .header .brand small {
 }
 @media (max-width: 620px) {
   .user-home .hero {
-    margin-top: -70px;
+    margin-top: 0;
   }
   .uh-papo {
     padding: 26px 22px;
