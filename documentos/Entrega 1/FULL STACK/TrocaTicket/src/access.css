@@ -744,6 +744,8 @@ html[data-theme="dark"] .account-shell .header .brand small {
 .user-home .hero {
   text-align: left;
   padding-bottom: 72px;
+  min-height: max(665px, 100vh);
+  min-height: max(665px, 100svh);
 }
 .user-home .hero-content {
   max-width: 1240px;
@@ -1039,4 +1041,28 @@ html[data-theme="dark"] .account-shell .header .brand small {
   .uh-card:focus-within {
     transform: none;
   }
+}
+.uh-pbar {
+  display: block;
+  height: 8px;
+  border-radius: 99px;
+  background: #eeebff;
+  overflow: hidden;
+}
+.uh-pbar i {
+  display: block;
+  height: 100%;
+  background: #6c4cf0;
+  border-radius: inherit;
+}
+html[data-theme="dark"] .uh-pbar { background: rgba(255, 255, 255, 0.14); }
+html[data-theme="dark"] .uh-pbar i { background: #a99aff; }
+.uh-car {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.25s;
+}
+.uh-car:hover,
+.uh-car:has(:focus-visible) {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(109, 143, 245, 0.6);
+  box-shadow: 0 22px 40px -18px rgba(109, 143, 245, 0.4);
 }
