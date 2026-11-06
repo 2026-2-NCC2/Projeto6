@@ -740,3 +740,303 @@ html[data-theme="dark"] .account-shell .header .brand small {
     padding: 26px 22px;
   }
 }
+/* ---------- Home do usuário: carrossel e cards ---------- */
+.user-home .hero {
+  text-align: left;
+  padding-bottom: 72px;
+}
+.user-home .hero-content {
+  max-width: 1240px;
+}
+.user-home .hero h1 {
+  margin-inline: 0;
+}
+.user-home .hero-description {
+  margin: 0 0 28px;
+  max-width: 48ch;
+}
+.user-home .hero-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.uh-two {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 44px;
+  align-items: center;
+}
+
+/* Carrossel */
+.uh-car {
+  position: relative;
+  height: 410px;
+  overflow: hidden;
+  border-radius: 18px;
+  color: #fff;
+  background: #0b1220;
+  border: 1px solid #263349;
+}
+.uh-car-top {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 18px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.uh-car .uh-k {
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: rgba(8, 14, 26, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.uh-nav {
+  display: flex;
+  gap: 6px;
+}
+.uh-nav button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(8, 14, 26, 0.78);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.uh-nav button:hover {
+  background: rgba(79, 120, 232, 0.9);
+}
+.uh-slide {
+  position: absolute;
+  inset: 0 0 4px;
+  color: #fff;
+}
+.uh-slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: uh-in 0.6s ease both;
+}
+.uh-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 10, 20, 0.55) 0, transparent 32%, rgba(6, 10, 20, 0.92) 100%);
+}
+.uh-tx {
+  position: absolute;
+  z-index: 1;
+  left: 22px;
+  right: 22px;
+  bottom: 20px;
+  display: grid;
+  gap: 6px;
+}
+.uh-tx b {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.uh-tx > span {
+  font-size: 13.5px;
+  color: #d3dbea;
+}
+.uh-tx .uh-price {
+  width: max-content;
+  padding: 4px 11px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.16);
+  font-weight: 600;
+  color: #fff;
+}
+.uh-tx .uh-go {
+  color: #fff;
+}
+.uh-bar {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.uh-fill {
+  display: block;
+  height: 100%;
+  background: #6d8ff5;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: uh-fill 10s linear forwards;
+}
+.uh-fill.is-paused,
+.uh-car:hover .uh-fill,
+.uh-car:focus-within .uh-fill {
+  animation-play-state: paused;
+}
+@keyframes uh-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes uh-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+/* Cards */
+.uh-strip {
+  margin-top: 48px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.uh-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 176px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  color: #f1f4fa;
+  background: rgba(17, 26, 43, 0.86);
+  border: 1px solid #263349;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.25s;
+}
+.uh-card:hover,
+.uh-card:focus-within {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(109, 143, 245, 0.6);
+  box-shadow: 0 22px 40px -18px rgba(109, 143, 245, 0.4);
+}
+.uh-card:active {
+  transform: translateY(-2px) scale(0.99);
+  transition-duration: 0.1s;
+}
+.uh-card:focus-visible,
+.uh-card a:focus-visible,
+.uh-slide:focus-visible {
+  outline: 3px solid rgba(169, 154, 255, 0.7);
+  outline-offset: 2px;
+}
+.uh-k {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9aa8bf;
+  transition: color 0.25s;
+}
+.uh-card:hover .uh-k {
+  color: #a99aff;
+}
+.uh-big {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: inherit;
+}
+.uh-sub {
+  font-size: 13px;
+  color: #9aa8bf;
+}
+.uh-go {
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8fa8ff;
+}
+.uh-go::after {
+  content: " →";
+  display: inline-block;
+  transition: transform 0.3s;
+}
+.uh-card:hover .uh-go::after,
+.uh-slide:hover .uh-go::after {
+  transform: translateX(5px);
+}
+.uh-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.uh-chips span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 99px;
+  color: #7be0b2;
+  background: rgba(123, 224, 178, 0.14);
+}
+.uh-thumbs {
+  display: flex;
+  gap: 6px;
+}
+.uh-thumbs img {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.uh-stretch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+}
+.uh-heart {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #263349;
+  background: #141d2c;
+  color: #a99aff;
+  font-size: 17px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.uh-heart:hover {
+  transform: scale(1.12);
+}
+
+@media (max-width: 900px) {
+  .uh-two {
+    grid-template-columns: 1fr;
+  }
+  .uh-car {
+    height: 380px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .uh-card,
+  .uh-slide img {
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+  }
+  .uh-card:hover,
+  .uh-card:focus-within {
+    transform: none;
+  }
+}
