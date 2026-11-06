@@ -47,7 +47,7 @@ function SeletorComunidade({ valor, onChange }) {
     <div className="dropdown seletor-comunidade">
       <button type="button" className="seletor-btn" aria-haspopup="listbox" aria-expanded={aberto} onClick={() => setAberto(!aberto)}>
         {c ? <ComunidadeIcone comunidade={c} size={26} /> : <span className="com-icone vazio" />}
-        <b>{c ? `r/${c.slug}` : "Escolha uma comunidade"}</b>
+        <b>{c ? `t/${c.slug}` : "Escolha uma comunidade"}</b>
         <Icon name="chevronDown" size={17} />
       </button>
       {aberto && (
@@ -57,7 +57,7 @@ function SeletorComunidade({ valor, onChange }) {
               <button type="button" onClick={() => (onChange(x.slug), setAberto(false))}>
                 <ComunidadeIcone comunidade={x} size={26} />
                 <span>
-                  <b>r/{x.slug}</b>
+                  <b>t/{x.slug}</b>
                   <small>{numeroCompacto(x.membros)} membros</small>
                 </span>
                 {x.slug === valor && <Icon name="check" size={16} className="texto-azul" />}
@@ -186,7 +186,7 @@ export default function CreatePost() {
     });
     if (rascunhoId) f.removerRascunho(rascunhoId);
     f.toast("Publicação criada com sucesso!");
-    navigate(`/r/${comunidade}/post/${id}`);
+    navigate(`/t/${comunidade}/post/${id}`);
   };
 
   const salvarRascunho = () => {
@@ -231,7 +231,7 @@ export default function CreatePost() {
                     <button type="button" onClick={() => carregarRascunho(r)}>
                       <b>{r.titulo || "(sem título)"}</b>
                       <small>
-                        r/{r.comunidade} • {tempoRelativo(r.atualizadoEm)}
+                        t/{r.comunidade} • {tempoRelativo(r.atualizadoEm)}
                       </small>
                     </button>
                     <button type="button" className="icone-btn" aria-label="Excluir rascunho" onClick={() => f.removerRascunho(r.id)}>
@@ -367,7 +367,7 @@ export default function CreatePost() {
         {c && (
           <section className="card">
             <h3 className="card-titulo">
-              <Icon name="shieldCheck" size={18} className="texto-azul" /> Regras de r/{c.slug}
+              <Icon name="shieldCheck" size={18} className="texto-azul" /> Regras de t/{c.slug}
             </h3>
             <ol className="regras-numeradas">
               {c.regras.map((r) => (

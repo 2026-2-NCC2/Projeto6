@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useMatch, useNavigate, useSearchParams } from "react-router";
 import Icon from "./Icon.jsx";
 import { Avatar } from "./Common.jsx";
 import { categorias } from "../data/forum.js";
 import { useForum } from "../store/ForumContext.jsx";
 import { tempoRelativo } from "../utils/format.js";
+import { ComunidadesDestaque } from "./Widgets.jsx";
 
 function Logo() {
   return (
@@ -21,7 +22,7 @@ function Logo() {
 function Busca() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const match = useMatch("/r/:slug/*");
+  const match = useMatch("/t/:slug/*");
   const slug = match?.params.slug;
   const [escopo, setEscopo] = useState(slug);
   const [texto, setTexto] = useState(params.get("busca") || "");
@@ -43,7 +44,7 @@ function Busca() {
   const enviar = (e) => {
     e.preventDefault();
     const q = texto.trim();
-    const base = escopo ? `/r/${escopo}` : "/";
+    const base = escopo ? `/t/${escopo}` : "/";
     navigate(q ? `${base}?busca=${encodeURIComponent(q)}` : base);
   };
 
@@ -52,7 +53,7 @@ function Busca() {
       <Icon name="search" size={17} />
       {escopo && (
         <span className="busca-escopo">
-          r/{escopo}
+          t/{escopo}
           <button type="button" aria-label="Buscar em todo o fórum" onClick={() => setEscopo(undefined)}>
             <Icon name="x" size={12} stroke={3} />
           </button>
@@ -62,7 +63,7 @@ function Busca() {
         ref={ref}
         value={texto}
         onChange={(e) => setTexto(e.target.value)}
-        placeholder={escopo ? `Buscar em r/${escopo}` : "Buscar"}
+        placeholder={escopo ? `Buscar em t/${escopo}` : "Buscar"}
         aria-label="Buscar no fórum"
       />
     </form>
@@ -108,7 +109,7 @@ function MenuUsuario() {
         <Avatar username={f.usuario.username} size={34} online />
         <span className="usuario-btn-texto">
           <b>{f.usuario.nome || `u/${f.usuario.username}`}</b>
-          <small>{f.usuario.role ? `Conta ${f.usuario.role}` : (f.usuario.vip ? "VIP Verified" : "Conta TrocaTicket")}</small>
+          <small>{f.usuario.role ? `Conta ${{ comprador: "Participante", organizador: "Organizador", fornecedor: "Fornecedor", admin: "Administrador" }[f.usuario.role] || f.usuario.role}` : (f.usuario.vip ? "VIP Verified" : "Conta TrocaTicket")}</small>
         </span>
         <Icon name="chevronDown" size={15} />
       </button>
@@ -134,7 +135,7 @@ function MenuUsuario() {
 
 function Header({ onMenu }) {
   const f = useForum();
-  const match = useMatch("/r/:slug/*");
+  const match = useMatch("/t/:slug/*");
   const slug = match?.params.slug;
   return (
     <header className="header">
@@ -147,7 +148,7 @@ function Header({ onMenu }) {
           <NavLink to="/" end>
             Discussões
           </NavLink>
-          <NavLink to="/r/AvisosESeguranca">Segurança</NavLink>
+          <NavLink to="/t/AvisosESeguranca">Segurança</NavLink>
         </nav>
         <Busca />
         <Link to={slug ? `/criar?r=${slug}` : "/criar"} className="btn btn-primario header-criar">
@@ -171,11 +172,12 @@ function Header({ onMenu }) {
 }
 
 const navPrincipal = [
-  { aba: "para-voce", rotulo: "Início", icone: "home" },
+  { aba: "para-voce", rotulo: "Para você", icone: "home" },
+  { aba: "seguindo", rotulo: "Seguindo", icone: "heart", contador: true },
   { aba: "em-alta", rotulo: "Em alta", icone: "flame" },
-  { aba: "recentes", rotulo: "Mais recentes", icone: "clock" },
-  { aba: "seguindo", rotulo: "Comunidades seguidas", icone: "users", contador: true },
-  { aba: "salvas", rotulo: "Publicações salvas", icone: "bookmark" },
+  { aba: "recentes", rotulo: "Recentes", icone: "clock" },
+  { aba: "mais-votados", rotulo: "Mais votados", icone: "trending" },
+  { aba: "salvas", rotulo: "Publicações salvas", icone: "bookmark", separadorAntes: true },
   { aba: "minhas", rotulo: "Minhas publicações", icone: "file" },
 ];
 
@@ -186,7 +188,7 @@ function SidebarEsquerda({ aberto, fechar }) {
   const naHome = pathname === "/";
   const abaAtual = params.get("aba") || "para-voce";
   const catAtual = params.get("categoria");
-  const matchCom = useMatch("/r/:slug/*");
+  const matchCom = useMatch("/t/:slug/*");
   const catComunidade = matchCom ? f.getComunidade(matchCom.params.slug)?.categoria : null;
 
   return (
@@ -195,58 +197,25 @@ function SidebarEsquerda({ aberto, fechar }) {
       <aside className={`col-esquerda ${aberto ? "aberto" : ""}`} aria-label="Navegação do fórum">
         <nav className="card nav-lista">
           {navPrincipal.map((n) => (
-            <Link
-              key={n.aba}
-              to={n.aba === "para-voce" ? "/" : `/?aba=${n.aba}`}
-              className={naHome && !catAtual && abaAtual === n.aba ? "ativo" : ""}
-              onClick={fechar}
-            >
-              <Icon name={n.icone} size={19} />
-              <span>{n.rotulo}</span>
-              {n.contador && <span className="contador-cinza">{f.seguindo.length}</span>}
-            </Link>
+            <React.Fragment key={n.aba}>
+              {n.separadorAntes && <div className="nav-separador" aria-hidden="true" />}
+              <Link
+                to={n.aba === "para-voce" ? "/" : `/?aba=${n.aba}`}
+                className={naHome && !catAtual && abaAtual === n.aba ? "ativo" : ""}
+                onClick={fechar}
+              >
+                <Icon name={n.icone} size={19} />
+                <span>{n.rotulo}</span>
+                {n.contador && <span className="contador-cinza">{f.seguindo.length}</span>}
+              </Link>
+            </React.Fragment>
           ))}
         </nav>
 
-        <section className="card">
-          <div className="card-titulo-pequeno">
-            EXPLORAR CATEGORIAS <Icon name="sliders" size={15} />
-          </div>
-          <nav className="nav-categorias">
-            {categorias.map((c) => (
-              <Link
-                key={c.id}
-                to={`/?categoria=${c.id}`}
-                className={`${catAtual === c.id || catComunidade === c.id ? "ativo" : ""} ${c.id === "golpes" ? "alerta" : ""}`}
-                onClick={fechar}
-              >
-                <span className="emoji" aria-hidden="true">
-                  {c.emoji}
-                </span>
-                <span>{c.nome}</span>
-                {c.selo ? <span className={`selo selo-${c.selo.tom}`}>{c.selo.texto}</span> : c.contagem && <small>{c.contagem}</small>}
-              </Link>
-            ))}
-          </nav>
-          <button type="button" className="btn btn-suave btn-bloco" onClick={() => f.toast("Solicitação de nova comunidade enviada à moderação")}>
-            <Icon name="plusCircle" size={18} /> Criar Comunidade
-          </button>
-        </section>
+        <div className="sidebar-comunidades-destaque">
+          <ComunidadesDestaque />
+        </div>
 
-        <section className="card card-texto">
-          <div className="card-titulo-pequeno">COMPROMISSO ÉTICO</div>
-          <p>Repasse consciente sem ágio extorsivo. Denuncie cambismo e uploads de QR Codes falsos com um clique.</p>
-        </section>
-
-        <section className="card card-garantia-escuro">
-          <strong>
-            <Icon name="shieldCheck" size={16} /> GARANTIA BLINDADA
-          </strong>
-          <p>Transações protegidas por retenção bancária até o evento.</p>
-          <Link to="/r/AvisosESeguranca/post/8901" onClick={fechar}>
-            Entenda a proteção →
-          </Link>
-        </section>
       </aside>
     </>
   );
@@ -264,18 +233,18 @@ function Rodape() {
           <strong>Navegação</strong>
           <Link to="/">Feed Principal</Link>
           <Link to="/?categoria=trocas">Ingressos Verificados</Link>
-          <Link to="/r/EventosSP">Cidades e Polos</Link>
+          <Link to="/t/EventosSP">Cidades e Polos</Link>
         </div>
         <div>
           <strong>Confiança</strong>
-          <Link to="/r/AvisosESeguranca">Diretrizes de Proteção</Link>
+          <Link to="/t/AvisosESeguranca">Diretrizes de Proteção</Link>
           <Link to="/?categoria=golpes">Denúncias de Cambismo</Link>
-          <Link to="/r/ShowsEFestivais?aba=sobre">Termos e Moderação</Link>
+          <Link to="/t/ShowsEFestivais?aba=sobre">Termos e Moderação</Link>
         </div>
         <div>
           <strong>Suporte</strong>
           <Link to="/?categoria=duvidas">Perguntas Frequentes</Link>
-          <Link to="/r/AvisosESeguranca">Falar com Moderadores</Link>
+          <Link to="/t/AvisosESeguranca">Falar com Moderadores</Link>
         </div>
       </div>
       <div className="rodape-base">

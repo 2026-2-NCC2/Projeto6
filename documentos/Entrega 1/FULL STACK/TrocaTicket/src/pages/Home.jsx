@@ -57,15 +57,15 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             <Link to="/cadastro" className="button primary">
-              Começar Gratuitamente <Icon name="arrow" size={18} />
+              Comece na TrocaTicket <Icon name="arrow" size={18} />
             </Link>
-            <a className="button secondary" href="#profiles-title">
-              <Icon name="shield" size={18} /> Conhecer perfis
+            <a className="button secondary" href="#profiles">
+              <Icon name="shield" size={18} /> Como funciona?
             </a>
           </div>
         </div>
       </section>
-      <section className="profiles section" aria-labelledby="profiles-title">
+      <section id="profiles" className="profiles section" aria-labelledby="profiles-title">
         <div className="section-heading">
           <p className="eyebrow">Acesso multi-perfil</p>
           <h2 id="profiles-title">Como você quer usar o Troca Ticket?</h2>

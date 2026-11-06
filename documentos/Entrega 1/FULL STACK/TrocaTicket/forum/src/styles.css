@@ -2811,3 +2811,239 @@ input, textarea, select {
     flex-basis: 30px;
   }
 }
+
+
+/* Comunidades em destaque na antiga área de categorias */
+.sidebar-comunidades-destaque > .card {
+  padding: 17px 16px;
+}
+.sidebar-comunidades-destaque .card-titulo {
+  font-size: 14px;
+  line-height: 1.35;
+  margin: 0 0 14px;
+}
+.sidebar-comunidades-destaque .lista-comunidades {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sidebar-comunidades-destaque .lista-comunidades li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  min-width: 0;
+}
+.sidebar-comunidades-destaque .lista-comunidades li > a {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-decoration: none;
+}
+.sidebar-comunidades-destaque .lista-comunidades li > a b {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.sidebar-comunidades-destaque .lista-comunidades li > a small {
+  color: var(--texto-suave);
+  font-size: 11.5px;
+}
+.sidebar-comunidades-destaque .lista-comunidades .btn {
+  flex: 0 0 auto;
+}
+@media (max-width: 900px) {
+  .sidebar-comunidades-destaque .lista-comunidades {
+    gap: 11px;
+  }
+}
+
+/* TrocaPapo — cabeçalho de comunidade reorganizado */
+.com-cabecalho {
+  border-radius: 18px;
+  overflow: clip;
+  isolation: isolate;
+}
+.com-banner {
+  height: 142px;
+  background:
+    radial-gradient(ellipse at 78% 18%, color-mix(in srgb, var(--cor) 48%, transparent), transparent 48%),
+    linear-gradient(118deg, #191d49 0%, #293e91 58%, #3157b7 100%);
+}
+.com-info {
+  padding: 0 22px 16px;
+}
+.com-avatar-linha {
+  position: relative;
+  z-index: 1;
+  min-height: 94px;
+  margin-top: -44px;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+}
+.com-avatar {
+  flex: 0 0 auto;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: 22px;
+  box-shadow: 0 8px 22px rgba(12, 24, 48, .16);
+}
+.com-avatar .com-icone {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+}
+.com-botoes {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 2px;
+}
+.com-botoes .btn {
+  min-height: 40px;
+  height: 40px;
+  padding: 0 15px;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(30, 55, 105, .07);
+}
+.com-botoes .icone-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  background: var(--card);
+  border: 1px solid var(--borda-forte);
+}
+.com-botoes .icone-btn:hover {
+  border-color: var(--primaria);
+  background: var(--primaria-suave);
+}
+.com-nome {
+  margin: 8px 0 0;
+  gap: 9px;
+  font-size: clamp(20px, 2.4vw, 24px);
+  line-height: 1.25;
+}
+.com-nome .selo {
+  font-size: 11px;
+  line-height: 1.2;
+}
+.com-info > .texto-suave {
+  margin: 5px 0 0;
+  line-height: 1.4;
+}
+.com-descricao {
+  max-width: 760px;
+  margin: 10px 0 12px;
+  line-height: 1.55;
+}
+.com-numeros {
+  gap: 7px 9px;
+  margin: 0;
+  line-height: 1.5;
+}
+.com-abas {
+  min-height: 50px;
+  padding: 0 16px;
+  gap: 8px;
+  background: var(--card);
+}
+.com-abas button {
+  min-height: 50px;
+  padding: 12px 10px;
+  font-size: 13.5px;
+}
+.com-abas button:focus-visible,
+.com-botoes button:focus-visible,
+.com-botoes a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primaria) 40%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .com-banner {
+    height: 126px;
+  }
+  .com-info {
+    padding: 0 16px 14px;
+  }
+  .com-avatar-linha {
+    min-height: 0;
+    margin-top: -38px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .com-avatar .com-icone {
+    width: 66px;
+    height: 66px;
+  }
+  .com-botoes {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0;
+    gap: 7px;
+  }
+  .com-botoes .btn {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .com-botoes .icone-btn {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+  .com-nome {
+    margin-top: 14px;
+    font-size: 21px;
+  }
+  .com-descricao {
+    font-size: 14px;
+  }
+  .com-abas {
+    padding: 0 10px;
+    gap: 2px;
+  }
+  .com-abas button {
+    padding: 11px 9px;
+    font-size: 12.5px;
+  }
+}
+@media (max-width: 420px) {
+  .com-botoes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 38px 38px;
+  }
+  .com-botoes .btn {
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  .com-numeros {
+    font-size: 12px;
+  }
+  .com-abas button {
+    font-size: 11.5px;
+    padding-inline: 8px;
+  }
+}
+
+
+/* Navegação do feed integrada à barra lateral */
+.nav-lista .nav-separador {
+  height: 1px;
+  margin: 7px 8px;
+  background: var(--borda);
+}
