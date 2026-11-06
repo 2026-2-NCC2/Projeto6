@@ -21,15 +21,27 @@ import {
 //comentario so pra merge
 
 export function Organizer({ list = false }) {
-  const { data } = useStore();
+  const { data, setEvents } = useStore(); // Ou a função que atualiza a store
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Todos');
   const [view, setView] = useState('Grade');
-  const events = data.events.filter(
+
+  // MANTENHA A SUA LINHA DE FILTRO INTACTA:
+  const events = (data?.events || []).filter(
     (e) =>
-      e.title.toLowerCase().includes(query.toLowerCase()) &&
-      (status === 'Todos' || e.status === status),
+      e.title?.toLowerCase().includes(query.toLowerCase()) &&
+      (status === 'Todos' || e.status === status)
   );
+
+  // ADICIONE APENAS A CHAMADA DA API NA MONTAGEM (Se for carregar via API):
+  useEffect(() => {
+    // Exemplo: buscar registros da API e salvar na store sem quebrar o layout
+    organizerService.getAll().then((dados) => {
+      if (setEvents) setEvents(dados);
+    }).catch(err => console.error(err));
+  }, []);
+
+  // ... rest das suas 705 linhas continuam idênticas
   return (
     <div className="workspace">
       <PageTitle

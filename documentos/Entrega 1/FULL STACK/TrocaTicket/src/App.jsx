@@ -10,6 +10,7 @@ import SupplierQuote from './pages/supplier/SupplierQuote';
 import SupplierInventory from './pages/supplier/SupplierInventory';
 import SupplierProfile from './pages/supplier/SupplierProfile';
 import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organizer';
+import OrganizerManager from './pages/Organizer/OrganizerManager'
 import Admin from './pages/Admin';
 import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="organizador/eventos/:id/editar" element={<EventEditorRoute />} />
         <Route path="organizador/eventos/:id/consolidar" element={<Consolidation />} />
         <Route path="organizador/fornecedores" element={<Suppliers />} />
+        <Route path="organizadro/gerenciar" element={<OrganizerManager />} />
         <Route path="fornecedor" element={<SupplierHome />} />
         <Route path="fornecedor/propostas" element={<SupplierProposals />} />
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
