@@ -219,7 +219,7 @@ export const destinations = {
   admin: '/admin',
 };
 export const roleNames = {
-  comprador: 'Participante',
+  comprador: 'Usuário',
   organizador: 'Organizador',
   fornecedor: 'Fornecedor',
   admin: 'Administrador',

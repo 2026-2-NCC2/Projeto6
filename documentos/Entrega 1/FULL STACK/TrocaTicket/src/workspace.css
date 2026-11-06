@@ -3276,3 +3276,32 @@ html[data-theme="dark"] .workspace p,
 html[data-theme="dark"] .workspace small {
   color: #a5b3c9;
 }
+
+/* HEADER — BADGES ROXAS */
+
+.app-header .app-navigation a {
+  padding: 9px 15px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  transition:
+    background-color .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+.app-header .app-navigation a:hover {
+  background: rgba(157, 126, 230, 0.10);
+  border-color: rgba(157, 126, 230, 0.20);
+  transform: translateY(-1px);
+}
+
+.app-header .app-navigation a:hover::after {
+  opacity: 0;
+}
+/* Hover da logo TrocaTicket no header */
+
+.app-header .brand:hover > span,
+.app-header .brand:hover > span small {
+  color: #a78bdf !important;
+  transition: color .2s ease;
+}

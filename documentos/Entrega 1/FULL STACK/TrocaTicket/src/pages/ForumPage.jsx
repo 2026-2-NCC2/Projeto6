@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 
 /**
@@ -7,6 +8,9 @@ import { useStore } from '../context/Store';
  */
 export default function ForumPage() {
   const frame = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = location.state?.from;
   const { role, data } = useStore();
   const perfil = data?.profile || {};
   const identidade = {
@@ -35,6 +39,16 @@ export default function ForumPage() {
     aplicarTema(temaSalvo);
     const aoReceber = (event) => {
       if (event.origin !== window.location.origin) return;
+      if (event.data?.type === 'TROCATICKET_FORUM_BACK') {
+  const destino =
+    typeof returnTo === 'string' &&
+    returnTo.startsWith('/') &&
+    !returnTo.startsWith('//')
+      ? returnTo
+      : '/inicio';
+
+  navigate(destino);
+}
       if (event.data?.type === 'TROCATICKET_FORUM_READY') {
         enviarIdentidade();
         frame.current?.contentWindow?.postMessage({ type: 'TROCATICKET_SET_THEME', dark: temaSalvo }, window.location.origin);
@@ -44,7 +58,7 @@ export default function ForumPage() {
     window.addEventListener('message', aoReceber);
     enviarIdentidade();
     return () => window.removeEventListener('message', aoReceber);
-  }, [enviarIdentidade]);
+    }, [enviarIdentidade, navigate, returnTo]);
 
   return (
     <iframe

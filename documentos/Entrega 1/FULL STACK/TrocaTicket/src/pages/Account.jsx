@@ -268,7 +268,7 @@ export function Profiles() {
         {profileCards.map((card) => (
           <Link
             key={card.id}
-            to={destinations[card.id]}
+            to={card.id === 'comprador' ? '/inicio' : destinations[card.id]}
             className={`pf-card pf-${card.id}`}
             onClick={() => chooseRole(card.id)}
           >

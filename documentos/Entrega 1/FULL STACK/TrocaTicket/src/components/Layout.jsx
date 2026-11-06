@@ -27,7 +27,7 @@ const menus = {
   ],
 };
 export default function Layout() {
-  const { pathname, state } = useLocation();
+const { pathname, search, hash, state } = useLocation();
   const navigate = useNavigate();
   const { role, chooseRole, logout, notify, data } = useStore();
   const [menu, setMenu] = useState(false);
@@ -132,11 +132,20 @@ export default function Layout() {
               className={`app-navigation ${menu ? 'is-open' : ''}`}
               aria-label="Navegação principal"
             >
-              {menus[activeRole].map(([label, to]) => (
-                <NavLink end key={to} to={to}>
-                  {label}
-                </NavLink>
-              ))}
+          {menus[activeRole].map(([label, to]) => (
+            <NavLink
+              end
+              key={to}
+              to={to}
+              state={
+                to === '/comunidade'
+                  ? { from: `${pathname}${search}${hash}` }
+                  : undefined
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
             </nav>
             <div className="header-tools">
               <button

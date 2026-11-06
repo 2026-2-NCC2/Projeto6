@@ -154,9 +154,19 @@ function Header({ onMenu }) {
         <Link to={slug ? `/criar?r=${slug}` : "/criar"} className="btn btn-primario header-criar">
           <Icon name="plus" size={18} stroke={2.5} /> <span>Criar Publicação</span>
         </Link>
-        <a className="forum-voltar" href="/" target="_top" title="Voltar ao site principal">
+        <button
+          type="button"
+          className="forum-voltar"
+          title="Voltar à página anterior"
+          onClick={() =>
+            window.parent.postMessage(
+              { type: 'TROCATICKET_FORUM_BACK' },
+              window.location.origin
+            )
+          }
+        >
           <Icon name="arrowLeft" size={16} /> <span>Voltar</span>
-        </a>
+        </button>
         <button type="button" className="icone-btn header-icone esconde-mobile" aria-label={f.dark ? "Ativar tema claro" : "Ativar tema escuro"} onClick={f.alternarTema}>
           <Icon name={f.dark ? "sun" : "moon"} size={20} />
         </button>
