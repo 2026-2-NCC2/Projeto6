@@ -79,7 +79,11 @@ export default function Layout() {
         Pular para o conteúdo
       </a>
       <header className={`header ${!publicPage ? 'app-header' : ''}`}>
-        <Link className="brand" to="/" aria-label="TrocaTicket, início">
+      <Link
+          className="brand"
+          to={publicPage ? '/' : activeRole === 'comprador' ? '/inicio' : destinations[activeRole]}
+          aria-label="TrocaTicket, início"
+        >
           <img src="/images/logo.png" alt="" />
           <span>
             TrocaTicket<small>EVENTOS & INGRESSOS</small>

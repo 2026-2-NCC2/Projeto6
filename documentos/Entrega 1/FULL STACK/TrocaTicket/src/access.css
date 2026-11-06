@@ -632,3 +632,111 @@ html[data-theme="dark"] .pf-picker {
 html[data-theme="dark"] .account-shell .header .brand small {
   color: #f1f5fb;
 }
+/* ---------- Home do usuário logado ---------- */
+.user-home .hero {
+  margin-top: -80px;
+}
+.user-home .hero h1 em {
+  color: #a99aff;
+}
+.uh-summary {
+  padding-block: 56px 8px;
+  background: var(--tt-bg);
+  color: var(--tt-ink);
+}
+.uh-summary h2 {
+  margin: 0 0 20px;
+}
+.uh-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 760px;
+}
+.uh-tile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  min-width: 0;
+  color: var(--tt-ink);
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: 16px;
+  box-shadow: var(--tt-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.uh-tile:hover,
+.uh-tile:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--tt-shadow-hover);
+  border-color: var(--tt-violet);
+}
+.uh-ic {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  font-size: 22px;
+  color: var(--tt-violet);
+  background: color-mix(in srgb, var(--tt-violet) 14%, var(--tt-surface));
+}
+.uh-tile strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.uh-tile small {
+  font-size: 13px;
+  color: var(--tt-muted);
+}
+.uh-papo-wrap {
+  padding-block: 24px 72px;
+  background: var(--tt-bg);
+}
+.uh-papo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 32px 36px;
+  color: #f4f7ff;
+  border-radius: 20px;
+  background: linear-gradient(115deg, #1b2342 0%, #2d2566 55%, #4a3a9c 100%);
+}
+.uh-papo > div {
+  max-width: 620px;
+}
+.uh-papo .eyebrow {
+  color: #c9bfff;
+}
+.uh-papo h2 {
+  margin: 0;
+  color: #fff;
+}
+.uh-papo p:not(.eyebrow) {
+  margin: 8px 0 0;
+  color: #d3d9ea;
+  line-height: 1.55;
+}
+.uh-papo .button {
+  background: #fff;
+  color: #1b2342;
+  border-color: transparent;
+}
+.uh-papo .button:hover {
+  background: #eeebff;
+}
+@media (max-width: 620px) {
+  .user-home .hero {
+    margin-top: -70px;
+  }
+  .uh-papo {
+    padding: 26px 22px;
+  }
+}

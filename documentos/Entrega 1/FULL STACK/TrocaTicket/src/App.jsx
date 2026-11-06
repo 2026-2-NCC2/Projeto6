@@ -9,6 +9,7 @@ import { Opportunities, Proposals, Quote, Inventory } from './pages/Supplier';
 import { Admin, Report, Moderation } from './pages/Admin';
 import { Catalog, EventDetails, Tickets } from './pages/Participant';
 import ForumPage from './pages/ForumPage';
+import UserHome from './pages/UserHome';
 function Info({ title, children }) {
   return (
     <div className="workspace narrow">
@@ -26,7 +27,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Home />} />
+      <Route path="inicio" element={<UserHome />} />
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
         <Route path="recuperar" element={<Recover />} />
