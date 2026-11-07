@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { useStore } from '../context/Store';
 import Events, { useEvents, currency } from '../components/Events';
 import Icon from '../components/Icon';
+import PapoBanner from '../components/PapoBanner';
 import { notificacoesIniciais } from '../../forum/src/data/forum.js';
 
 // Troque por 'Bem-vindo' ou 'Bem-vinda' se preferir.
@@ -226,8 +227,8 @@ export default function UserHome() {
           </div>
         </div>
       </section>
-
       <Events />
+      <PapoBanner />
     </div>
   );
 }

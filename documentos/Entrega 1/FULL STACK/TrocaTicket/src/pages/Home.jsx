@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import Events from '../components/Events';
 import Icon from '../components/Icon';
+import PapoBanner from '../components/PapoBanner';
 const profiles = [
   {
     id: 'comprador',
@@ -98,6 +99,7 @@ export default function Home() {
         </div>
       </section>
       <Events />
+      <PapoBanner to="/cadastro" />
     </>
   );
 }
