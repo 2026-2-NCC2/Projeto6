@@ -613,9 +613,16 @@ small.muted {
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 18px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.agenda-item:hover {
-  border-color: #8faaf8;
+.agenda-item:hover,
+.agenda-item:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+  transform: scale(1.03);
 }
 .agenda-item h3 {
   margin-top: 14px;
@@ -2408,6 +2415,14 @@ td code {
   .upload-label {
     cursor: pointer;
   }
+  @media (prefers-reduced-motion: reduce) {
+  .discovery-image img,
+  .managed-image img,
+  .agenda-item,        /* ← nova linha */
+  .role-card {
+    transition: none;
+  }
+}
   .header nav {
     font-size: 11px;
   }

@@ -741,11 +741,14 @@ html[data-theme="dark"] .account-shell .header .brand small {
   }
 }
 /* ---------- Home do usuário: carrossel e cards ---------- */
+.hero.hero-full,
+.user-home .hero {
+  min-height: max(665px, 100vh);
+  min-height: max(665px, 100svh);
+}
 .user-home .hero {
   text-align: left;
   padding-bottom: 72px;
-  min-height: max(665px, 100vh);
-  min-height: max(665px, 100svh);
 }
 .user-home .hero-content {
   max-width: 1240px;

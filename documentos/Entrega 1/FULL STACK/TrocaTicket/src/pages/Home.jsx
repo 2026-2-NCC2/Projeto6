@@ -43,7 +43,7 @@ const profiles = [
 export default function Home() {
   return (
     <>
-      <section className="hero">
+        <section className="hero hero-full">
         <div className="hero-content">
           <p className="hero-badge">
             <span /> Troca e compra segura de ingressos
