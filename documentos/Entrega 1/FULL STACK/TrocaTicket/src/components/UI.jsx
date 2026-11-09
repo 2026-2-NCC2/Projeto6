@@ -79,7 +79,7 @@ export function Tabs({ options, value, onChange, label = 'Filtrar resultados' })
   );
 }
 
-export function Field({label, name, id, error, mask, onChange,  ...props}) {
+export function Field({ label, name, id, error, mask, onChange, children, ...props }) {
   const fieldId = id || name;
   const errorId = `${fieldId}-error`;
 
@@ -93,32 +93,37 @@ export function Field({label, name, id, error, mask, onChange,  ...props}) {
     onChange?.(event);
   }
 
+  const control = children
+    ? React.Children.map(children, (child) => {
+        if (
+          !React.isValidElement(child) ||
+          !['input', 'select', 'textarea'].includes(child.type)
+        ) {
+          return child;
+        }
+        return React.cloneElement(child, {
+          id: child.props.id || fieldId,
+          name: child.props.name || name,
+          'aria-invalid': child.props['aria-invalid'] ?? Boolean(error),
+          'aria-describedby': child.props['aria-describedby'] || (error ? errorId : undefined),
+        });
+      })
+    : (
+        <input
+          {...props}
+          id={fieldId}
+          name={name}
+          onChange={handleChange}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      );
+
   return (
     <div className={`field ${error ? 'has-error' : ''}`}>
-
-      <label htmlFor={fieldId}>
-        {label}
-      </label>
-
-      <input
-        {...props}
-        id={fieldId}
-        name={name}
-        onChange={handleChange}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-      />
-
-      {error && (
-        <span
-          id={errorId}
-          className="field-error"
-          role="alert"
-        >
-          {error}
-        </span>
-      )}
-
+      <label htmlFor={fieldId}>{label}</label>
+      {control}
+      {error && <span id={errorId} className="field-error" role="alert">{error}</span>}
     </div>
   );
 }

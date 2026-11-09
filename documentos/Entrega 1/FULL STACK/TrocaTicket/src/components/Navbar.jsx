@@ -41,9 +41,38 @@ menus.participante = menus.comprador;
 export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { data, role, chooseRole, notify } = useStore();
+  const { data, role, isAuthenticated, chooseRole, notify } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem('trocaticket-theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      darkMode ? '#0e1420' : '#f7f9fb',
+    );
+    try {
+      localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light');
+    } catch {}
+  }, [darkMode]);
+
+  function toggleTheme() {
+    const next = !darkMode;
+    setDarkMode(next);
+    document
+      .querySelector('.forum-frame')
+      ?.contentWindow?.postMessage(
+        { type: 'TROCATICKET_SET_THEME', dark: next },
+        window.location.origin,
+      );
+  }
 
   function handleLogout() {
     chooseRole('');
@@ -72,7 +101,7 @@ export default function Navbar() {
     return lower === 'participante' ? 'comprador' : lower;
   };
 
-  const currentSessionRole = normalizeRole(sessionRole);
+  const currentSessionRole = normalizeRole(sessionRole || data?.profile?.role);
   const isPublicRoute = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
 
   // A sessão define o perfil prioritariamente.
@@ -91,7 +120,7 @@ export default function Navbar() {
             ? 'admin'
             : 'comprador');
 
-  const isPublicView = !activeRole;
+  const isPublicView = !activeRole && !isAuthenticated;
 
   // Informações específicas do perfil
   const supplier = activeRole === 'fornecedor' ? data?.supplierProfile : null;
@@ -133,6 +162,15 @@ export default function Navbar() {
           <Link className="login-link" to="/entrar">
             Entrar
           </Link>
+          <button
+            type="button"
+            className="theme-toggle"
+            aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            title={darkMode ? 'Modo claro' : 'Modo escuro'}
+            onClick={toggleTheme}
+          >
+            <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
+          </button>
           <Link className="header-cta" to="/cadastro">
             Criar conta ↗
           </Link>
@@ -170,6 +208,16 @@ export default function Navbar() {
               ♧<i />
             </button>
 
+            <button
+              type="button"
+              className="theme-toggle"
+              aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              title={darkMode ? 'Modo claro' : 'Modo escuro'}
+              onClick={toggleTheme}
+            >
+              <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
+            </button>
+
             {/* Botão do perfil/participante: leva para a página de perfil (profileUrl) */}
             <Link
               className="user-chip"
@@ -200,7 +248,11 @@ export default function Navbar() {
       {notifications && !isPublicView && (
         <div className="notification-popover">
           <strong>Central de notificações</strong>
-          <p>Seu ambiente de demonstração está pronto.</p>
+          <p>
+            {isAuthenticated
+              ? 'Você não tem notificações novas.'
+              : 'Seu ambiente de demonstração está pronto.'}
+          </p>
           <Link
             to={destinations[activeRole] || '/eventos'}
             onClick={() => setNotifications(false)}

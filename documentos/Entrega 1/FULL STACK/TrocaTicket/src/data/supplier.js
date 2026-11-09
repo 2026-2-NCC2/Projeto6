@@ -231,8 +231,17 @@ export function withEventInfo(proposal) {
     ...proposal,
   };
 }
-export const quoteTotal = (items, prices) =>
-  items.reduce((sum, item, i) => sum + item.qty * (Number(prices[i]) || 0), 0);
+export const quoteTotal = (items, prices, quantities) => {
+  const cents = items.reduce((sum, item, index) => {
+    const price = Number(prices[index]);
+    const quantity = Number(quantities?.[index] ?? item.qty);
+    if (!Number.isFinite(price) || price < 0 || !Number.isSafeInteger(quantity) || quantity < 1) {
+      return sum;
+    }
+    return sum + Math.round(price * 100) * quantity;
+  }, 0);
+  return cents / 100;
+};
 
 /* ------------------------------------------------------------------ */
 /* Propostas (estático — novas propostas entram pela tela de cotação)  */

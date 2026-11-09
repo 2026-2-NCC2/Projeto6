@@ -25,7 +25,7 @@ export default function Account({ login = false }) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { update, chooseRole, notify } = useStore();
+  const { activateUser, chooseRole, notify, isAuthenticated, role } = useStore();
 
 
   async function handleSubmit(event) {
@@ -90,21 +90,7 @@ export default function Account({ login = false }) {
           tipo_perfil: resultado.user?.tipo_perfil || dadosExtras?.tipo_perfil || 1,
         };
 
-        // Atualiza as informações do perfil na Store global (que sincroniza com o localStorage)
-        update?.('profile', (prev) => ({
-          ...prev,
-          ...usuarioFinal,
-        }));
-
-        if (perfilRetornado === 'fornecedor') {
-          update?.('supplierProfile', (prev) => ({
-            ...prev,
-            id: usuarioFinal.id,
-            name: usuarioFinal.name,
-            tradeName: usuarioFinal.name,
-            photo: usuarioFinal.photo || prev?.photo,
-          }));
-        }
+        activateUser(usuarioFinal);
 
         // Armazena os dados na sessionStorage
         try {
@@ -144,10 +130,7 @@ export default function Account({ login = false }) {
           document: data.document || '',
         };
 
-        update?.('profile', (prev) => ({
-          ...prev,
-          ...novoUsuario,
-        }));
+        activateUser(novoUsuario);
 
         try {
           sessionStorage.setItem('trocaticket-user', JSON.stringify(novoUsuario));
@@ -301,17 +284,17 @@ export default function Account({ login = false }) {
 
         </form>
 
-        <p className="auth-note">
-          Demonstração: utilize dados válidos para testar a gravação na base de dados.
-        </p>
-
-        <div className="divider">
-          OU EXPLORE SEM CADASTRO
-        </div>
-
-        <Link className="button outline full" to="/perfis">
-          Escolher perfil de demonstração →
-        </Link>
+        {!isAuthenticated && (
+          <>
+            <p className="auth-note">
+              Acesse com sua conta ou cadastre-se para usar os dados vinculados ao banco.
+            </p>
+            <div className="divider">OU EXPLORE SEM CADASTRO</div>
+            <Link className="button outline full" to="/perfis">
+              Escolher perfil de demonstração →
+            </Link>
+          </>
+        )}
 
       </div>
 
@@ -361,8 +344,12 @@ function AccountOptions({login, showPassword, onTogglePassword}) {
 }
 
 export function Profiles() {
-  const { chooseRole } = useStore();
+  const { chooseRole, isAuthenticated, role } = useStore();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (isAuthenticated) navigate(destinations[role] || '/eventos', { replace: true });
+  }, [isAuthenticated, navigate, role]);
 
   const descriptions = [
     'Descubra eventos, salve favoritos e simule os seus ingressos.',
