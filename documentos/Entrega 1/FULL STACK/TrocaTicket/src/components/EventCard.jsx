@@ -116,7 +116,7 @@ export default function EventCard({
         <>
           <div className="event-image">
             <img loading="lazy" src={event.image} alt={event.imageAlt || event.title} />
-            <span className="event-tag">{event.tag || 'Ingresso demonstrativo'}</span>
+            <span className="event-tag">{event.tag}</span>
             {onToggleFavorite && (
               <button
                 type="button"

@@ -24,13 +24,27 @@ function read() {
   try {
     const saved = JSON.parse(localStorage.getItem('trocaticket-v2'));
     return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
-    return saved?.version === 2 ? { ...defaults, ...saved.data } : defaults;
   } catch {
     return defaults;
   }
 }
 export function StoreProvider({ children }) {
-  const [data, setData] = useState(read);
+  const [data, setData] = useState(() => {
+    const initial = read();
+    try {
+      const sessionUser = JSON.parse(sessionStorage.getItem('trocaticket-user') || 'null');
+      if (sessionUser && sessionUser.name) {
+        return {
+          ...initial,
+          profile: {
+            ...initial.profile,
+            ...sessionUser,
+          },
+        };
+      }
+    } catch {}
+    return initial;
+  });
   const [role, setRole] = useState(() => {
     try {
       return sessionStorage.getItem('trocaticket-role') || '';
@@ -57,6 +71,9 @@ export function StoreProvider({ children }) {
     setRole(value);
     try {
       sessionStorage.setItem('trocaticket-role', value);
+      if (!value) {
+        sessionStorage.removeItem('trocaticket-user');
+      }
     } catch {}
   }
   function update(key, value) {
