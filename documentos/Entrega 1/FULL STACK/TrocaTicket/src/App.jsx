@@ -14,17 +14,32 @@ import Admin from './pages/Admin';
 import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
+import ForumPage from './pages/ForumPage';
+import { useStore } from './context/Store';
 function Info({ title, children }) {
+  const { isAuthenticated } = useStore();
   return (
     <div className="workspace narrow">
       <section className="panel">
         <h1>{title}</h1>
         <p>{children}</p>
-        <Link className="button primary" to="/perfis">
-          Explorar os perfis
-        </Link>
+        {!isAuthenticated && (
+          <Link className="button primary" to="/perfis">
+            Explorar os perfis
+          </Link>
+        )}
       </section>
     </div>
+  );
+}
+function DemoOnly({ children }) {
+  const { isAuthenticated } = useStore();
+  if (!isAuthenticated) return children;
+  return (
+    <Info title="Área ainda não conectada ao banco de dados">
+      Esta funcionalidade está disponível apenas na demonstração. Nenhum dado demonstrativo foi
+      carregado para sua conta.
+    </Info>
   );
 }
 export default function App() {
@@ -41,7 +56,7 @@ export default function App() {
         <Route path="eventos/:id" element={<EventDetails />} />
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
-        <Route path="comunidade" element={<Community />} />
+        <Route path="comunidade/eventos" element={<Community />} />
         <Route path="organizador" element={<Organizer />} />
         <Route path="organizador/eventos" element={<Organizer list />} />
         <Route path="organizador/novo" element={<EventEditor key="new" />} />
@@ -53,9 +68,9 @@ export default function App() {
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
         <Route path="fornecedor/inventario" element={<SupplierInventory />} />
         <Route path="fornecedor/perfil" element={<SupplierProfile />} />
-        <Route path="admin" element={<Admin />} />
-        <Route path="admin/relatorios/:id" element={<Report />} />
-        <Route path="admin/moderacao" element={<Moderation />} />
+        <Route path="admin" element={<DemoOnly><Admin /></DemoOnly>} />
+        <Route path="admin/relatorios/:id" element={<DemoOnly><Report /></DemoOnly>} />
+        <Route path="admin/moderacao" element={<DemoOnly><Moderation /></DemoOnly>} />
         <Route
           path="termos"
           element={
@@ -98,6 +113,7 @@ export default function App() {
           }
         />
       </Route>
+      <Route path="comunidade/*" element={<ForumPage />} />
     </Routes>
   );
 }

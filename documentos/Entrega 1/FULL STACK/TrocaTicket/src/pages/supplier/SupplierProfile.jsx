@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../../context/Store';
 import { Badge, Modal, PageTitle, Panel } from '../../components/UI';
+import { atualizarSenhaUsuario, excluirFotoUsuario, uploadFotoUsuario } from '../../services/api';
+import { getSupplierProfile, saveSupplierProfile } from '../../services/supplier';
 import { FormInput, FormSelect, FormTextArea, PreferenceItem } from '../../components/supplier/FormControls';
 import AvatarUpload from '../../components/supplier/AvatarUpload';
 import PasswordSection from '../../components/supplier/PasswordSection';
@@ -21,6 +23,18 @@ const ACCESS_HISTORY = [
   ['Ontem, 18:40', 'Safari em iPhone', 'São Paulo, SP', 'Concluído'],
   ['3 dias atrás, 11:05', 'Chrome em Windows', 'Campinas, SP', 'Concluído'],
 ];
+
+function syncSessionUser(updates) {
+  try {
+    const raw = sessionStorage.getItem('trocaticket-user');
+    const user = raw ? JSON.parse(raw) : null;
+    if (!user || typeof user !== 'object' || Array.isArray(user)) return false;
+    sessionStorage.setItem('trocaticket-user', JSON.stringify({ ...user, ...updates }));
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // Retorna { idDoCampo: 'mensagem' } na mesma ordem em que os campos aparecem na tela.
 function validate(form, password) {
@@ -45,12 +59,49 @@ function validate(form, password) {
 }
 
 export default function SupplierProfile() {
-  const { data, update, notify } = useStore();
-  const saved = { ...initialSupplierProfile, ...data.supplierProfile };
+  const { data, role, update, notify } = useStore();
+  const saved = {
+    ...initialSupplierProfile,
+    ...data.supplierProfile,
+    address: { ...initialSupplierProfile.address, ...data.supplierProfile?.address },
+    notifications: { ...initialSupplierProfile.notifications, ...data.supplierProfile?.notifications },
+  };
   const [form, setForm] = useState(saved);
   const [password, setPassword] = useState(EMPTY_PASSWORD);
   const [errors, setErrors] = useState({});
   const [history, setHistory] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+
+  useEffect(() => {
+    const supplierId = Number(data.supplierProfile?.id);
+    if (role !== 'fornecedor' || !Number.isSafeInteger(supplierId) || supplierId <= 0) return undefined;
+    const controller = new AbortController();
+    getSupplierProfile(supplierId, controller.signal)
+      .then((profile) => {
+        const normalizedProfile = {
+          ...profile,
+          address: { ...initialSupplierProfile.address, ...profile.address },
+          notifications: { ...initialSupplierProfile.notifications, ...profile.notifications },
+        };
+        update('supplierProfile', (current) => ({ ...current, ...normalizedProfile }));
+        update('profile', (current) => ({
+          ...current,
+          id: normalizedProfile.id,
+          name: normalizedProfile.name,
+          email: normalizedProfile.email,
+          phone: normalizedProfile.phone,
+          photo: normalizedProfile.photo || '',
+        }));
+        setForm((current) => ({ ...current, ...normalizedProfile }));
+        setApiError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setApiError(error.message);
+      });
+    return () => controller.abort();
+  }, [data.supplierProfile?.id, role, update]);
 
   const hasPassword = !!(password.current || password.next || password.confirm);
   const dirty = useMemo(
@@ -64,7 +115,37 @@ export default function SupplierProfile() {
   const setNotification = (key) => (value) =>
     setForm((old) => ({ ...old, notifications: { ...old.notifications, [key]: value } }));
 
-  function submit(event) {
+  async function changePhoto(photo) {
+    const supplierId = Number(data.supplierProfile?.id);
+    if (!Number.isSafeInteger(supplierId) || supplierId <= 0) {
+      setForm((current) => ({ ...current, photo }));
+      update('supplierProfile', (current) => ({ ...current, photo }));
+      return;
+    }
+    setPhotoBusy(true);
+    setApiError('');
+    try {
+      const result = photo
+        ? await uploadFotoUsuario(supplierId, photo)
+        : await excluirFotoUsuario(supplierId);
+      const nextPhoto = result.url_foto_perfil || '';
+      setForm((current) => ({ ...current, photo: nextPhoto }));
+      update('supplierProfile', (current) => ({ ...current, photo: nextPhoto }));
+      update('profile', (current) => ({ ...current, photo: nextPhoto }));
+      const sessionSynced = syncSessionUser({ photo: nextPhoto });
+      notify(
+        sessionSynced
+          ? photo ? 'Foto do fornecedor salva no banco de dados.' : 'Foto do fornecedor removida.'
+          : 'Foto salva no banco, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+      );
+    } catch (error) {
+      setApiError(error.message);
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+
+  async function submit(event) {
     event.preventDefault();
     const next = validate(form, password);
     setErrors(next);
@@ -75,14 +156,45 @@ export default function SupplierProfile() {
     }
     const lastSync = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const next_profile = { ...form, lastSync };
-    update('supplierProfile', next_profile);
-    setForm(next_profile);
-    setPassword(EMPTY_PASSWORD);
-    notify(
-      hasPassword
-        ? 'Perfil salvo. A troca de senha foi validada, mas só será aplicada quando o backend for conectado.'
-        : 'Perfil do fornecedor salvo neste navegador.',
-    );
+    const supplierId = Number(data.supplierProfile?.id);
+    let sessionSynced = true;
+    setSaving(true);
+    setApiError('');
+    try {
+      if (Number.isSafeInteger(supplierId) && supplierId > 0) {
+        await saveSupplierProfile(supplierId, next_profile);
+        update('supplierProfile', next_profile);
+        update('profile', (current) => ({
+          ...current,
+          name: next_profile.name,
+          email: next_profile.email,
+          phone: next_profile.phone,
+        }));
+        sessionSynced = syncSessionUser({ name: next_profile.name, email: next_profile.email });
+        if (hasPassword) {
+          try {
+            await atualizarSenhaUsuario(supplierId, password.current, password.next);
+          } catch (error) {
+            setForm(next_profile);
+            setApiError(`Perfil salvo, mas a senha não foi alterada. ${error.message}`);
+            notify('Perfil salvo; não foi possível alterar a senha.');
+            return;
+          }
+        }
+      }
+      update('supplierProfile', next_profile);
+      setForm(next_profile);
+      setPassword(EMPTY_PASSWORD);
+      notify(
+        sessionSynced
+          ? 'Perfil do fornecedor salvo.'
+          : 'Perfil salvo, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+      );
+    } catch (error) {
+      setApiError(error.message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   function cancel() {
@@ -104,10 +216,16 @@ export default function SupplierProfile() {
 
       <form noValidate onSubmit={submit}>
         <Panel>
-          <AvatarUpload name={form.tradeName || form.name} photo={form.photo} onChange={set('photo')}>
+          <AvatarUpload
+            name={form.tradeName || form.name}
+            photo={form.photo}
+            onChange={changePhoto}
+            disabled={photoBusy}
+          >
             <h2 className="sp-profile-name">{form.name}</h2>
           </AvatarUpload>
         </Panel>
+        {apiError && <p className="api-error" role="alert">{apiError}</p>}
 
         <Panel
           title={<PanelTitle icon="user">Informações pessoais & contato</PanelTitle>}
@@ -278,7 +396,7 @@ export default function SupplierProfile() {
         <Panel
           title={<PanelTitle icon="shield">Segurança da conta & credenciais</PanelTitle>}
           subtitle="Preencha apenas se quiser trocar a senha. A autenticação real depende do backend."
-          action={<small className="muted">Última alteração de senha: 45 dias atrás</small>}
+          action={          <small className="muted">As alterações de senha são validadas pelo servidor.</small>}
         >
           <PasswordSection values={password} onChange={setPassword} errors={errors} />
           <div className="sp-security-card">
@@ -287,7 +405,7 @@ export default function SupplierProfile() {
             </span>
             <div>
               <strong>Autenticação de 2 fatores (2FA)</strong>
-              <small>Exigir código via app autenticador ao conectar de um novo navegador.</small>
+              <small>Preferência registrada; a verificação por aplicativo ainda não está implementada.</small>
             </div>
             <button
               type="button"
@@ -332,8 +450,10 @@ export default function SupplierProfile() {
             <button className="button outline" type="button" onClick={cancel} disabled={!dirty}>
               Cancelar
             </button>
-            <button className="button dark" disabled={!dirty}>
-              <Icon name="check" size={14} /> Salvar alterações
+            <button className="button dark" disabled={!dirty || saving || photoBusy}>
+              {saving ? 'Salvando…' : null}
+              {!saving && <Icon name="check" size={14} />}
+              {!saving && ' Salvar alterações'}
             </button>
           </div>
         </div>
@@ -365,7 +485,7 @@ export default function SupplierProfile() {
               </tbody>
             </table>
           </div>
-          <p className="muted">Dados de demonstração. O histórico real será exibido quando o backend for conectado.</p>
+          <p className="muted">Este histórico é demonstrativo e não corresponde a sessões reais.</p>
         </Modal>
       )}
     </div>

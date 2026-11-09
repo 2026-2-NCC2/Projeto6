@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export async function buscarUsuario(id) {
     let response;
@@ -163,5 +163,29 @@ export async function excluirFotoUsuario(id) {
         throw new Error(resultado.error || 'Erro ao excluir a foto de perfil');
     }
 
+    return resultado;
+}
+
+export async function atualizarSenhaUsuario(id, senhaAtual, novaSenha) {
+    let response;
+    try {
+        response = await fetch(`${API_URL}/usuarios/${encodeURIComponent(id)}/senha`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senhaAtual, novaSenha })
+        });
+    } catch (error) {
+        throw new Error('Não foi possível conectar ao servidor backend.', { cause: error });
+    }
+
+    let resultado;
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor.');
+    }
+    if (!response.ok) {
+        throw new Error(resultado.error || 'Não foi possível atualizar a senha.');
+    }
     return resultado;
 }

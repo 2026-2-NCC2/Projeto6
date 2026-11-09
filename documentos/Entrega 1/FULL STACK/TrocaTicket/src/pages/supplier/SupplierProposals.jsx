@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '../../context/Store';
 import { Badge, Empty, Modal, PageTitle, dateLabel, downloadCSV, money } from '../../components/UI';
@@ -7,6 +7,7 @@ import ProposalCard, { outcomeOf } from '../../components/supplier/ProposalCard'
 import Icon from '../../components/supplier/Icon';
 import { Chip, LabeledSelect } from '../../components/supplier/common';
 import { withEventInfo } from '../../data/supplier';
+import { getSupplierProposals } from '../../services/supplier';
 
 const GROUPS = [
   { value: 'Todas', label: 'Todas as propostas', tone: 'blue', match: () => true },
@@ -30,7 +31,13 @@ const SORTS = [
 const yearOf = (proposal) => String(proposal.eventDate || '').slice(0, 4);
 
 export default function SupplierProposals() {
-  const { data, notify } = useStore();
+  const { data, role, update, notify } = useStore();
+  const supplierId = Number(data.supplierProfile?.id);
+  const connectedSupplier =
+    role === 'fornecedor' && Number.isSafeInteger(supplierId) && supplierId > 0;
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
+  const [loading, setLoading] = useState(false);
   const all = useMemo(() => data.proposals.map(withEventInfo), [data.proposals]);
   const [group, setGroup] = useState('Todas');
   const [period, setPeriod] = useState('Todos');
@@ -38,6 +45,24 @@ export default function SupplierProposals() {
   const [range, setRange] = useState('Todos');
   const [sort, setSort] = useState('recent');
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (!connectedSupplier) return undefined;
+    const controller = new AbortController();
+    setLoading(true);
+    getSupplierProposals(supplierId, controller.signal)
+      .then((proposals) => {
+        update('proposals', proposals);
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [connectedSupplier, retry, supplierId, update]);
 
   const years = [...new Set(all.map(yearOf).filter(Boolean))].sort();
   const categories = [...new Set(all.map((p) => p.category).filter(Boolean))].sort();
@@ -109,6 +134,15 @@ export default function SupplierProposals() {
         <Chip dot>{count('Não selecionada')} não selecionadas</Chip>
         <Chip>{count('Encerrada')} encerrada{count('Encerrada') === 1 ? '' : 's'}</Chip>
       </div>
+      {loadError && (
+        <div className="api-error" role="alert">
+          <span>Não foi possível carregar propostas do banco: {loadError}</span>
+          <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
+      {loading && <p role="status" className="muted">Carregando propostas do banco de dados…</p>}
 
       <div className="sp-proposals-layout">
         <FilterSidebar
@@ -153,7 +187,7 @@ export default function SupplierProposals() {
                   proposal={p}
                   onDetails={setSelected}
                   onExport={exportOne}
-                  onSecondary={(item) => notify(`“${item.secondaryAction}” ficará disponível quando o backend for conectado.`)}
+                  onSecondary={(item) => notify(`“${item.secondaryAction}” está disponível apenas na demonstração.`)}
                 />
               ))}
             </div>
@@ -204,7 +238,9 @@ export default function SupplierProposals() {
           )}
           {selected.note && <p>Observações: {selected.note}</p>}
           <p className="muted">
-            Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi realizado.
+            {connectedSupplier
+              ? 'Proposta persistida no banco. Nenhum contrato ou pagamento real foi realizado.'
+              : 'Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi realizado.'}
           </p>
           <button className="button outline" onClick={() => exportOne(selected)}>
             ↓ Baixar resumo (CSV)

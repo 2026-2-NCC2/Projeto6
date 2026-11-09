@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../../context/Store';
 import { DownloadButton, Empty, PageTitle, Panel } from '../../components/UI';
 import { inventoryStatuses, inventoryTypes, supplierCategories } from '../../data/supplier';
@@ -10,6 +10,7 @@ import SearchToolbar from '../../components/supplier/SearchToolbar';
 import InventoryTable from '../../components/supplier/InventoryTable';
 import ItemDetail from '../../components/supplier/ItemDetail';
 import ItemFormModal from '../../components/supplier/ItemFormModal';
+import { getSupplierInventory, saveSupplierProduct } from '../../services/supplier';
 
 const PAGE_SIZE = 5;
 const STATUS_FILTERS = [
@@ -24,7 +25,7 @@ const newId = () => `ITEM-${Date.now().toString().slice(-6)}`;
 const BLANK = { category: supplierCategories[0], type: 'Produto', unit: 'Unidade / Diária', status: 'Disponível' };
 
 export default function SupplierInventory() {
-  const { data, update, notify } = useStore();
+  const { data, role, update, notify } = useStore();
   const inventory = data.inventory;
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState('Todos');
@@ -33,7 +34,32 @@ export default function SupplierInventory() {
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState(inventory[0]?.id);
   const [editing, setEditing] = useState(null);
+  const [apiError, setApiError] = useState('');
+  const [loading, setLoading] = useState(false);
   const importRef = useRef(null);
+
+  const supplierId = Number(data.supplierProfile?.id);
+  const connectedSupplier =
+    role === 'fornecedor' && Number.isSafeInteger(supplierId) && supplierId > 0;
+
+  useEffect(() => {
+    if (!connectedSupplier) return undefined;
+    const controller = new AbortController();
+    setLoading(true);
+    getSupplierInventory(supplierId, controller.signal)
+      .then((items) => {
+        update('inventory', items);
+        setSelectedId(items[0]?.id);
+        setApiError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setApiError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [connectedSupplier, supplierId, update]);
 
   const categories = [...new Set([...supplierCategories, ...inventory.map((item) => item.category)])];
   const count = (predicate) => inventory.filter(predicate).length;
@@ -67,27 +93,48 @@ export default function SupplierInventory() {
     setPage(1);
   }
 
-  function save(item) {
+  async function save(item) {
     const saved = { ...item, id: item.id || newId() };
     if (!saved.sku) saved.sku = saved.id;
-    update('inventory', (old) => (item.id ? old.map((i) => (i.id === saved.id ? saved : i)) : [...old, saved]));
-    setSelectedId(saved.id);
-    setEditing(null);
-    notify('Item salvo no inventário.');
+    try {
+      const persisted = connectedSupplier ? await saveSupplierProduct(supplierId, saved) : saved;
+      update('inventory', (old) =>
+        item.id
+          ? old.map((i) => (String(i.id) === String(item.id) ? persisted : i))
+          : [...old, persisted],
+      );
+      setSelectedId(persisted.id);
+      setEditing(null);
+      setApiError('');
+      notify(connectedSupplier ? 'Item salvo no banco de dados.' : 'Item salvo no inventário.');
+    } catch (error) {
+      setApiError(error.message);
+    }
   }
-  function duplicate(item) {
+  async function duplicate(item) {
     const id = newId();
-    const copy = { ...item, id, sku: `${skuOf(item)}-COPIA`, name: `${item.name} (cópia)`, usage: [], allocatedEvents: 0 };
-    update('inventory', (old) => [...old, copy]);
-    setSelectedId(id);
-    notify('Item duplicado. Ajuste os dados da cópia se necessário.');
+    const copy = { ...item, id: undefined, sku: `${skuOf(item)}-${Date.now().toString().slice(-5)}`, name: `${item.name} (cópia)`, usage: [], allocatedEvents: 0 };
+    try {
+      const saved = connectedSupplier ? await saveSupplierProduct(supplierId, copy) : { ...copy, id };
+      update('inventory', (old) => [...old, saved]);
+      setSelectedId(saved.id);
+      notify('Item duplicado. Ajuste os dados da cópia se necessário.');
+    } catch (error) {
+      setApiError(error.message);
+    }
   }
-  function toggle(item) {
+  async function toggle(item) {
     const inactive = item.status === 'Inativo';
-    update('inventory', (old) =>
-      old.map((i) => (i.id === item.id ? { ...i, status: inactive ? 'Disponível' : 'Inativo' } : i)),
-    );
-    notify(inactive ? 'Item reativado.' : 'Item desativado.');
+    const updated = { ...item, status: inactive ? 'Disponível' : 'Inativo' };
+    try {
+      const saved = connectedSupplier ? await saveSupplierProduct(supplierId, updated) : updated;
+      update('inventory', (old) =>
+        old.map((i) => (String(i.id) === String(item.id) ? saved : i)),
+      );
+      notify(inactive ? 'Item reativado.' : 'Item desativado.');
+    } catch (error) {
+      setApiError(error.message);
+    }
   }
 
   async function importFile(event) {
@@ -98,7 +145,14 @@ export default function SupplierInventory() {
       notify('Por enquanto a importação aceita apenas CSV. Salve a planilha como .csv e tente de novo.');
       return;
     }
-    const [header = [], ...rows] = parseCSV(await file.text());
+    let parsedRows;
+    try {
+      parsedRows = parseCSV(await file.text());
+    } catch (error) {
+      setApiError(`Não foi possível ler o arquivo CSV. ${error.message}`);
+      return;
+    }
+    const [header = [], ...rows] = parsedRows;
     const col = (name) => header.findIndex((h) => normalize(h.trim()) === normalize(name));
     const idx = {
       id: col('Código'),
@@ -114,19 +168,26 @@ export default function SupplierInventory() {
       notify('Não foi possível importar: o CSV precisa ter as colunas “Nome” e “Preço”.');
       return;
     }
-    const taken = new Set(inventory.map((item) => item.id));
+    const taken = new Set(inventory.flatMap((item) => [String(item.id), skuOf(item)]));
     const imported = [];
     let skipped = 0;
     rows.forEach((row, n) => {
       const get = (key) => (idx[key] >= 0 ? (row[idx[key]] || '').trim() : '');
-      const price = Number(get('price').replace(/\./g, '').replace(',', '.')) || Number(get('price'));
+      const parseAmount = (value) => {
+        const normalized = value.trim().replace(/^R\$\s*/i, '');
+        return Number(normalized.includes(',')
+          ? normalized.replace(/\./g, '').replace(',', '.')
+          : normalized);
+      };
+      const price = parseAmount(get('price'));
       if (get('name').length < 3 || !(price > 0)) {
         skipped++;
         return;
       }
       let id = get('id') || `${newId()}-${n}`;
-      if (taken.has(id)) id = `${newId()}-${n}`;
+      if (taken.has(String(id)) || taken.has(id)) id = `${newId()}-${n}`;
       taken.add(id);
+      taken.add(String(id));
       imported.push({
         ...BLANK,
         id,
@@ -136,12 +197,31 @@ export default function SupplierInventory() {
         type: get('type') || BLANK.type,
         unit: get('unit') || BLANK.unit,
         price,
-        cost: Number(get('cost')) || 0,
+        cost: parseAmount(get('cost')) || 0,
         status: inventoryStatuses.includes(get('status')) ? get('status') : 'Disponível',
         description: '',
       });
     });
-    if (imported.length) update('inventory', (old) => [...old, ...imported]);
+    if (imported.length && connectedSupplier) {
+      const saved = [];
+      let failedMessage = '';
+      try {
+        for (const item of imported) saved.push(await saveSupplierProduct(supplierId, item));
+        update('inventory', (old) => [...old, ...saved]);
+      } catch (error) {
+        if (saved.length) update('inventory', (old) => [...old, ...saved]);
+        failedMessage = `Importação interrompida: ${saved.length} de ${imported.length} itens salvos. ${error.message}`;
+        setApiError(failedMessage);
+      }
+      notify(
+        failedMessage
+          ? failedMessage
+          : `${saved.length} ${saved.length === 1 ? 'item importado' : 'itens importados'}${skipped ? `; ${skipped} linha(s) ignorada(s) por dados inválidos` : ''}.`,
+      );
+      return;
+    } else if (imported.length) {
+      update('inventory', (old) => [...old, ...imported]);
+    }
     notify(
       imported.length
         ? `${imported.length} ${imported.length === 1 ? 'item importado' : 'itens importados'}${skipped ? `; ${skipped} linha(s) ignorada(s) por dados inválidos` : ''}.`
@@ -182,6 +262,8 @@ export default function SupplierInventory() {
         <Chip tone="blue" dot>{available} disponíveis imediatos</Chip>
         <Chip tone="amber" dot>{offline} em manutenção / alocados</Chip>
       </div>
+      {apiError && <p className="api-error" role="alert">{apiError}</p>}
+      {loading && <p role="status" className="muted">Carregando inventário do banco de dados…</p>}
 
       <Panel className="sp-inventory-filters">
         <SearchToolbar

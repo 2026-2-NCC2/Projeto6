@@ -1,19 +1,29 @@
-# TrocaTicket — Front-end React
+# TrocaTicket — React e API Node.js
 
-Site navegável baseado nas 21 telas únicas exportadas do Figma. Inclui áreas de participante, organizador, fornecedor e administrador. React, React Router, Vite e CSS responsivo, sem backend.
+Site navegável baseado nas 21 telas únicas exportadas do Figma. Inclui áreas de participante, organizador, fornecedor e administrador. A interface usa React, React Router e Vite; o servidor Node.js conecta contas e eventos de organizadores ao MySQL.
 
 ## Abrir no VS Code
 
 1. Extraia o ZIP e abra a pasta **TrocaTicket** no VS Code (Arquivo → Abrir Pasta).
-2. Instale o Node.js LTS 22.12 ou superior, com npm. Se o terminal não reconhecer `npm`, feche todas as janelas do VS Code e reabra após instalar.
-3. No terminal, dentro da pasta que contém `package.json`:
+2. Instale o Node.js LTS 22.12 ou superior, com npm, e configure o MySQL.
+3. Crie o banco executando `documentos/Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql`.
+4. Copie `server/.env.example` para `server/.env` e preencha `DB_HOST`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`.
+5. Em um terminal, instale e inicie a API:
+
+```sh
+cd server
+npm install
+npm run dev
+```
+
+6. Em outro terminal, dentro da pasta que contém o `package.json` do front-end:
 
 ```sh
 npm install
 npm run dev
 ```
 
-Abra o endereço exibido no terminal. Use **Explorar demo** para acessar os quatro perfis sem cadastro. Alternativamente, use dados fictícios no formulário: e-mail válido, senha com 8 caracteres e documento com 11 ou 14 dígitos. A validação do documento verifica somente formato e comprimento; não consulta CPF/CNPJ.
+Abra o endereço exibido pelo Vite. A API fica em `http://localhost:3000/api`; para outro endereço, defina `VITE_API_URL` no ambiente do Vite. Use **Explorar demo** para acessar as telas sem persistência no banco. Para cadastrar eventos no MySQL, entre com uma conta de organizador cadastrada na API.
 
 No PowerShell, caso a execução de `npm.ps1` esteja bloqueada, use `npm.cmd install` e `npm.cmd run dev`.
 
@@ -21,20 +31,22 @@ Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aprovei
 
 ## O que funciona
 
-- **Participante:** busca por nome/local, filtro por cidade, favoritos persistentes, detalhes com abas, escolha de entrada, cálculo de quantidade e valor, reserva/cancelamento simulados e comunidade local.
-- **Organizador:** painel, visualização em grade/lista, filtros, cadastro e edição de evento, prévia, capa local de até 2 MB, vinculação de fornecedores, orçamento calculado, confirmação de pendências, publicação e cancelamento. Um evento publicado aparece no catálogo do participante.
-- **Fornecedor:** oportunidades, pesquisa e ordenação, cotações com cálculo em tempo real, rascunhos, envio local, filtros de propostas e detalhes. Inventário permite adicionar, editar, desativar, reativar, pesquisar e exportar itens.
-- **Administrador:** painel, busca e paginação de lotes, relatórios, gráfico por setor/canal, exportação CSV e detalhes. Moderação exige revisar os critérios antes de aprovar e exige justificativa ao recusar; permite reabrir análise.
+- **Participante:** busca por nome/local, filtro por cidade, favoritos, avaliações, reservas simuladas, ingressos e mensagens da comunidade persistidos no MySQL. Participantes podem anunciar ingressos para troca, propor trocas diretas e aceitar, recusar ou cancelar solicitações. Nenhum pagamento é processado e os ingressos simulados não são válidos para entrada.
+- **Organizador:** painel, visualização em grade/lista, filtros, cadastro e edição de eventos no MySQL, vínculo persistente de fornecedores cadastrados aos eventos, consulta dos itens ativos do catálogo do fornecedor, revisão de propostas recebidas, decisão de aprovação, estimativa de orçamento, publicação e cancelamento. Eventos de demonstração continuam locais e separados das contas.
+- **Fornecedor:** perfil e preferências, oportunidades baseadas em eventos publicados, inventário persistido (adicionar, editar, desativar, reativar e exportar), rascunhos e propostas persistidos, com cálculo do total por quantidade e preço unitário. CSV é salvo item a item e informa importações parciais.
+- **Administrador:** painel, busca, relatórios e moderação são demonstrativos e aparecem apenas no modo demo; ainda não há operações de administração conectadas ao banco.
 - **Perfil:** dados de demonstração, foto, preferências e cancelamento das alterações não salvas.
 - **Geral:** menu móvel, estados vazios, carregamento, falha com nova tentativa, formulários validados, modais com foco contido e fechamento por Escape, avisos de ação e página 404.
 
 ## Dados e limitações
 
-O catálogo inicial é carregado assincronamente de `public/data/events.json`. Para testar erro, abra `/eventos?erro=1` e clique em **Tentar novamente**.
+O catálogo inicial é carregado assincronamente de `public/data/events.json`. Eventos publicados, produtos/serviços, propostas, favoritos, avaliações, mensagens da comunidade, ingressos simulados e trocas de ingressos de contas reais usam a API e o MySQL. Para a compra simulada, o servidor valida evento publicado, capacidade e quantidade; a troca transfere a titularidade dos dois ingressos em uma transação, sem pagamento.
 
-Alterações de eventos, inventário, propostas, reservas, comunidade, perfil e favoritos ficam no `localStorage` deste navegador sob `trocaticket-v2`. O perfil escolhido fica no `sessionStorage`. Limpar os dados do site restaura a demonstração inicial. As alterações feitas durante a verificação do navegador não estão dentro do ZIP.
+Em uma instalação nova, execute `SCRIPT_BANCO_V2.sql`. Em um banco existente, aplique `MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql`; ela cria os vínculos de fornecedores, favoritos, trocas e mensagens da comunidade, e pode ser reaplicada com segurança para completar estruturas ausentes. A migração não é necessária depois de criar o banco com a versão atual do script base. A cotação usa os itens ativos do inventário do fornecedor como linhas da oferta; o modelo atual não contém edital com itens requisitados ou teto de orçamento, então a tela não trata o preço do ingresso como teto da proposta.
 
-**Não há autenticação ou autorização reais.** Qualquer perfil é acessível para avaliação acadêmica. Senhas e documentos de cadastro não são enviados nem armazenados. Use somente dados fictícios, inclusive no perfil. Reservas não geram ingressos válidos, pagamentos, contratos, e-mails, notificações externas ou verificação de identidade. OAuth, chat em tempo real, importação XLSX/CSV e relatórios PDF não foram conectados; os controles implementados oferecem demonstrações locais e exportações CSV. A cotação usa itens de exemplo para demonstrar o cálculo; não integra estoque real.
+Mensagens da comunidade na demonstração permanecem locais e separadas das contas. Ingressos comprados pela interface são reservas simuladas persistidas no banco, não geram um ingresso válido para entrada nem acionam pagamento. Dados locais da demonstração sem conta usam `trocaticket-v2`; o perfil escolhido fica no `sessionStorage`. Para os fluxos conectados, mantenha a API e o MySQL em execução conforme as instruções de instalação.
+
+**Não há autenticação/autorização de produção.** As rotas recebem IDs do cliente e verificam perfil/propriedade no banco, mas não usam sessão ou token para comprovar a identidade; IDs podem ser falsificados. Cadastro envia senha e documento à API, que armazena a senha com bcrypt e o documento no banco. Use somente dados fictícios: não exponha a API sem TLS e autenticação real. A opção 2FA é apenas uma preferência salva, não ativa segundo fator; e-mail não é verificado e o histórico de acesso é demonstrativo. Ingressos e trocas são registros acadêmicos simulados, não geram validação na portaria, pagamento ou reembolso. OAuth, chat em tempo real e relatórios PDF não foram conectados; os fluxos correspondentes são demonstrações locais e/ou exportações CSV. O modo demo usa dados fictícios somente quando escolhido sem conta; contas autenticadas carregam registros da API, não exibem ações para entrar/sair do demo e não usam reservas ou mensagens demonstrativas.
 
 As imagens não fornecem camadas, fontes ou regras de interação. O layout foi reconstruído em componentes, com ajustes de responsividade, consistência e acessibilidade. Alguns símbolos e textos foram adaptados. Datas e nomes fictícios do material foram mantidos como exemplos, sem confirmação de existência dos eventos.
 
@@ -47,12 +59,15 @@ As imagens não fornecem camadas, fontes ou regras de interação. O layout foi 
 | `src/components/UI.jsx`     | Campos, painéis, modais, badges e exportação CSV        |
 | `src/context/Store.jsx`     | Estado compartilhado e persistência local               |
 | `src/data/demo.js`          | Eventos, fornecedores, inventário e pessoas fictícias   |
-| `src/services/events.js`    | Carregamento assíncrono do catálogo                     |
+| `src/services/events.js`    | Eventos, favoritos, avaliações e propostas de organizador |
+| `src/services/tickets.js`   | Reservas simuladas e troca de ingressos                   |
+| `src/services/supplier.js`  | Perfil, inventário, oportunidades e propostas do fornecedor |
+| `server/server.js`          | API Node.js para contas, eventos e fluxos conectados    |
 | `src/pages/Home.jsx`        | Página inicial                                          |
 | `src/pages/Account.jsx`     | Entrada, cadastro, recuperação e escolha de perfil      |
 | `src/pages/Participant.jsx` | Catálogo, detalhes, ingressos e comunidade              |
 | `src/pages/Organizer.jsx`   | Painel, editor, consolidação e fornecedores             |
-| `src/pages/Supplier.jsx`    | Oportunidades, cotações, propostas e inventário         |
+| `src/pages/supplier/`       | Perfil, oportunidades, cotações, propostas e inventário |
 | `src/pages/Admin.jsx`       | Painel, relatórios e moderação                          |
 | `src/pages/Profile.jsx`     | Configurações de perfil                                 |
 | `src/styles.css`            | Estilos da página inicial                               |

@@ -3,6 +3,19 @@ import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel } from '../components/UI';
 import { roleNames } from '../data/demo';
 import { atualizarUsuario, uploadFotoUsuario, excluirFotoUsuario } from '../services/api';
+
+function syncSessionUser(updates) {
+  try {
+    const raw = sessionStorage.getItem('trocaticket-user');
+    const user = raw ? JSON.parse(raw) : null;
+    if (!user || typeof user !== 'object' || Array.isArray(user)) return false;
+    sessionStorage.setItem('trocaticket-user', JSON.stringify({ ...user, ...updates }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Profile() {
   const { data, update, role, notify } = useStore();
   const [form, setForm] = useState(data.profile);
@@ -28,6 +41,7 @@ export default function Profile() {
     setError('');
 
     const reader = new FileReader();
+    const previousPhoto = form.photo || '';
     reader.onload = async () => {
       const base64Data = reader.result;
       
@@ -44,14 +58,13 @@ export default function Profile() {
           setForm((old) => ({ ...old, photo: novaUrl }));
           update('profile', (old) => ({ ...old, photo: novaUrl }));
 
-          try {
-            const user = JSON.parse(sessionStorage.getItem('trocaticket-user') || '{}');
-            user.photo = novaUrl;
-            sessionStorage.setItem('trocaticket-user', JSON.stringify(user));
-          } catch {}
-
-          notify('Foto de perfil salva no banco de dados com sucesso!');
+          notify(
+            syncSessionUser({ photo: novaUrl })
+              ? 'Foto de perfil salva no banco de dados com sucesso!'
+              : 'Foto salva no banco, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+          );
         } catch (err) {
+          setForm((old) => ({ ...old, photo: previousPhoto }));
           setError(err.message || 'Erro ao salvar foto no servidor.');
         } finally {
           setUploading(false);
@@ -70,7 +83,9 @@ export default function Profile() {
       try {
         await excluirFotoUsuario(form.id);
       } catch (err) {
-        console.warn('Erro ao remover foto do servidor:', err);
+        setError(err.message || 'Erro ao remover foto do servidor.');
+        setUploading(false);
+        return;
       } finally {
         setUploading(false);
       }
@@ -79,14 +94,14 @@ export default function Profile() {
     setForm((old) => ({ ...old, photo: '' }));
     update('profile', (old) => ({ ...old, photo: '' }));
 
-    try {
-      const user = JSON.parse(sessionStorage.getItem('trocaticket-user') || '{}');
-      user.photo = '';
-      sessionStorage.setItem('trocaticket-user', JSON.stringify(user));
-    } catch {}
+    const sessionSynced = !form.id || syncSessionUser({ photo: '' });
 
     setError('');
-    notify('Foto de perfil removida com sucesso!');
+    notify(
+      sessionSynced
+        ? 'Foto de perfil removida com sucesso!'
+        : 'Foto removida do banco, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+    );
   }
   return (
     <div className="workspace narrow">
@@ -108,15 +123,18 @@ export default function Profile() {
                 email: form.email,
               });
             } catch (err) {
-              console.warn('Erro ao sincronizar com banco de dados:', err);
+              setError(err.message || 'Erro ao salvar os dados no servidor.');
+              return;
             }
           }
           update('profile', form);
-          try {
-            sessionStorage.setItem('trocaticket-user', JSON.stringify(form));
-          } catch {}
+          const sessionSynced = !form.id || syncSessionUser(form);
           setError('');
-          notify('Perfil salvo com sucesso.');
+          notify(
+            sessionSynced
+              ? 'Perfil salvo com sucesso.'
+              : 'Perfil salvo, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+          );
         }}
       >
         <Panel className="profile-banner">
@@ -166,7 +184,7 @@ export default function Profile() {
         </Panel>
         <Panel
           title="Informações Pessoais & Contato"
-          subtitle="Use dados fictícios: as informações ficam armazenadas neste navegador."
+          subtitle="Contas cadastradas sincronizam com o servidor; use somente dados fictícios."
         >
           <div className="form-grid">
             <Field

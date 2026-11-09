@@ -79,7 +79,16 @@ export function BriefingPanel({ docs, onOpen }) {
 }
 
 // Tabela de itens com campo de valor por item
-export function QuoteItemsTable({ items, prices, onPrice, disabled, invalid = [] }) {
+export function QuoteItemsTable({
+  items,
+  prices,
+  quantities = [],
+  onPrice,
+  onQuantity,
+  editableQuantity = false,
+  disabled,
+  invalid = [],
+}) {
   return (
     <div className="table-wrap sp-quote-table">
       <table>
@@ -88,7 +97,7 @@ export function QuoteItemsTable({ items, prices, onPrice, disabled, invalid = []
             <th>Item / Especificação técnica</th>
             <th>Quantidade</th>
             <th>Unidade</th>
-            <th>Valor unitário sugerido</th>
+            <th>Valor unitário de referência</th>
             <th>Proposta do fornecedor (R$)</th>
           </tr>
         </thead>
@@ -101,7 +110,20 @@ export function QuoteItemsTable({ items, prices, onPrice, disabled, invalid = []
                 </strong>
                 <small>{item.spec}</small>
               </td>
-              <td className="num">{item.qty}</td>
+              <td className="num">
+                {editableQuantity ? (
+                  <input
+                    className="sp-price-input"
+                    type="number"
+                    min="1"
+                    step="1"
+                    disabled={disabled}
+                    aria-label={`Quantidade de ${item.name}`}
+                    value={quantities[i] ?? item.qty}
+                    onChange={(event) => onQuantity(i, event.target.value)}
+                  />
+                ) : item.qty}
+              </td>
               <td>{item.unit}</td>
               <td className="num muted-cell">{money(item.ref)}</td>
               <td>
@@ -138,9 +160,13 @@ export function QuoteFooter({ total, withinCeiling, children }) {
         <small>TOTAL PROPOSTO DA COTAÇÃO</small>
         <strong>{money(total)}</strong>
       </div>
-      <span className={`sp-ceiling ${withinCeiling ? 'ok' : 'over'}`}>
-        {withinCeiling ? 'Dentro do teto' : 'Acima do teto sugerido'}
-      </span>
+      {withinCeiling === null ? (
+        <span className="sp-ceiling">Sem teto de orçamento informado</span>
+      ) : (
+        <span className={`sp-ceiling ${withinCeiling ? 'ok' : 'over'}`}>
+          {withinCeiling ? 'Dentro do teto' : 'Acima do teto sugerido'}
+        </span>
+      )}
       <div className="sp-quote-actions">{children}</div>
     </div>
   );

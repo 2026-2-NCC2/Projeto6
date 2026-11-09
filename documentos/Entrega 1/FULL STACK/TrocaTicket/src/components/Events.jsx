@@ -1,29 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { getEvents } from '../services/events';
+import { getEvents, getPublishedEvents } from '../services/events';
 import EventCard from './EventCard';
+import { useStore } from '../context/Store';
 
 export const currency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 export function useEvents() {
   const [params] = useSearchParams();
+  const { isAuthenticated } = useStore();
   const simulateError = params.get('erro') === '1';
-  const [state, setState] = useState({ loading: true, events: [], error: '' });
+  const [state, setState] = useState({ loading: true, events: [], error: '', warning: '' });
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
-    setState({ loading: true, events: [], error: '' });
-    getEvents(controller.signal, simulateError && attempt === 0)
-      .then((events) => setState({ loading: false, events, error: '' }))
+    setState({ loading: true, events: [], error: '', warning: '' });
+    (isAuthenticated ? Promise.resolve([]) : getEvents(controller.signal, simulateError && attempt === 0))
+      .then(async (events) => {
+        try {
+          const published = await getPublishedEvents(controller.signal);
+          const byId = new Map([...events, ...published].map((event) => [String(event.id), event]));
+          setState({ loading: false, events: [...byId.values()], error: '', warning: '' });
+        } catch (error) {
+          if (error.name === 'AbortError') return;
+          setState(isAuthenticated
+            ? { loading: false, events: [], error: `Não foi possível carregar eventos do banco de dados. ${error.message}`, warning: '' }
+            : {
+                loading: false,
+                events,
+                error: '',
+                warning: `A API não está disponível; exibindo apenas os eventos de demonstração. ${error.message}`,
+              });
+        }
+      })
       .catch((error) => {
         if (error.name !== 'AbortError')
-          setState({ loading: false, events: [], error: error.message });
+          setState({ loading: false, events: [], error: error.message, warning: '' });
       });
     return () => controller.abort();
-  }, [simulateError, attempt]);
+  }, [attempt, isAuthenticated, simulateError]);
   return { ...state, retry: () => setAttempt((value) => value + 1) };
 }
-export function LoadState({ loading, error, retry }) {
+export function LoadState({ loading, error, retry, warning }) {
   if (loading)
     return (
       <p className="feedback" role="status">
@@ -38,6 +56,12 @@ export function LoadState({ loading, error, retry }) {
           Tentar novamente
         </button>
       </div>
+    );
+  if (warning)
+    return (
+      <p className="feedback warning" role="status">
+        {warning}
+      </p>
     );
   return null;
 }
