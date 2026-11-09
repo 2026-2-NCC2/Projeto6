@@ -66,6 +66,7 @@ export default function App() {
             </Info>
           }
         />
+        
         <Route
           path="privacidade"
           element={
