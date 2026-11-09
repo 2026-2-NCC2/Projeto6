@@ -25,7 +25,7 @@ export default function Account({ login = false }) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { chooseRole, notify } = useStore();
+  const { update, chooseRole, notify } = useStore();
 
 
   async function handleSubmit(event) {
@@ -67,14 +67,56 @@ export default function Account({ login = false }) {
         const resultado = await fazerLogin(payload);
         
         // Define o papel (role) retornado pela base de dados
-        const perfilRetornado = resultado.user.role || 'comprador';
+        const roleDoBanco = resultado.user?.role || 'comprador';
+        const perfilRetornado = roleDoBanco === 'participante' ? 'comprador' : roleDoBanco;
         chooseRole(perfilRetornado);
 
-        notify('Sessão iniciada com sucesso a partir da base de dados!');
-        navigate(destinations[perfilRetornado] || '/perfis');
+        // Busca dados adicionais do usuário pelo ID retornado se disponível
+        let dadosExtras = null;
+        if (resultado.user?.id) {
+          try {
+            dadosExtras = await buscarUsuario(resultado.user.id);
+          } catch (e) {
+            console.warn('Não foi possível obter dados extras do usuário:', e);
+          }
+        }
+
+        const usuarioFinal = {
+          id: resultado.user?.id,
+          name: resultado.user?.nome || dadosExtras?.nome || 'Usuário',
+          email: resultado.user?.email || dadosExtras?.email || data.email,
+          photo: resultado.user?.foto || dadosExtras?.url_foto_perfil || '',
+          role: perfilRetornado,
+          tipo_perfil: resultado.user?.tipo_perfil || dadosExtras?.tipo_perfil || 1,
+        };
+
+        // Atualiza as informações do perfil na Store global (que sincroniza com o localStorage)
+        update?.('profile', (prev) => ({
+          ...prev,
+          ...usuarioFinal,
+        }));
+
+        if (perfilRetornado === 'fornecedor') {
+          update?.('supplierProfile', (prev) => ({
+            ...prev,
+            id: usuarioFinal.id,
+            name: usuarioFinal.name,
+            tradeName: usuarioFinal.name,
+            photo: usuarioFinal.photo || prev?.photo,
+          }));
+        }
+
+        // Armazena os dados na sessionStorage
+        try {
+          sessionStorage.setItem('trocaticket-user', JSON.stringify(usuarioFinal));
+          sessionStorage.setItem('trocaticket-role', perfilRetornado);
+        } catch {}
+
+        notify(`Bem-vindo de volta, ${usuarioFinal.name}!`);
+        navigate(destinations[perfilRetornado] || '/eventos');
 
       } else {
-        // Fluxo de Cadastro (que já tínhamos ajustado)
+        // Fluxo de Cadastro
         const mapPerfil = {
           comprador: 1,
           organizador: 2,
@@ -89,11 +131,31 @@ export default function Account({ login = false }) {
           documento: data.document ? data.document.replace(/\D/g, '') : null
         };
 
-        await cadastrarUsuario(payload);
+        const cadResultado = await cadastrarUsuario(payload);
 
         chooseRole(profile);
+
+        const novoUsuario = {
+          id: cadResultado?.usuarioId,
+          name: data.name,
+          email: data.email,
+          role: profile,
+          tipo_perfil: mapPerfil[profile] || 1,
+          document: data.document || '',
+        };
+
+        update?.('profile', (prev) => ({
+          ...prev,
+          ...novoUsuario,
+        }));
+
+        try {
+          sessionStorage.setItem('trocaticket-user', JSON.stringify(novoUsuario));
+          sessionStorage.setItem('trocaticket-role', profile);
+        } catch {}
+
         notify('Cadastro gravado na base de dados com sucesso!');
-        navigate(destinations[profile]);
+        navigate(destinations[profile] || '/eventos');
       }
 
     } catch (error) {

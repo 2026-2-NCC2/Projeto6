@@ -101,12 +101,18 @@ export function validateAccount(data, login = false) {
         errors.email = 'Informe um e-mail válido.';
     }
 
-    if (!validatePassword(data.password)) {
-        errors.password = 'A senha deve possuir pelo menos 8 caracteres.';
-    }
+    if (!login) {
+        if (!validatePassword(data.password)) {
+            errors.password = 'A senha deve possuir pelo menos 8 caracteres.';
+        }
 
-    if (!login && !validatePasswordConfirmation(data.password, data.confirm)) {
-        errors.confirm = 'As senhas não conferem.';
+        if (!validatePasswordConfirmation(data.password, data.confirm)) {
+            errors.confirm = 'As senhas não conferem.';
+        }
+    } else {
+        if (!data.password || String(data.password).trim() === '') {
+            errors.password = 'Informe sua senha.';
+        }
     }
 
     return errors;

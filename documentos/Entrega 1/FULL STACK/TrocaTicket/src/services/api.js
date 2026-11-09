@@ -1,30 +1,49 @@
 const API_URL = 'http://localhost:3000/api';
 
 export async function buscarUsuario(id) {
-    const response = await fetch(
-        `${API_URL}/usuarios/${id}`
-    );
+    let response;
+    let resultado;
 
-    if (!response.ok) {
-        throw new Error('Não foi possível buscar os dados da conta.');
+    try {
+        response = await fetch(`${API_URL}/usuarios/${id}`);
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000).');
+    }
+    
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor.');
     }
 
-    return response.json();
+    if (!response.ok) {
+        throw new Error(resultado.error || 'Não foi possível buscar os dados da conta.');
+    }
+
+    return resultado;
 }
 
 export async function atualizarUsuario(id, dados) {
-    const response = await fetch(
-        `${API_URL}/usuarios/${id}`,
-        {
+    let response;
+    let resultado;
+
+    try {
+        response = await fetch(`${API_URL}/usuarios/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(dados)
-        }
-    );
+        });
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend.');
+    }
 
-    const resultado = await response.json();
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor.');
+    }
 
     if (!response.ok) {
         throw new Error(
@@ -36,15 +55,26 @@ export async function atualizarUsuario(id, dados) {
 }
 
 export async function cadastrarUsuario(dados) {
-    const response = await fetch(`${API_URL}/usuarios`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dados)
-    });
+    let response;
+    let resultado;
 
-    const resultado = await response.json();
+    try {
+        response = await fetch(`${API_URL}/usuarios`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dados)
+        });
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000). Verifique se o servidor Node está rodando.');
+    }
+
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor ao cadastrar.');
+    }
 
     if (!response.ok) {
         throw new Error(resultado.error || 'Erro ao realizar cadastro');
@@ -54,18 +84,83 @@ export async function cadastrarUsuario(dados) {
 }
 
 export async function fazerLogin(credenciais) {
-    const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credenciais)
-    });
+    let response;
+    let resultado;
+    
+    try {
+        response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credenciais)
+        });
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000). Verifique se o servidor Node e o MySQL estão rodando.');
+    }
 
-    const resultado = await response.json();
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor ao efetuar login.');
+    }
 
     if (!response.ok) {
         throw new Error(resultado.error || 'Erro ao efetuar login');
+    }
+
+    return resultado;
+}
+
+export async function uploadFotoUsuario(id, fotoBase64) {
+    let response;
+    let resultado;
+
+    try {
+        response = await fetch(`${API_URL}/usuarios/${id}/foto`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fotoBase64 })
+        });
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000).');
+    }
+
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor ao fazer upload da foto.');
+    }
+
+    if (!response.ok) {
+        throw new Error(resultado.error || 'Erro ao salvar a foto de perfil');
+    }
+
+    return resultado;
+}
+
+export async function excluirFotoUsuario(id) {
+    let response;
+    let resultado;
+
+    try {
+        response = await fetch(`${API_URL}/usuarios/${id}/foto`, {
+            method: 'DELETE'
+        });
+    } catch {
+        throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000).');
+    }
+
+    try {
+        resultado = await response.json();
+    } catch {
+        throw new Error('Resposta inválida do servidor ao excluir foto.');
+    }
+
+    if (!response.ok) {
+        throw new Error(resultado.error || 'Erro ao excluir a foto de perfil');
     }
 
     return resultado;
