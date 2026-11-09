@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useStore } from '../context/Store';
 import { suppliers } from '../data/demo';
 import EventCard from '../../src/components/EventCard';
+import {
+  createEvent,
+  getOrganizerEvents,
+  getOrganizerProposals,
+  getOrganizerSuppliers,
+  getEventSuppliers,
+  setEventSupplier,
+  updateEvent,
+  updateOrganizerProposal,
+} from '../services/events';
 import {
   Badge,
   Empty,
@@ -21,10 +31,30 @@ import {
 //comentario so pra merge
 
 export function Organizer({ list = false }) {
-  const { data } = useStore();
+  const { data, role, update, isAuthenticated } = useStore();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Todos');
   const [view, setView] = useState('Grade');
+  const [loadError, setLoadError] = useState('');
+  const [reloadEvents, setReloadEvents] = useState(0);
+  const organizerId = Number(data.profile?.id);
+  const canLoadDatabaseEvents =
+    role === 'organizador' && Number.isSafeInteger(organizerId) && organizerId > 0;
+
+  useEffect(() => {
+    if (!canLoadDatabaseEvents) return undefined;
+    const controller = new AbortController();
+    getOrganizerEvents(organizerId, controller.signal)
+      .then((databaseEvents) => {
+        update('events', databaseEvents);
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setLoadError(error.message);
+      });
+    return () => controller.abort();
+  }, [canLoadDatabaseEvents, organizerId, reloadEvents, update]);
+
   const events = data.events.filter(
     (e) =>
       e.title.toLowerCase().includes(query.toLowerCase()) &&
@@ -40,6 +70,14 @@ export function Organizer({ list = false }) {
           + Novo evento
         </Link>
       </PageTitle>
+      {loadError && (
+        <div className="api-error" role="alert">
+          <span>Não foi possível carregar os eventos do banco: {loadError}</span>
+          <button type="button" className="button outline tiny" onClick={() => setReloadEvents((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
       <div className="dashboard-layout">
         <div>
           <div className="metrics">
@@ -57,7 +95,7 @@ export function Organizer({ list = false }) {
                 ).length,
                 'Requer atenção',
               ],
-              ['Parceiros', suppliers.length, 'Rede de fornecedores'],
+              ['Parceiros', isAuthenticated ? data.events.reduce((sum, event) => sum + (event.suppliers?.length || 0), 0) : suppliers.length, 'Rede de fornecedores'],
             ].map(([label, value, note]) => (
               <div className="metric" key={label}>
                 <span>{label}</span>
@@ -127,7 +165,7 @@ export function Organizer({ list = false }) {
                     <Badge>{dateLabel(event.date)}</Badge>
                     <h3>{event.title}</h3>
                     <p>{event.location}</p>
-                    <small>{event.suppliers.length} fornecedores vinculados</small>
+                    <small>{event.suppliers?.length || 0} fornecedores vinculados</small>
                   </Link>
                 ))}
             </div>
@@ -135,22 +173,14 @@ export function Organizer({ list = false }) {
         </div>
         <aside>
           <Panel
-            title="Últimos Fornecedores"
-            subtitle="Contratos recentes e contatos rápidos"
-            action={
-              <Link className="text-link" to="/organizador/fornecedores">
-                Ver todos
-              </Link>
-            }
+            title={isAuthenticated ? 'Fornecedores cadastrados' : 'Últimos Fornecedores'}
+            subtitle={isAuthenticated ? 'Vincule fornecedores reais aos seus eventos.' : 'Contratos recentes e contatos rápidos'}
+            action={<Link className="text-link" to="/organizador/fornecedores">Ver todos</Link>}
           >
-            {suppliers.map((s) => (
+            {!isAuthenticated && suppliers.map((s) => (
               <Link className="supplier-row" to="/organizador/fornecedores" key={s.id}>
                 <img src={s.image} alt="" />
-                <div>
-                  <strong>{s.name}</strong>
-                  <small>{s.category}</small>
-                  <Badge>{s.status}</Badge>
-                </div>
+                <div><strong>{s.name}</strong><small>{s.category}</small><Badge>{s.status}</Badge></div>
               </Link>
             ))}
             <Link className="button outline full" to="/organizador/fornecedores">
@@ -188,18 +218,69 @@ const blank = {
 };
 export function EventEditor() {
   const { id } = useParams();
-  const { data, update, notify } = useStore();
+  const { data, role, update, notify } = useStore();
   const navigate = useNavigate();
-  const existing = data.events.find((e) => e.id === id);
+  const organizerId = Number(data.profile?.id);
+  const existing = data.events.find((e) => String(e.id) === id);
   const [form, setForm] = useState(existing || blank);
   const [errors, setErrors] = useState({});
   const [preview, setPreview] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [eventLoading, setEventLoading] = useState(
+    () => Boolean(id && Number.isSafeInteger(Number(id)) && !existing && organizerId > 0),
+  );
+  const [eventLoadError, setEventLoadError] = useState('');
+  const [eventReload, setEventReload] = useState(0);
+
+  useEffect(() => {
+    if (!id || !Number.isSafeInteger(Number(id)) || !organizerId || existing) return undefined;
+    const controller = new AbortController();
+    setEventLoading(true);
+    setEventLoadError('');
+    getOrganizerEvents(organizerId, controller.signal)
+      .then((databaseEvents) => {
+        update('events', databaseEvents);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setEventLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setEventLoading(false);
+      });
+    return () => controller.abort();
+  }, [eventReload, existing, id, organizerId, update]);
+
+  useEffect(() => {
+    if (existing) setForm(existing);
+  }, [existing]);
+
+  if (id && !existing && eventLoading) {
+    return <div className="workspace"><p role="status">Carregando evento…</p></div>;
+  }
+  if (id && !existing && eventLoadError) {
+    return (
+      <div className="workspace">
+        <div className="api-error" role="alert">
+          <span>Não foi possível carregar o evento: {eventLoadError}</span>
+          <button type="button" className="button outline" onClick={() => {
+            setEventLoadError('');
+            setEventLoading(true);
+            setEventReload((value) => value + 1);
+          }}>
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (id && !existing) return <NotFound title="Evento não encontrado" />;
+
   function field(name, value) {
     setForm((old) => ({ ...old, [name]: value }));
     setErrors((old) => ({ ...old, [name]: undefined }));
   }
-  function save(consolidate) {
+  async function save(consolidate) {
+    if (saving) return;
     const next = {};
     if (form.title.trim().length < 3) next.title = 'Informe um nome com pelo menos 3 caracteres.';
     if (!form.location.trim()) next.location = 'Informe o local ou link de acesso.';
@@ -216,14 +297,47 @@ export function EventEditor() {
     }
     const event = {
       ...form,
-      id: id || crypto.randomUUID(),
+      id: existing?.id || id || crypto.randomUUID(),
       capacity: form.capacity === '' ? null : Number(form.capacity),
       price: Number(form.price),
       status: existing?.status || 'Rascunho',
       suppliers: existing?.suppliers || form.suppliers || [],
     };
+
+    const canSaveToDatabase =
+      role === 'organizador' && Number.isSafeInteger(organizerId) && organizerId > 0;
+    if (canSaveToDatabase) {
+      setSaving(true);
+      try {
+        const savedEvent =
+          existing && Number.isSafeInteger(Number(existing.id))
+            ? await updateEvent(existing.id, organizerId, event)
+            : await createEvent(organizerId, event);
+        const eventWithLocalDetails = {
+          ...savedEvent,
+          suppliers: existing?.suppliers || form.suppliers || [],
+          confirmations: existing?.confirmations || [],
+        };
+        update('events', (current) => {
+          const found = current.some((item) => String(item.id) === String(eventWithLocalDetails.id));
+          return found
+            ? current.map((item) =>
+                String(item.id) === String(eventWithLocalDetails.id) ? eventWithLocalDetails : item,
+              )
+            : [...current, eventWithLocalDetails];
+        });
+        notify('Evento salvo no banco de dados.');
+        navigate(`/organizador/eventos/${eventWithLocalDetails.id}/${consolidate ? 'consolidar' : 'editar'}`);
+      } catch (error) {
+        notify(error.message);
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
     update('events', (old) => (id ? old.map((e) => (e.id === id ? event : e)) : [...old, event]));
-    notify(consolidate ? 'Evento salvo. Agora você pode revisar os fornecedores e custos.' : 'Rascunho salvo neste navegador.');
+    notify(consolidate ? 'Evento salvo localmente. Agora você pode revisar os fornecedores e custos.' : 'Rascunho salvo neste navegador.');
     navigate(`/organizador/eventos/${event.id}/${consolidate ? 'consolidar' : 'editar'}`);
   }
   function upload(e) {
@@ -247,7 +361,7 @@ export function EventEditor() {
           ◉ Pré-visualizar
         </button>
       </PageTitle>
-      <div className="event-editor-hint"><span aria-hidden="true">✓</span> Seus dados são salvos como rascunho neste navegador. Campos com * são obrigatórios.</div>
+      <div className="event-editor-hint"><span aria-hidden="true">✓</span> Eventos com uma conta de organizador são salvos no banco de dados; a demonstração usa este navegador. Campos com * são obrigatórios.</div>
       <form
         onSubmit={(e) => { e.preventDefault(); save(true); }}
         noValidate
@@ -341,8 +455,8 @@ export function EventEditor() {
           </div>
           <div className="form-footer event-editor-footer">
             <Link className="button outline" to="/organizador">Cancelar</Link>
-            <button type="button" className="button outline" onClick={() => save(false)}>Salvar rascunho</button>
-            <button type="submit" className="button blue-button">Continuar para custos →</button>
+            <button type="button" className="button outline" disabled={saving} onClick={() => save(false)}>{saving ? 'Salvando…' : 'Salvar rascunho'}</button>
+            <button type="submit" className="button blue-button" disabled={saving}>{saving ? 'Salvando…' : 'Continuar para custos →'}</button>
           </div>
         </Panel>
       </form>
@@ -362,22 +476,161 @@ export function EventEditor() {
 
 export function Consolidation() {
   const { id } = useParams();
-  const { data, update, notify } = useStore();
+  const { data, role, update, notify } = useStore();
   const [modal, setModal] = useState(false);
-  const event = data.events.find((item) => item.id === id);
-  if (!event) return <NotFound title="Evento não encontrado" />;
+  const event = data.events.find((item) => String(item.id) === id);
+  const organizerId = Number(data.profile?.id);
+  const isDatabaseEvent =
+    role === 'organizador' &&
+    Number.isSafeInteger(organizerId) &&
+    organizerId > 0 &&
+    Number.isSafeInteger(Number(id));
+  const [databaseProposals, setDatabaseProposals] = useState([]);
+  const [linkedSuppliers, setLinkedSuppliers] = useState([]);
+  const [proposalError, setProposalError] = useState('');
+  const [proposalLoading, setProposalLoading] = useState(false);
+  const [proposalRetry, setProposalRetry] = useState(0);
+  const [eventLoading, setEventLoading] = useState(() => isDatabaseEvent && !event);
+  const [eventLoadError, setEventLoadError] = useState('');
+  const [eventRetry, setEventRetry] = useState(0);
+
+  useEffect(() => {
+    if (!isDatabaseEvent || event) return undefined;
+    const controller = new AbortController();
+    setEventLoading(true);
+    setEventLoadError('');
+    getOrganizerEvents(organizerId, controller.signal)
+      .then((events) => {
+        update('events', (current) => {
+          const ids = new Set(events.map((item) => String(item.id)));
+          return [...current.filter((item) => !ids.has(String(item.id))), ...events];
+        });
+        setEventLoadError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setEventLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setEventLoading(false);
+      });
+    return () => controller.abort();
+  }, [event, eventRetry, isDatabaseEvent, organizerId, update]);
+
+  useEffect(() => {
+    if (!isDatabaseEvent) return undefined;
+    const controller = new AbortController();
+    setProposalLoading(true);
+    getOrganizerProposals(organizerId, id, controller.signal)
+      .then((proposals) => {
+        setDatabaseProposals(proposals);
+        setProposalError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setProposalError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setProposalLoading(false);
+      });
+    return () => controller.abort();
+  }, [id, isDatabaseEvent, organizerId, proposalRetry]);
+
+  useEffect(() => {
+    if (!isDatabaseEvent) return undefined;
+    const controller = new AbortController();
+    getEventSuppliers(organizerId, id, controller.signal)
+      .then(setLinkedSuppliers)
+      .catch((error) => {
+        if (error.name !== 'AbortError') setProposalError(error.message);
+      });
+    return () => controller.abort();
+  }, [id, isDatabaseEvent, organizerId]);
+
+  if (!event) {
+    if (eventLoading) return <div className="workspace"><p role="status">Carregando evento do banco de dados…</p></div>;
+    if (eventLoadError) {
+      return (
+        <div className="workspace">
+          <div className="api-error" role="alert">
+            <span>Não foi possível carregar o evento: {eventLoadError}</span>
+            <button type="button" className="button outline tiny" onClick={() => setEventRetry((value) => value + 1)}>
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return <NotFound title="Evento não encontrado" />;
+  }
 
   const selected = suppliers.filter((supplier) => (event.suppliers || []).includes(supplier.id));
   const confirmations = event.confirmations || [];
   const pending = selected.filter(
     (supplier) => supplier.status === 'Pendente' && !confirmations.includes(supplier.id),
   );
-  const total = selected.reduce((sum, supplier) => sum + supplier.price, 0);
-  const progress = selected.length
-    ? Math.round(((selected.length - pending.length) / selected.length) * 100)
-    : 100;
-  const change = (values) =>
-    update('events', (old) => old.map((item) => (item.id === id ? { ...item, ...values } : item)));
+  const databaseApproved = databaseProposals.filter((proposal) => proposal.status === 'Aprovada');
+  const databasePending = databaseProposals.filter((proposal) => proposal.status === 'Em análise');
+  const databaseResolved = databaseProposals.length - databasePending.length;
+  const cents = (value) => Math.round(Number(value) * 100);
+  const totalCents = isDatabaseEvent
+    ? databaseApproved.reduce((sum, proposal) => sum + cents(proposal.total), 0)
+    : selected.reduce((sum, supplier) => sum + cents(supplier.price), 0);
+  const total = totalCents / 100;
+  const pendingCount = isDatabaseEvent ? databasePending.length : pending.length;
+  const partnerCount = isDatabaseEvent
+    ? new Set([
+        ...linkedSuppliers.map((supplier) => String(supplier.id)),
+        ...databaseProposals.map((proposal) => String(proposal.supplierId)),
+      ]).size
+    : selected.length;
+  const confirmedCount = isDatabaseEvent ? databaseApproved.length : selected.length - pending.length;
+  const progress = isDatabaseEvent
+    ? databaseProposals.length
+      ? Math.round((databaseResolved / databaseProposals.length) * 100)
+      : 0
+    : selected.length
+      ? Math.round(((selected.length - pending.length) / selected.length) * 100)
+      : 0;
+  const capacity = Number(event.capacity);
+  const hasCapacity = Number.isSafeInteger(capacity) && capacity > 0;
+  const estimatedRevenue = hasCapacity ? cents(capacity * Number(event.price)) / 100 : null;
+  const estimatedResult = estimatedRevenue === null ? null : estimatedRevenue - total;
+  const minimumTicketPrice = hasCapacity ? cents(total / capacity) / 100 : null;
+  async function setProposalStatus(proposal, status) {
+    try {
+      await updateOrganizerProposal(organizerId, id, proposal.id, status);
+      setDatabaseProposals((current) =>
+        current.map((item) => (item.id === proposal.id ? { ...item, status } : item)),
+      );
+      setProposalError('');
+      notify(status === 'Aprovada' ? 'Proposta aprovada.' : 'Proposta recusada.');
+    } catch (error) {
+      setProposalError(error.message);
+    }
+  }
+  const change = async (values) => {
+    const updatedEvent = { ...event, ...values };
+    if (
+      role === 'organizador' &&
+      Number.isSafeInteger(organizerId) &&
+      organizerId > 0 &&
+      Number.isSafeInteger(Number(event.id))
+    ) {
+      try {
+        const savedEvent = await updateEvent(event.id, organizerId, updatedEvent);
+        Object.assign(updatedEvent, savedEvent, {
+          suppliers: event.suppliers || [],
+          confirmations: updatedEvent.confirmations || event.confirmations || [],
+        });
+      } catch (error) {
+        notify(error.message);
+        return false;
+      }
+    }
+    update('events', (old) =>
+      old.map((item) => (String(item.id) === id ? updatedEvent : item)),
+    );
+    return true;
+  };
   const allEvents = data.events.filter((item) => item.status !== 'Cancelado');
   const isPublished = event.status === 'Publicado';
   const isCancelled = event.status === 'Cancelado';
@@ -392,8 +645,10 @@ export function Consolidation() {
           name="custos-evento.csv"
           rows={[
             [event.title],
-            ['Fornecedor', 'Valor'],
-            ...selected.map((supplier) => [supplier.name, supplier.price]),
+            ['Fornecedor', 'Valor', 'Status'],
+            ...(isDatabaseEvent
+              ? databaseProposals.map((proposal) => [proposal.supplierName, proposal.total, proposal.status])
+              : selected.map((supplier) => [supplier.name, supplier.price, 'Confirmado'])),
             ['Total', total],
           ]}
         />
@@ -418,7 +673,7 @@ export function Consolidation() {
           <div><span>Data e horário</span><strong>{dateLabel(event.date)} · {event.time || 'A definir'}</strong></div>
           <div><span>Local</span><strong>{event.location || 'A definir'}</strong></div>
           <div><span>Capacidade</span><strong>{event.capacity ? `${event.capacity} pessoas` : 'Não definida'}</strong></div>
-          <div><span>Orçamento de parceiros</span><strong>{money(total)}</strong></div>
+          <div><span>Custos de propostas aprovadas</span><strong>{money(total)}</strong></div>
         </div>
       </section>
 
@@ -426,17 +681,64 @@ export function Consolidation() {
         <section className="panel consolidation-partners">
           <div className="consolidation-section-heading">
             <div>
-              <h2>Parceiros contratados</h2>
-              <p>{selected.length} {selected.length === 1 ? 'fornecedor vinculado' : 'fornecedores vinculados'}</p>
+              <h2>{isDatabaseEvent ? 'Propostas recebidas' : 'Parceiros contratados'}</h2>
+              <p>{partnerCount} {partnerCount === 1 ? 'fornecedor' : 'fornecedores'}</p>
             </div>
-            <Link className="text-link" to="/organizador/fornecedores">Gerenciar</Link>
+            <Link className="text-link" to={`/organizador/fornecedores?evento=${encodeURIComponent(id)}`}>Gerenciar</Link>
           </div>
           <div className="consolidation-status-summary">
-            <div><strong>{selected.length - pending.length}</strong><span>Confirmados</span></div>
-            <div><strong>{pending.length}</strong><span>Pendentes</span></div>
+            <div><strong>{confirmedCount}</strong><span>{isDatabaseEvent ? 'Aprovadas' : 'Confirmados'}</span></div>
+            <div><strong>{pendingCount}</strong><span>Pendentes</span></div>
             <div><strong>{progress}%</strong><span>Concluído</span></div>
           </div>
-          {selected.length ? (
+          {proposalError && (
+            <div className="api-error" role="alert">
+              <span>{proposalError}</span>
+              <button type="button" className="button outline tiny" onClick={() => setProposalRetry((value) => value + 1)}>
+                Tentar novamente
+              </button>
+            </div>
+          )}
+          {proposalLoading && <p role="status">Carregando propostas recebidas…</p>}
+          {isDatabaseEvent && linkedSuppliers.length > 0 && (
+            <div className="consolidation-linked-suppliers">
+              <h3>Fornecedores vinculados</h3>
+              {linkedSuppliers.map((supplier) => (
+                <div className="consolidation-linked-supplier" key={supplier.id}>
+                  <span><strong>{supplier.name}</strong><small>{supplier.category || 'Categoria não informada'}</small></span>
+                  <Badge tone="blue">Vinculado</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+          {isDatabaseEvent && !proposalLoading && databaseProposals.length ? (
+            <div className="consolidation-partner-list">
+              {databaseProposals.map((proposal) => (
+                <div className="consolidation-partner" key={proposal.id}>
+                  <div className="consolidation-partner-info">
+                    <strong>{proposal.supplierName}</strong>
+                    <span>{proposal.category || 'Categoria não informada'} · #{proposal.protocol || proposal.id}</span>
+                    {proposal.items?.length > 0 && (
+                      <small>{proposal.items.map((item) => `${item.qty} ${item.unit} ${item.name}`).join(' · ')}</small>
+                    )}
+                  </div>
+                  <div className="consolidation-partner-end">
+                    <strong>{money(proposal.total)}</strong>
+                    {proposal.status === 'Em análise' ? (
+                      <div className="actions">
+                        <button className="button tiny outline" onClick={() => setProposalStatus(proposal, 'Não selecionada')}>
+                          Recusar
+                        </button>
+                        <button className="button tiny blue-button" onClick={() => setProposalStatus(proposal, 'Aprovada')}>
+                          Aprovar
+                        </button>
+                      </div>
+                    ) : <Badge tone={proposal.status === 'Aprovada' ? 'green' : 'red'}>{proposal.status}</Badge>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !isDatabaseEvent && selected.length ? (
             <div className="consolidation-partner-list">
               {selected.map((supplier) => {
                 const isPending = pending.some((item) => item.id === supplier.id);
@@ -463,8 +765,10 @@ export function Consolidation() {
               })}
             </div>
           ) : (
-            <Empty title="Nenhum parceiro vinculado">
-              Você pode adicionar fornecedores antes de publicar o evento.
+            <Empty title={isDatabaseEvent ? 'Nenhuma proposta recebida' : 'Nenhum parceiro vinculado'}>
+              {isDatabaseEvent
+                ? 'Fornecedores poderão enviar propostas quando o evento estiver publicado.'
+                : 'Você pode adicionar fornecedores antes de publicar o evento.'}
             </Empty>
           )}
         </section>
@@ -475,32 +779,37 @@ export function Consolidation() {
               <h2>Resumo para publicação</h2>
               <p>Uma última conferência antes de disponibilizar o evento.</p>
             </div>
-            <Badge tone={isPublished ? 'green' : isCancelled ? 'red' : pending.length ? 'amber' : 'blue'}>
-              {isCancelled ? 'Cancelado' : isPublished ? 'Publicado' : pending.length ? 'Pendente' : 'Pronto para publicar'}
+            <Badge tone={isPublished ? 'green' : isCancelled ? 'red' : pendingCount ? 'amber' : 'blue'}>
+              {isCancelled ? 'Cancelado' : isPublished ? 'Publicado' : pendingCount ? 'Pendente' : 'Pronto para publicar'}
             </Badge>
           </div>
           <div className="consolidation-progress-label"><span>Etapa de consolidação</span><strong>{progress}%</strong></div>
           <progress value={progress} max="100" aria-label="Progresso da consolidação" />
           <div className="consolidation-budget">
-            <div><span>Receita estimada com lotação completa</span><strong>{money((Number(event.capacity) || 0) * (Number(event.price) || 0))}</strong></div>
+            <div><span>Receita bruta estimada (lotação completa)</span><strong>{estimatedRevenue === null ? 'Defina a capacidade' : money(estimatedRevenue)}</strong></div>
             <div><span>Custos dos fornecedores</span><strong>{money(total)}</strong></div>
-            <div className="consolidation-budget-total"><span>Resultado estimado</span><strong>{money((Number(event.capacity) || 0) * (Number(event.price) || 0) - total)}</strong></div>
+            <div><span>Preço mínimo por ingresso para cobrir fornecedores</span><strong>{minimumTicketPrice === null ? 'Defina a capacidade' : money(minimumTicketPrice)}</strong></div>
+            <div className="consolidation-budget-total"><span>Saldo bruto estimado</span><strong>{estimatedResult === null ? 'Defina a capacidade' : money(estimatedResult)}</strong></div>
           </div>
+          <p className="muted">Estimativa considera lotação completa e somente propostas aprovadas; não inclui impostos, taxas ou demais despesas.</p>
           <p className="consolidation-guidance">
-            {pending.length
-              ? `Confirme ${pending.length === 1 ? 'o fornecedor pendente' : `os ${pending.length} fornecedores pendentes`} para concluir a consolidação.`
+            {pendingCount
+              ? `${pendingCount} proposta${pendingCount === 1 ? '' : 's'} aguardam análise.`
               : isPublished
-                ? 'Este evento já está publicado no catálogo da demonstração.'
+                ? isDatabaseEvent
+                  ? 'Este evento já está publicado no catálogo.'
+                  : 'Este evento já está publicado no catálogo da demonstração.'
                 : 'Os dados e parceiros estão prontos para a publicação do evento.'}
           </p>
           <div className="consolidation-actions">
             <button className="button danger-outline" onClick={() => setModal(true)} disabled={isCancelled}>Cancelar evento</button>
             <button
               className="button blue-button"
-              disabled={pending.length > 0 || isPublished || isCancelled}
-              onClick={() => {
-                change({ status: 'Publicado' });
-                notify('Evento publicado no catálogo da demonstração.');
+              disabled={pendingCount > 0 || isPublished || isCancelled}
+              onClick={async () => {
+                if (await change({ status: 'Publicado' })) {
+                  notify('Evento publicado no catálogo.');
+                }
               }}
             >{isPublished ? 'Evento publicado' : 'Consolidar e publicar'}</button>
           </div>
@@ -530,10 +839,11 @@ export function Consolidation() {
           <p>O evento ficará marcado como cancelado. Você ainda poderá consultar os dados posteriormente.</p>
           <div className="actions">
             <button className="button outline" onClick={() => setModal(false)}>Voltar</button>
-            <button className="button danger" onClick={() => {
-              change({ status: 'Cancelado' });
-              setModal(false);
-              notify('Evento cancelado.');
+            <button className="button danger" onClick={async () => {
+              if (await change({ status: 'Cancelado' })) {
+                setModal(false);
+                notify('Evento cancelado.');
+              }
             }}>Confirmar cancelamento</button>
           </div>
         </Modal>
@@ -543,19 +853,115 @@ export function Consolidation() {
 }
 
 export function Suppliers() {
+  const { data, role, isAuthenticated, update, notify } = useStore();
+  const organizerId = Number(data.profile?.id);
+  const databaseOrganizer = isAuthenticated && role === 'organizador' &&
+    Number.isSafeInteger(organizerId) && organizerId > 0;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const eventId = searchParams.get('evento') || '';
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('Todas as categorias');
   const [status, setStatus] = useState('Todos os status');
   const [selected, setSelected] = useState(null);
+  const [databaseSuppliers, setDatabaseSuppliers] = useState([]);
+  const [linkedSuppliers, setLinkedSuppliers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingLinks, setLoadingLinks] = useState(false);
+  const [linkingId, setLinkingId] = useState(null);
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
 
-  const categories = [...new Set(suppliers.map((supplier) => supplier.category))];
-  const filtered = suppliers.filter((supplier) => {
+  useEffect(() => {
+    if (!databaseOrganizer) return undefined;
+    const controller = new AbortController();
+    setLoading(true);
+    setLoadError('');
+    Promise.all([
+      getOrganizerSuppliers(organizerId, controller.signal),
+      getOrganizerEvents(organizerId, controller.signal),
+    ])
+      .then(([supplierRows, events]) => {
+        setDatabaseSuppliers(supplierRows);
+        update('events', events);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [databaseOrganizer, organizerId, retry, update]);
+
+  useEffect(() => {
+    if (!databaseOrganizer || !eventId) {
+      setLinkedSuppliers([]);
+      return undefined;
+    }
+    const controller = new AbortController();
+    setLoadingLinks(true);
+    getEventSuppliers(organizerId, eventId, controller.signal)
+      .then(setLinkedSuppliers)
+      .catch((error) => {
+        if (error.name !== 'AbortError') setLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoadingLinks(false);
+      });
+    return () => controller.abort();
+  }, [databaseOrganizer, eventId, organizerId]);
+
+  useEffect(() => {
+    if (databaseOrganizer || eventId || !data.events.length) return;
+    setSearchParams({ evento: String(data.events[0].id) }, { replace: true });
+  }, [data.events, databaseOrganizer, eventId, setSearchParams]);
+
+  const rows = databaseOrganizer ? databaseSuppliers : suppliers;
+  const linkedIds = new Set(
+    databaseOrganizer
+      ? linkedSuppliers.map((supplier) => String(supplier.id))
+      : (data.events.find((event) => String(event.id) === eventId)?.suppliers || []).map(String),
+  );
+  const categories = [...new Set(rows.map((supplier) => supplier.category).filter(Boolean))];
+  const filtered = rows.filter((supplier) => {
     const text = `${supplier.name} ${supplier.category}`.toLowerCase();
     const matchesQuery = text.includes(query.trim().toLowerCase());
     const matchesCategory = category === 'Todas as categorias' || supplier.category === category;
-    const matchesStatus = status === 'Todos os status' || supplier.status === status;
+    const supplierStatus = linkedIds.has(String(supplier.id)) ? 'Vinculado' : 'Disponível';
+    const matchesStatus = status === 'Todos os status' || supplierStatus === status ||
+      (!databaseOrganizer && supplier.status === status);
     return matchesQuery && matchesCategory && matchesStatus;
   });
+  const event = data.events.find((item) => String(item.id) === eventId);
+  const canLink = databaseOrganizer ? Boolean(event) : Boolean(event);
+
+  async function toggleLink(supplier) {
+    if (!event) return;
+    const linked = linkedIds.has(String(supplier.id));
+    setLinkingId(supplier.id);
+    setLoadError('');
+    try {
+      if (databaseOrganizer) {
+        await setEventSupplier(organizerId, event.id, supplier.id, !linked);
+        setLinkedSuppliers((current) => linked
+          ? current.filter((item) => String(item.id) !== String(supplier.id))
+          : [...current, supplier]);
+      } else {
+        update('events', (current) => current.map((item) => {
+          if (String(item.id) !== String(event.id)) return item;
+          const existingIds = item.suppliers || [];
+          return { ...item, suppliers: linked
+            ? existingIds.filter((id) => String(id) !== String(supplier.id))
+            : [...existingIds, supplier.id] };
+        }));
+      }
+      notify(linked ? 'Fornecedor removido do evento.' : 'Fornecedor vinculado ao evento.');
+    } catch (error) {
+      setLoadError(error.message);
+    } finally {
+      setLinkingId(null);
+    }
+  }
 
   const initials = (name) => name
     .replace(/&/g, ' ')
@@ -570,12 +976,42 @@ export function Suppliers() {
     <div className="workspace supplier-directory">
       <PageTitle
         title="Fornecedores"
-        subtitle="Encontre parceiros para os seus eventos e consulte os valores de referência."
+        subtitle={databaseOrganizer
+          ? 'Selecione um evento e vincule fornecedores cadastrados à sua organização.'
+          : 'Encontre parceiros para os seus eventos e consulte os valores de referência.'}
       >
-        <Link className="button blue-button" to="/organizador/novo">
-          Criar evento
-        </Link>
+        {!event && <Link className="button blue-button" to="/organizador/novo">Criar evento</Link>}
       </PageTitle>
+
+      {event && (
+        <label className="supplier-event-select">
+          Vincular fornecedores ao evento
+          <select
+            aria-label="Evento para vincular fornecedores"
+            value={eventId}
+            onChange={(e) => setSearchParams({ evento: e.target.value })}
+          >
+            {data.events.map((item) => (
+              <option key={item.id} value={item.id}>{item.title}</option>
+            ))}
+          </select>
+        </label>
+      )}
+      {loading && <p role="status">Carregando fornecedores e eventos do banco…</p>}
+      {loadingLinks && <p role="status">Carregando vínculos do evento…</p>}
+      {loadError && (
+        <div className="api-error" role="alert">
+          <span>Não foi possível concluir a operação: {loadError}</span>
+          <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
+      {!data.events.length && !loading && (
+        <Empty title="Crie um evento antes de vincular fornecedores">
+          <Link className="button blue-button" to="/organizador/novo">Criar evento</Link>
+        </Empty>
+      )}
 
       <section className="supplier-toolbar" aria-label="Filtros de fornecedores">
         <label className="supplier-search">
@@ -604,7 +1040,10 @@ export function Suppliers() {
           <span className="sr-only">Filtrar por status</span>
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
             <option>Todos os status</option>
-            {[...new Set(suppliers.map((supplier) => supplier.status))].map((item) => (
+            {(databaseOrganizer
+              ? ['Disponível', 'Vinculado']
+              : [...new Set([...suppliers.map((supplier) => supplier.status), 'Disponível', 'Vinculado'])]
+            ).map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -622,11 +1061,13 @@ export function Suppliers() {
 
       <div className="supplier-results-line">
         <span><strong>{filtered.length}</strong> {filtered.length === 1 ? 'fornecedor encontrado' : 'fornecedores encontrados'}</span>
-        <span className="supplier-results-hint">Valores de referência sujeitos a confirmação com o parceiro.</span>
+        <span className="supplier-results-hint">{databaseOrganizer
+          ? event ? `Evento: ${event.title}` : 'Selecione ou crie um evento.'
+          : 'Valores de referência sujeitos a confirmação com o parceiro.'}</span>
       </div>
 
       <section className="supplier-table-card" aria-label="Lista de fornecedores">
-        {filtered.length ? (
+        {filtered.length && !loading ? (
           <div className="supplier-table-scroll">
             <table className="supplier-table">
               <thead>
@@ -646,15 +1087,19 @@ export function Suppliers() {
                         <span className="supplier-initials" aria-hidden="true">{initials(supplier.name)}</span>
                         <span className="supplier-name-copy">
                           <strong>{supplier.name}</strong>
-                          <small>Parceiro para eventos</small>
+                          <small>{supplier.productCount !== undefined
+                            ? `${supplier.productCount} itens ativos no catálogo`
+                            : 'Parceiro para eventos'}</small>
                         </span>
                       </div>
                     </td>
                     <td><span className="supplier-category">{supplier.category}</span></td>
-                    <td><strong className="supplier-price">{money(supplier.price)}</strong></td>
+                    <td><strong className="supplier-price">
+                      {supplier.price === null || supplier.price === undefined ? 'Sem preço de referência' : money(supplier.price)}
+                    </strong></td>
                     <td>
-                      <span className={`supplier-status ${supplier.status.toLowerCase().includes('confirm') ? 'is-confirmed' : 'is-pending'}`}>
-                        <span aria-hidden="true" />{supplier.status}
+                      <span className={`supplier-status ${linkedIds.has(String(supplier.id)) ? 'is-confirmed' : 'is-pending'}`}>
+                        <span aria-hidden="true" />{linkedIds.has(String(supplier.id)) ? 'Vinculado' : 'Disponível'}
                       </span>
                     </td>
                     <td>
@@ -662,9 +1107,15 @@ export function Suppliers() {
                         <button type="button" className="button outline supplier-details-button" onClick={() => setSelected(supplier)}>
                           Detalhes
                         </button>
-                        <Link className="button blue-button supplier-link-button" to="/organizador/novo" title={`Planejar evento com ${supplier.name}`}>
-                          Vincular
-                        </Link>
+                        <button
+                          type="button"
+                          className={`button ${linkedIds.has(String(supplier.id)) ? 'outline' : 'blue-button'} supplier-link-button`}
+                          disabled={!canLink || linkingId === supplier.id}
+                          onClick={() => toggleLink(supplier)}
+                          title={event ? `${linkedIds.has(String(supplier.id)) ? 'Remover vínculo de' : 'Vincular'} ${supplier.name} ${linkedIds.has(String(supplier.id)) ? 'do' : 'ao'} evento ${event.title}` : 'Crie um evento para vincular fornecedores'}
+                        >
+                          {linkingId === supplier.id ? 'Salvando…' : linkedIds.has(String(supplier.id)) ? 'Remover' : 'Vincular'}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -672,11 +1123,13 @@ export function Suppliers() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : !loading && (
           <div className="supplier-empty">
             <span className="supplier-empty-icon" aria-hidden="true">⌕</span>
             <strong>Nenhum fornecedor encontrado</strong>
-            <p>Tente mudar a busca ou remover algum filtro.</p>
+            <p>{databaseOrganizer && !rows.length
+              ? 'Nenhum fornecedor possui cadastro ativo no banco.'
+              : 'Tente mudar a busca ou remover algum filtro.'}</p>
             <button type="button" className="button outline" onClick={() => { setQuery(''); setCategory('Todas as categorias'); setStatus('Todos os status'); }}>
               Limpar filtros
             </button>
@@ -690,11 +1143,44 @@ export function Suppliers() {
             <span className="supplier-initials supplier-modal-initials" aria-hidden="true">{initials(selected.name)}</span>
             <div>
               <p className="muted">{selected.category}</p>
-              <p className="supplier-modal-price">{money(selected.price)} <span>valor de referência</span></p>
+              <p className="supplier-modal-price">
+                {selected.price === null || selected.price === undefined
+                  ? 'Sem preço de referência'
+                  : money(selected.price)}{' '}
+                <span>valor de referência</span>
+              </p>
+              <section aria-label="Itens ativos do fornecedor">
+                <h3>Itens do catálogo</h3>
+                {selected.products?.length ? (
+                  <ul className="supplier-product-list">
+                    {selected.products.map((product) => (
+                      <li key={product.id}>
+                        <span>
+                          <strong>{product.name}</strong>
+                          <small>
+                            {product.category} · {product.unit}
+                          </small>
+                          {product.description && <small>{product.description}</small>}
+                        </span>
+                        <strong>{money(product.price)}</strong>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="muted">Este fornecedor ainda não cadastrou itens ativos.</p>
+                )}
+              </section>
               <p className="muted">Confirme disponibilidade, escopo do serviço e orçamento diretamente com o parceiro antes de fechar a contratação.</p>
               <div className="supplier-modal-actions">
                 <button type="button" className="button outline" onClick={() => setSelected(null)}>Fechar</button>
-                <Link className="button blue-button" to="/organizador/novo">Planejar evento</Link>
+                <button
+                  type="button"
+                  className={`button ${linkedIds.has(String(selected.id)) ? 'outline' : 'blue-button'}`}
+                  disabled={!canLink || linkingId === selected.id}
+                  onClick={() => toggleLink(selected)}
+                >
+                  {linkedIds.has(String(selected.id)) ? 'Remover do evento' : 'Vincular ao evento'}
+                </button>
               </div>
             </div>
           </div>

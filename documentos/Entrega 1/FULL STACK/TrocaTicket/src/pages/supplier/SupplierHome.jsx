@@ -1,38 +1,66 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { supplierOpportunities as opportunities } from '../../data/supplier';
 import { Empty, PageTitle } from '../../components/UI';
 import SearchToolbar from '../../components/supplier/SearchToolbar';
 import SummaryBar from '../../components/supplier/SummaryBar';
 import OpportunityCard from '../../components/supplier/OpportunityCard';
 import { Chip } from '../../components/supplier/common';
+import { useStore } from '../../context/Store';
+import { getSupplierOpportunities } from '../../services/supplier';
 
 const STATUSES = ['Cotação aberta', 'Em análise', 'Alta prioridade'];
-const CATEGORIES = [...new Set(opportunities.map((event) => event.category))];
 const SORTS = [
   { value: 'date-desc', label: 'Data do evento' },
   { value: 'date-asc', label: 'Data mais próxima' },
   { value: 'name', label: 'Nome' },
-  { value: 'value', label: 'Maior valor' },
 ];
 const normalize = (text) =>
   text.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/\p{Diacritic}/gu, '');
 const clock = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
 export default function SupplierHome() {
+  const { data, role } = useStore();
+  const supplierId = Number(data.supplierProfile?.id);
+  const connectedSupplier =
+    role === 'fornecedor' && Number.isSafeInteger(supplierId) && supplierId > 0;
+  const [databaseEvents, setDatabaseEvents] = useState([]);
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Todos');
   const [sort, setSort] = useState('date-desc');
   const [category, setCategory] = useState('Todas');
   const [onlyPending, setOnlyPending] = useState(false);
   const [updatedAt] = useState(clock);
+  const list = connectedSupplier ? databaseEvents : opportunities;
+  const categories = [...new Set(list.map((event) => event.category).filter(Boolean))];
 
-  const countBy = (value) => opportunities.filter((event) => event.status === value).length;
-  const pending = opportunities.filter((event) => !event.proposal).length;
+  useEffect(() => {
+    if (!connectedSupplier) return undefined;
+    const controller = new AbortController();
+    setLoading(true);
+    getSupplierOpportunities(supplierId, controller.signal)
+      .then((events) => {
+        setDatabaseEvents(events);
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setLoadError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [connectedSupplier, retry, supplierId]);
+
+  const countBy = (value) => list.filter((event) => event.status === value).length;
+  const pending = list.filter((event) => !event.proposal).length;
   const advancedCount = (category !== 'Todas') + onlyPending;
 
   const events = useMemo(() => {
     const term = normalize(query.trim());
-    return opportunities
+    return list
       .filter((event) => {
         const haystack = normalize(
           [event.title, event.subtitle, event.organizer, event.location, ...(event.services || [])].join(' '),
@@ -46,11 +74,10 @@ export default function SupplierHome() {
       })
       .sort((a, b) => {
         if (sort === 'name') return a.title.localeCompare(b.title, 'pt-BR');
-        if (sort === 'value') return b.price - a.price;
         if (sort === 'date-asc') return a.date.localeCompare(b.date);
         return b.date.localeCompare(a.date);
       });
-  }, [query, status, sort, category, onlyPending]);
+  }, [list, query, status, sort, category, onlyPending]);
 
   function clearFilters() {
     setQuery('');
@@ -73,7 +100,7 @@ export default function SupplierHome() {
             value: status,
             onChange: setStatus,
             options: [
-              { value: 'Todos', label: `Todos os eventos (${opportunities.length})` },
+              { value: 'Todos', label: `Todos os eventos (${list.length})` },
               ...STATUSES.map((value) => ({ value, label: `${value} (${countBy(value)})` })),
             ],
           },
@@ -85,7 +112,7 @@ export default function SupplierHome() {
             <label className="sp-select">
               <span>Categoria de serviço:</span>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                {['Todas', ...CATEGORIES].map((item) => (
+                {['Todas', ...categories].map((item) => (
                   <option key={item}>{item}</option>
                 ))}
               </select>
@@ -103,11 +130,20 @@ export default function SupplierHome() {
 
       <SummaryBar
         items={[
-          { label: 'Oportunidades em destaque', value: `${opportunities.length} ativas` },
+          { label: 'Oportunidades em destaque', value: `${list.length} ativas` },
           { label: 'Propostas aguardando envio', value: `${pending} pendentes`, tone: 'warning' },
         ]}
         trailing={`Última atualização: hoje às ${updatedAt}`}
       />
+      {loadError && (
+        <div className="api-error" role="alert">
+          <span>Não foi possível carregar eventos do banco: {loadError}</span>
+          <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
+            Tentar novamente
+          </button>
+        </div>
+      )}
+      {loading && <p role="status" className="muted">Carregando oportunidades do banco de dados…</p>}
 
       <PageTitle
         title={
@@ -127,7 +163,7 @@ export default function SupplierHome() {
         <div className="sp-grid-cards">
           {events.map((event) => (
             // a numeração (EVENTO I, II…) acompanha a posição original, não muda ao filtrar
-            <OpportunityCard key={event.id} event={event} index={opportunities.indexOf(event)} />
+            <OpportunityCard key={event.id} event={event} index={list.indexOf(event)} />
           ))}
         </div>
       ) : (

@@ -5,6 +5,7 @@ import App from './App';
 import './styles.css';
 import './workspace.css';
 import './supplier.css';
+import './cards.css';
 import { StoreProvider } from './context/Store';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

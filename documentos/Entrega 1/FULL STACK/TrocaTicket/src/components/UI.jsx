@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useId } from 'react';
 import { Link } from 'react-router';
+
 export const money = (value) =>
   Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
 export const dateLabel = (date) =>
   date ? new Date(`${date}T12:00:00`).toLocaleDateString('pt-BR') : 'A definir';
+
 export function Badge({ children, tone }) {
   const text = String(children).toLowerCase();
   const color =
@@ -17,6 +20,7 @@ export function Badge({ children, tone }) {
           : 'blue');
   return <span className={`badge ${color}`}>{children}</span>;
 }
+
 export function PageTitle({ title, subtitle, children, eyebrow }) {
   return (
     <div className="page-title">
@@ -29,6 +33,7 @@ export function PageTitle({ title, subtitle, children, eyebrow }) {
     </div>
   );
 }
+
 export function Panel({ title, subtitle, children, className = '', action }) {
   return (
     <section className={`panel ${className}`}>
@@ -45,6 +50,7 @@ export function Panel({ title, subtitle, children, className = '', action }) {
     </section>
   );
 }
+
 export function Empty({ title = 'Nenhum resultado encontrado', children }) {
   return (
     <div className="empty-state">
@@ -54,6 +60,7 @@ export function Empty({ title = 'Nenhum resultado encontrado', children }) {
     </div>
   );
 }
+
 export function Tabs({ options, value, onChange, label = 'Filtrar resultados' }) {
   return (
     <div className="tabs" role="group" aria-label={label}>
@@ -71,27 +78,56 @@ export function Tabs({ options, value, onChange, label = 'Filtrar resultados' })
     </div>
   );
 }
-export function Field({ label, name, error, children, ...props }) {
-  return (
-    <div className={`field ${props.className || ''}`}>
-      <label htmlFor={name}>{label}</label>
-      {children || (
+
+export function Field({ label, name, id, error, mask, onChange, children, ...props }) {
+  const fieldId = id || name;
+  const errorId = `${fieldId}-error`;
+
+  function handleChange(event) {
+    const input = event.currentTarget;
+
+    if (mask) {
+      input.value = mask(input.value);
+    }
+
+    onChange?.(event);
+  }
+
+  const control = children
+    ? React.Children.map(children, (child) => {
+        if (
+          !React.isValidElement(child) ||
+          !['input', 'select', 'textarea'].includes(child.type)
+        ) {
+          return child;
+        }
+        return React.cloneElement(child, {
+          id: child.props.id || fieldId,
+          name: child.props.name || name,
+          'aria-invalid': child.props['aria-invalid'] ?? Boolean(error),
+          'aria-describedby': child.props['aria-describedby'] || (error ? errorId : undefined),
+        });
+      })
+    : (
         <input
-          id={name}
-          name={name}
           {...props}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${name}-error` : undefined}
+          id={fieldId}
+          name={name}
+          onChange={handleChange}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
         />
-      )}{' '}
-      {error && (
-        <small className="field-error" id={`${name}-error`}>
-          {error}
-        </small>
-      )}
+      );
+
+  return (
+    <div className={`field ${error ? 'has-error' : ''}`}>
+      <label htmlFor={fieldId}>{label}</label>
+      {control}
+      {error && <span id={errorId} className="field-error" role="alert">{error}</span>}
     </div>
   );
 }
+
 export function Modal({ title, children, onClose }) {
   const ref = useRef(null);
   const titleId = useId();

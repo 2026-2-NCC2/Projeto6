@@ -10,7 +10,7 @@ const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp'];
  *  - onChange:  recebe o novo data URL (ou '' ao remover)
  *  - children:  conteúdo exibido ao lado da foto (nome, selos…)
  */
-export default function AvatarUpload({ name, photo, onChange, maxMB = 2, children }) {
+export default function AvatarUpload({ name, photo, onChange, maxMB = 2, children, disabled = false }) {
   const [error, setError] = useState('');
   const inputRef = useRef(null);
 
@@ -38,20 +38,21 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
         <div className="avatar large">
           {photo ? <img src={photo} alt={`Foto de ${name || 'perfil'}`} /> : initialsOf(name)}
         </div>
-        <button type="button" className="sp-avatar-camera" onClick={openPicker} aria-label="Escolher foto de perfil">
+        <button type="button" className="sp-avatar-camera" onClick={openPicker} aria-label="Escolher foto de perfil" disabled={disabled}>
           <Icon name="camera" size={14} />
         </button>
       </div>
       <div className="sp-avatar-body">
         {children}
         <div className="actions">
-          <button type="button" className="button dark sp-small-button" onClick={openPicker}>
+          <button type="button" className="button dark sp-small-button" onClick={openPicker} disabled={disabled}>
             <Icon name="upload" size={14} /> {photo ? 'Trocar foto' : 'Enviar nova foto'}
           </button>
           {photo && (
             <button
               type="button"
               className="sp-danger-text"
+              disabled={disabled}
               onClick={() => {
                 setError('');
                 onChange('');
@@ -67,6 +68,7 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
           type="file"
           tabIndex={-1}
           accept={ACCEPTED.join(',')}
+          disabled={disabled}
           onChange={pick}
         />
         <p className="sp-hint">Formatos recomendados: PNG, JPG ou WEBP (máx. {maxMB} MB)</p>

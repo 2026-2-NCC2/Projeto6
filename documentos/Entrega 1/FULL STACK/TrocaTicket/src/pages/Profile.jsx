@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel } from '../components/UI';
 import { roleNames } from '../data/demo';
+import { atualizarUsuario, uploadFotoUsuario, excluirFotoUsuario } from '../services/api';
+
+function syncSessionUser(updates) {
+  try {
+    const raw = sessionStorage.getItem('trocaticket-user');
+    const user = raw ? JSON.parse(raw) : null;
+    if (!user || typeof user !== 'object' || Array.isArray(user)) return false;
+    sessionStorage.setItem('trocaticket-user', JSON.stringify({ ...user, ...updates }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Profile() {
   const { data, update, role, notify } = useStore();
   const [form, setForm] = useState(data.profile);
   const [error, setError] = useState('');
-  function photo(event) {
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (data.profile) {
+      setForm(data.profile);
+    }
+  }, [data.profile]);
+
+  async function photo(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (
@@ -16,9 +38,70 @@ export default function Profile() {
       setError('Escolha uma imagem PNG, JPG ou WEBP de até 2 MB.');
       return;
     }
+    setError('');
+
     const reader = new FileReader();
-    reader.onload = () => setForm((old) => ({ ...old, photo: reader.result }));
+    const previousPhoto = form.photo || '';
+    reader.onload = async () => {
+      const base64Data = reader.result;
+      
+      // Visualização imediata na tela
+      setForm((old) => ({ ...old, photo: base64Data }));
+
+      // Se o usuário possui ID cadastrado no banco, envia para a API e salva o arquivo
+      if (form.id) {
+        setUploading(true);
+        try {
+          const resultado = await uploadFotoUsuario(form.id, base64Data);
+          const novaUrl = resultado.url_foto_perfil;
+
+          setForm((old) => ({ ...old, photo: novaUrl }));
+          update('profile', (old) => ({ ...old, photo: novaUrl }));
+
+          notify(
+            syncSessionUser({ photo: novaUrl })
+              ? 'Foto de perfil salva no banco de dados com sucesso!'
+              : 'Foto salva no banco, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+          );
+        } catch (err) {
+          setForm((old) => ({ ...old, photo: previousPhoto }));
+          setError(err.message || 'Erro ao salvar foto no servidor.');
+        } finally {
+          setUploading(false);
+        }
+      } else {
+        update('profile', (old) => ({ ...old, photo: base64Data }));
+        notify('Foto de perfil atualizada.');
+      }
+    };
     reader.readAsDataURL(file);
+  }
+
+  async function handleRemovePhoto() {
+    if (form.id && form.photo) {
+      setUploading(true);
+      try {
+        await excluirFotoUsuario(form.id);
+      } catch (err) {
+        setError(err.message || 'Erro ao remover foto do servidor.');
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+
+    setForm((old) => ({ ...old, photo: '' }));
+    update('profile', (old) => ({ ...old, photo: '' }));
+
+    const sessionSynced = !form.id || syncSessionUser({ photo: '' });
+
+    setError('');
+    notify(
+      sessionSynced
+        ? 'Foto de perfil removida com sucesso!'
+        : 'Foto removida do banco, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+    );
   }
   return (
     <div className="workspace narrow">
@@ -27,44 +110,81 @@ export default function Profile() {
         subtitle="Gerencie seus dados de demonstração e suas preferências de comunicação."
       />
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           if (form.name.trim().length < 2) {
             setError('Informe um nome válido.');
             return;
           }
+          if (form.id) {
+            try {
+              await atualizarUsuario(form.id, {
+                nome: form.name,
+                email: form.email,
+              });
+            } catch (err) {
+              setError(err.message || 'Erro ao salvar os dados no servidor.');
+              return;
+            }
+          }
           update('profile', form);
+          const sessionSynced = !form.id || syncSessionUser(form);
           setError('');
-          notify('Perfil salvo neste navegador.');
+          notify(
+            sessionSynced
+              ? 'Perfil salvo com sucesso.'
+              : 'Perfil salvo, mas não foi possível sincronizar a sessão local. Entre novamente para atualizar.',
+          );
         }}
       >
         <Panel className="profile-banner">
           <div className="avatar large">
             {form.photo ? (
-              <img src={form.photo} alt="Foto de perfil" />
+              <img src={form.photo} alt={`Foto de ${form.name}`} />
             ) : (
               form.name.slice(0, 2).toUpperCase()
             )}
           </div>
           <div>
             <h2>{form.name}</h2>
-            <label className="button dark upload-label">
-              ↑ Enviar nova foto
-              <input type="file" accept="image/png,image/jpeg,image/webp" onChange={photo} />
-            </label>
-            <button
-              type="button"
-              className="button text-danger"
-              onClick={() => setForm({ ...form, photo: '' })}
-            >
-              Remover foto
-            </button>
-            <p className="muted">PNG, JPG ou WEBP · até 2 MB</p>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <label className="button dark upload-label" style={{ margin: 0, opacity: uploading ? 0.6 : 1, cursor: uploading ? 'wait' : 'pointer' }}>
+                {uploading ? 'A enviar foto…' : '↑ Enviar nova foto'}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={photo}
+                  disabled={uploading}
+                  style={{ display: 'none' }}
+                />
+              </label>
+
+              {form.photo && (
+                <button
+                  type="button"
+                  className="button text-danger"
+                  onClick={handleRemovePhoto}
+                  disabled={uploading}
+                >
+                  Remover foto
+                </button>
+              )}
+            </div>
+
+            {error && (
+              <p className="field-error" role="alert" style={{ marginTop: '10px', marginBottom: 0 }}>
+                {error}
+              </p>
+            )}
+
+            <p className="muted" style={{ marginTop: '6px' }}>
+              PNG, JPG ou WEBP · até 2 MB (salva no servidor e vinculada ao banco)
+            </p>
           </div>
         </Panel>
         <Panel
           title="Informações Pessoais & Contato"
-          subtitle="Use dados fictícios: as informações ficam armazenadas neste navegador."
+          subtitle="Contas cadastradas sincronizam com o servidor; use somente dados fictícios."
         >
           <div className="form-grid">
             <Field
