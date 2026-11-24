@@ -1,0 +1,97 @@
+/* ==========================================================
+   cards.css — interação padrão dos cards (versão "Sutil")
+   Cobre: event-card (home e catálogo), discovery-card (eventos
+   e favoritos), managed-event (organizador), supplier-row e
+   uh-tile (início do participante).
+   Deve ser importado POR ÚLTIMO em src/main.jsx.
+   ========================================================== */
+:root { --card-accent: #2860ed; }
+html[data-theme="dark"] { --card-accent: #6d8ff5; }
+
+/* ---- Base: mãozinha e transição ---- */
+:is(.event-card, .discovery-card, .managed-event, .supplier-row, .uh-tile) {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform .35s cubic-bezier(.2, .8, .2, 1),
+    box-shadow .35s ease,
+    border-color .25s ease;
+}
+.event-image { overflow: hidden; }
+
+/* ---- Card inteiro clicável (a foto também) ----
+   O link "Detalhes" / "Ver opções" / "Ver Ingressos" estica sobre o card.
+   O botão de favorito fica acima, então continua funcionando. */
+.event-card .ticket-link::after,
+.discovery-card .ticket-link::after,
+.managed-event .text-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 16px;
+}
+.discovery-card .favorite { z-index: 2; }
+.event-card .ticket-link:focus-visible::after,
+.discovery-card .ticket-link:focus-visible::after,
+.managed-event .text-link:focus-visible::after {
+  outline: 2px solid var(--card-accent);
+  outline-offset: -2px;
+}
+
+/* ---- Hover / foco: sobe de leve, borda e brilho azuis ---- */
+:root body :is(.event-card, .discovery-card, .managed-event, .supplier-row, .uh-tile):is(:hover, :focus-within) {
+  transform: translateY(-4px) scale(1.01);
+  border-color: color-mix(in srgb, var(--card-accent) 50%, var(--line, #e0e7f1)) !important;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, .08),
+    0 22px 40px -18px color-mix(in srgb, var(--card-accent) 14%, transparent) !important;
+}
+
+/* ---- Clique: o card afunda um pouco ---- */
+:root body :is(.event-card, .discovery-card, .managed-event, .supplier-row, .uh-tile):active {
+  transform: translateY(-2px) scale(.99);
+  transition-duration: .1s;
+}
+
+/* ---- Foto: zoom suave e um pouco mais clara ---- */
+.event-image img,
+.discovery-image img,
+.managed-image img {
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1), filter .4s ease;
+}
+:root body .event-card:is(:hover, :focus-within) .event-image img,
+:root body .discovery-card:is(:hover, :focus-within) .discovery-image img,
+:root body .managed-event:is(:hover, :focus-within) .managed-image img {
+  transform: scale(1.04);
+  filter: saturate(1.12) brightness(1.07);
+}
+:root body .event-card:active .event-image img,
+:root body .discovery-card:active .discovery-image img,
+:root body .managed-event:active .managed-image img {
+  transform: scale(1.02);
+}
+
+/* ---- Título e categoria ganham a cor de destaque ---- */
+:root body :is(.event-card, .discovery-card, .managed-event):is(:hover, :focus-within) h3 {
+  color: var(--card-accent);
+}
+:root body .managed-event:is(:hover, :focus-within) .eyebrow {
+  color: var(--card-accent);
+}
+
+/* ---- Acessibilidade: sem movimento se o sistema pedir ---- */
+@media (prefers-reduced-motion: reduce) {
+  :is(.event-card, .discovery-card, .managed-event, .supplier-row, .uh-tile),
+  .event-image img,
+  .discovery-image img,
+  .managed-image img {
+    transition-duration: .01ms;
+  }
+  :root body :is(.event-card, .discovery-card, .managed-event, .supplier-row, .uh-tile):is(:hover, :focus-within, :active),
+  :root body .event-card:is(:hover, :focus-within) .event-image img,
+  :root body .discovery-card:is(:hover, :focus-within) .discovery-image img,
+  :root body .managed-event:is(:hover, :focus-within) .managed-image img {
+    transform: none;
+  }
+}
