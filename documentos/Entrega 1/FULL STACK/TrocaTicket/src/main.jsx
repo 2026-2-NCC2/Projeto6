@@ -6,6 +6,10 @@ import './styles.css';
 import './workspace.css';
 import './supplier.css';
 import './cards.css';
+import './forms.css';
+import './shared.css';
+import './report.css';
+import './moderation.css';
 import { StoreProvider } from './context/Store';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
