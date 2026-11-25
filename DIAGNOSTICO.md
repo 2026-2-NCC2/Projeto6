@@ -14,7 +14,7 @@ Nenhuma nova dependência de execução no manifesto de Miguel. Preservar chart.
 | Divergente | `documentos/Entrega 1/FULL STACK/TrocaTicket/package-lock.json` | Preservar da main |
 | Divergente | `documentos/Entrega 1/FULL STACK/TrocaTicket/package.json` | Preservar da main |
 | Só Miguel | `documentos/Entrega 1/FULL STACK/TrocaTicket/pnpm-lock.yaml` | Dispensar na integração |
-| Só Miguel | `documentos/Entrega 1/FULL STACK/TrocaTicket/public/images/avatar-default.png` | Dispensar na integração |
+| Só Miguel | `documentos/Entrega 1/FULL STACK/TrocaTicket/public/images/avatar-default.png` | Copiar (fallback utilizado pelo fórum da main) |
 | Só main | `documentos/Entrega 1/FULL STACK/TrocaTicket/reference/design.png` | Preservar da main |
 | Só Miguel | `documentos/Entrega 1/FULL STACK/TrocaTicket/scripts/serve.mjs` | Dispensar na integração |
 | Só main | `documentos/Entrega 1/FULL STACK/TrocaTicket/server/.env.example` | Preservar da main |

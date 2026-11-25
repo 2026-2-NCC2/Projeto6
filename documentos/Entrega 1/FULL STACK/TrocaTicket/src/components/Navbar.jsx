@@ -56,12 +56,24 @@ export default function Navbar() {
     document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       'content',
-      darkMode ? '#0e1420' : '#f7f9fb',
+      darkMode ? '#080c14' : '#f4f7fc',
     );
     try {
       localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light');
     } catch {}
   }, [darkMode]);
+
+  useEffect(() => {
+    const syncForumTheme = (event) => {
+      const frame = document.querySelector('.forum-frame');
+      if (frame && event.origin === window.location.origin && event.source === frame.contentWindow &&
+          event.data?.type === 'TROCATICKET_THEME_CHANGED') {
+        setDarkMode(Boolean(event.data.dark));
+      }
+    };
+    window.addEventListener('message', syncForumTheme);
+    return () => window.removeEventListener('message', syncForumTheme);
+  }, []);
 
   function toggleTheme() {
     const next = !darkMode;
@@ -167,6 +179,7 @@ export default function Navbar() {
             className="theme-toggle"
             aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
             title={darkMode ? 'Modo claro' : 'Modo escuro'}
+            aria-pressed={darkMode}
             onClick={toggleTheme}
           >
             <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
@@ -213,7 +226,8 @@ export default function Navbar() {
               className="theme-toggle"
               aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
               title={darkMode ? 'Modo claro' : 'Modo escuro'}
-              onClick={toggleTheme}
+              aria-pressed={darkMode}
+            onClick={toggleTheme}
             >
               <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
             </button>

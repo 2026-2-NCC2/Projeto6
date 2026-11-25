@@ -31,20 +31,6 @@ export default function ForumPage() {
 
   useEffect(() => {
     if (isAuthenticated) return undefined;
-    const aplicarTema = (dark) => {
-      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-      try {
-        localStorage.setItem('trocaticket-theme', dark ? 'dark' : 'light');
-      } catch {}
-    };
-    const temaSalvo = (() => {
-      try {
-        return localStorage.getItem('trocaticket-theme') === 'dark';
-      } catch {
-        return false;
-      }
-    })();
-    aplicarTema(temaSalvo);
     const aoReceber = (event) => {
       if (event.origin !== window.location.origin) return;
       if (event.data?.type === 'TROCATICKET_FORUM_BACK') {
@@ -58,11 +44,10 @@ export default function ForumPage() {
       if (event.data?.type === 'TROCATICKET_FORUM_READY') {
         enviarIdentidade();
         frame.current?.contentWindow?.postMessage(
-          { type: 'TROCATICKET_SET_THEME', dark: temaSalvo },
+          { type: 'TROCATICKET_SET_THEME', dark: document.documentElement.dataset.theme === 'dark' },
           window.location.origin,
         );
       }
-      if (event.data?.type === 'TROCATICKET_THEME_CHANGED') aplicarTema(Boolean(event.data.dark));
     };
     window.addEventListener('message', aoReceber);
     enviarIdentidade();
