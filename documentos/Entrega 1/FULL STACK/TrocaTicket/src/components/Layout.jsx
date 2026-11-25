@@ -23,8 +23,8 @@ export default function Layout() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (['/', '/perfis', '/entrar', '/cadastro'].includes(pathname)) {
-        navigate(destinations[role] || '/eventos', { replace: true });
+      if (['/perfis', '/entrar', '/cadastro'].includes(pathname)) {
+        navigate('/', { replace: true });
         return;
       }
       const wrongRole =
@@ -46,7 +46,7 @@ export default function Layout() {
   }, [isAuthenticated, navigate, pathname, role, sessionRole]);
 
   return (
-    <div className={isPublic ? 'public-shell' : 'app-shell'}>
+    <div className={pathname === '/' ? 'public-shell' : isPublic ? 'account-shell' : 'app-shell'}>
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>

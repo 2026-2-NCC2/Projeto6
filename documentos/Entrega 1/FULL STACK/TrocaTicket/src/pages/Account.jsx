@@ -99,7 +99,7 @@ export default function Account({ login = false }) {
         } catch {}
 
         notify(`Bem-vindo de volta, ${usuarioFinal.name}!`);
-        navigate(destinations[perfilRetornado] || '/eventos');
+        navigate('/');
 
       } else {
         // Fluxo de Cadastro
@@ -138,7 +138,7 @@ export default function Account({ login = false }) {
         } catch {}
 
         notify('Cadastro gravado na base de dados com sucesso!');
-        navigate(destinations[profile] || '/eventos');
+        navigate('/');
       }
 
     } catch (error) {
@@ -348,7 +348,7 @@ export function Profiles() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (isAuthenticated) navigate(destinations[role] || '/eventos', { replace: true });
+    if (isAuthenticated) navigate('/', { replace: true });
   }, [isAuthenticated, navigate, role]);
 
   const descriptions = [

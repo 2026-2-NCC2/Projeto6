@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Link } from 'react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import UserHome from './pages/UserHome';
 import Account, { Profiles, Recover } from './pages/Account';
 import Profile from './pages/Profile';
 import SupplierHome from './pages/supplier/SupplierHome';
@@ -43,10 +44,11 @@ function DemoOnly({ children }) {
   );
 }
 export default function App() {
+  const { isAuthenticated } = useStore();
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index element={isAuthenticated ? <UserHome /> : <Home />} />
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
         <Route path="recuperar" element={<Recover />} />

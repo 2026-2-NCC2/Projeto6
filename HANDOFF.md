@@ -6,3 +6,4 @@ Ler CHECKPOINT.md e DIAGNOSTICO.md. Conferir git status, branch, commits e diff 
 
 Aplicação em documentos/Entrega 1/FULL STACK/TrocaTicket. O próximo passo inicial é portar o tema. Preservar a Entrega 2.
 Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
+Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.

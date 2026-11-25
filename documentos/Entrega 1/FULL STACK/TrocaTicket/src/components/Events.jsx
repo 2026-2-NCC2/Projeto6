@@ -67,7 +67,10 @@ export function LoadState({ loading, error, retry, warning }) {
 }
 
 export default function Events({ catalog = false }) {
-  const state = useEvents();
+  return <EventList catalog={catalog} state={useEvents()} />;
+}
+
+export function EventList({ catalog = false, state }) {
   const [query, setQuery] = useState('');
   const events = state.events.filter((event) =>
     `${event.title} ${event.location}`
