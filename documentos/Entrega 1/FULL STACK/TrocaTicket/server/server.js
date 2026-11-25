@@ -2136,6 +2136,11 @@ app.post('/api/logout', async (req, res) => {
       }
     });
 
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
+    // Abre a porta só quando executado diretamente (node server.js); os testes importam o app.
+    if (require.main === module) {
+      app.listen(PORT, () => {
+        console.log(`Servidor rodando na porta ${PORT}`);
+      });
+    }
+
+    module.exports = app;

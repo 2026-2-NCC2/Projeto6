@@ -9,14 +9,19 @@ Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
 Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.
 
 Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapa 4 concluída.
-Branch integracao-main-miguel publicada por um colega (b477108). O usuário pediu para trazer a TrocaTicket 2.0 para a Entrega 1 por etapas, mantendo a Entrega 1 como base; cada etapa vai numa branch nova e termina com testes e parada para confirmação.
+Branch integracao-main-miguel publicada por um colega (b477108). O usuário pediu para trazer a TrocaTicket 2.0 para a Entrega 1 por etapas, mantendo a Entrega 1 como base. Cada etapa termina com testes e parada para confirmação. O usuário prefere publicar só quando todas as etapas terminarem.
 
 ## Retomada atual
 
-A etapa 1 da integração com a 2.0 (login com sessão) está concluída e testada na branch local integracao-site-2.0-etapa1-sessao, criada a partir de b477108. Detalhes, arquivos e resultados estão em CHECKPOINT.md. Essa etapa muda o contrato da API da main, como o usuário aceitou: as rotas de conta passam a exigir sessão e as gravações exigem X-CSRF-Token. URLs e formatos de resposta foram mantidos. Commit local, sem publicação e sem merge. A publicação depende de um colega com permissão de escrita, porque o app do Claude não tem acesso à organização 2026-2-NCC2. Aguardar confirmação do usuário antes da etapa 2.
+As etapas 1 (login com sessão) e 2 (testes automáticos e iniciador) estão concluídas e testadas na branch local integracao-site-2.0, criada a partir de b477108, com um commit por etapa. A etapa 1 foi desenvolvida como integracao-site-2.0-etapa1-sessao, nome que deixou de ser usado. Detalhes, arquivos e resultados estão em CHECKPOINT.md.
+
+A etapa 1 muda o contrato da API da main, como o usuário aceitou: as rotas de conta passam a exigir sessão e as gravações exigem X-CSRF-Token. URLs e formatos de resposta foram mantidos.
+
+Nada foi publicado e não houve merge. Ao fim de cada etapa, o usuário recebe um ZIP acumulado (bundle a partir de b477108 e instruções para o colega publicar). A publicação depende de um colega com permissão de escrita, porque o app do Claude não tem acesso à organização 2026-2-NCC2. Aguardar confirmação do usuário antes da etapa 3.
+
+Para retomar: aplicar o bundle mais recente sobre um clone que contenha b477108 (ver LEIA-PRIMEIRO.txt do ZIP), depois rodar npm test (com um MySQL local que possa criar bancos) e o iniciador.
 
 Próximas etapas sugeridas, a confirmar com o usuário:
-2. Testes automatizados da API (como na 2.0) e iniciador de um clique.
 3. Compra simulada completa: pedido, pagamento, cancelamento e estorno.
 4. Revenda, fila de espera e transferência com aceite.
 5. Portaria e atendimento.
@@ -31,4 +36,4 @@ Pendências para a equipe:
 
 Para usar as migrações num banco local de testes: importar SCRIPT_BANCO_V2.sql, depois MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e depois MIGRACAO_SESSAO_LOGIN.sql, pelo cliente mysql ou pelo Workbench. A última consulta de cada arquivo deve voltar vazia. Não aplicar em banco compartilhado sem aval da equipe.
 
-Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. O commit esperado está no LEIA-PRIMEIRO.txt que acompanha o bundle. Para a etapa 1, um clone com integracao-main-miguel já basta como base, porque o bundle novo traz só o commit da etapa. Se a branch já existir, comparar os commits e preservar o trabalho local. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.
+Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. O commit esperado está no LEIA-PRIMEIRO.txt que acompanha o bundle. Para as etapas da integração com a 2.0, um clone com integracao-main-miguel já basta como base, porque o bundle traz só os commits novos. Se a branch já existir, comparar os commits e preservar o trabalho local. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.

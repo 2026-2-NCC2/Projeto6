@@ -2,6 +2,17 @@
 
 Site navegável baseado nas 21 telas únicas exportadas do Figma. Inclui áreas de participante, organizador, fornecedor e administrador. A interface usa React, React Router e Vite; o servidor Node.js conecta contas e eventos de organizadores ao MySQL.
 
+## Abrir com um clique
+
+Com o Node.js 22.12+ instalado e o MySQL ligado, dê dois cliques em `Iniciar-TrocaTicket.cmd` (Windows) ou `Iniciar-TrocaTicket.command` (Mac), ou rode `npm start` nesta pasta. O iniciador (`scripts/iniciar.mjs`, adaptado da TrocaTicket 2.0) faz o seguinte:
+
+- instala as dependências que faltarem;
+- na primeira vez, pergunta a conexão do MySQL e a guarda em `server/.env` (ignorado pelo Git) só depois de ela funcionar;
+- prepara o banco com `server/scripts/preparar-banco.js`: cria o banco e aplica o script base e as migrações se ele não existir, ou só confere as migrações num banco existente, sem apagar dados;
+- sobe a API (porta 3000) e o site (porta 5173) e abre o navegador.
+
+Enter encerra os dois. Use `configurar` para refazer a conexão; os registros ficam em `logs/`. Os passos abaixo continuam valendo para quem prefere abrir tudo manualmente.
+
 ## Abrir no VS Code
 
 1. Extraia o ZIP e abra a pasta **TrocaTicket** no VS Code (Arquivo → Abrir Pasta).
@@ -28,6 +39,13 @@ Abra o endereço exibido pelo Vite. O site chama a API na porta 3000 do mesmo en
 No PowerShell, caso a execução de `npm.ps1` esteja bloqueada, use `npm.cmd install` e `npm.cmd run dev`.
 
 Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aproveitando o lockfile incluído.
+
+## Testes automáticos
+
+Rode `npm test` nesta pasta (ou dentro de `server/`). Os testes usam o testador do próprio Node.js, como na TrocaTicket 2.0:
+
+- **Unidade** (sempre rodam): regras de sessão, CSRF, origem, senha, limite de tentativas e preparo do banco.
+- **Integração** (precisam de um MySQL local): API completa com sessão, tentativas de usar outra conta, CSRF, origem, senhas, limite de tentativas, troca de senha, logout, fluxos de participante, organizador e fornecedor, e o preparo do banco. Cada arquivo cria um banco temporário `trocaticket_teste_…`, sobe a API nele e o apaga no fim. **O banco da equipe (`DB_NAME`) nunca é usado.** O usuário de `server/.env` (ou das variáveis `DB_USER`/`DB_PASSWORD`) precisa ter permissão para criar bancos. Sem MySQL configurado, esses testes aparecem como pulados.
 
 ## O que funciona
 

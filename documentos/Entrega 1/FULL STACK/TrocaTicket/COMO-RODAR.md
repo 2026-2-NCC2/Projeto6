@@ -1,5 +1,18 @@
 # Como rodar o TrocaTicket (passo a passo)
 
+## Jeito mais fácil: sistema completo com dois cliques
+
+Precisa de Node.js 22.12 ou mais novo (https://nodejs.org) e do MySQL ligado (o mesmo que você usa no Workbench).
+
+1. Dê dois cliques em **Iniciar-TrocaTicket.cmd** (Windows) ou **Iniciar-TrocaTicket.command** (Mac). Também funciona `npm start` nesta pasta.
+2. Na primeira vez, responda às perguntas da janela: endereço, porta, usuário, senha do MySQL e nome do banco. Para aceitar a resposta entre colchetes, basta apertar Enter. A senha não aparece enquanto você digita.
+3. O iniciador instala o que falta, cria o banco se ele não existir (sem apagar nada), sobe a API e o site e abre o navegador em http://127.0.0.1:5173.
+4. Deixe a janela aberta. Para encerrar, aperte Enter nela.
+
+A conexão fica guardada em `server/.env`, que não vai para o GitHub. Para trocar, abra o iniciador com `configurar` (no Windows: `Iniciar-TrocaTicket.cmd configurar`). Se algo der errado, a janela mostra o motivo e os detalhes ficam na pasta `logs/`.
+
+Os passos abaixo abrem **só o site**, em modo demonstração, sem banco.
+
 ## 1. Pré-requisito
 Node.js 22.12 ou mais novo (https://nodejs.org). Para conferir, abra o terminal e rode:
     node -v

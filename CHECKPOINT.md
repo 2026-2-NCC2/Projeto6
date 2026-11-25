@@ -137,6 +137,59 @@ Branch integracao-site-2.0-etapa1-sessao, criada a partir de integracao-main-mig
 - Sem HTTPS, o cookie não é marcado como Secure.
 - A Entrega 2 não foi alterada e continua com o servidor antigo.
 
+## Integração com a TrocaTicket 2.0 — etapa 2: testes automáticos e iniciador (25/11/2026)
+
+Continuação na mesma branch local, renomeada para integracao-site-2.0, com um commit por etapa. O usuário prefere publicar só no final.
+
+**O que mudou.**
+- server/scripts/preparar-banco.js (novo) prepara o banco a partir dos SQL versionados (SCRIPT_BANCO_V2.sql e as duas migrações), para qualquer nome de banco:
+  - cria o banco e aplica tudo se ele não existir;
+  - num banco existente, só aplica as migrações, que podem ser reaplicadas;
+  - recusa banco de outro sistema e nomes inseguros;
+  - confere o resultado de cada migração;
+  - exige MySQL 8.0.16+ ou MariaDB 10.5+;
+  - nunca apaga dados.
+
+  O iniciador e os testes usam o mesmo módulo.
+- server/tests (novo), com node:test, como na 2.0:
+  - unidade.test.js, sem banco: origem e CORS, CSRF, própria conta, senha e conversão do texto puro, limite de tentativas, nomes de banco e versões;
+  - api.test.js: a bateria manual da etapa 1 transformada em 14 testes (sessão, abuso, senha, troca de senha, logout e fluxos completos);
+  - banco.test.js: banco novo, reaplicação, banco antigo, banco alheio, tabela com formato diferente e nome inseguro;
+  - apoio.js: cria um banco temporário trocaticket_teste_… por arquivo, sobe a API numa porta livre e apaga o banco no fim. Nunca usa DB_NAME. Sem MySQL configurado, os testes de integração são pulados com o motivo.
+- scripts/iniciar.mjs, Iniciar-TrocaTicket.cmd (Windows, CRLF) e Iniciar-TrocaTicket.command (Mac, executável), novos, adaptados da 2.0:
+  - conferem o Node 22.12+ e as portas 3000 e 5173;
+  - rodam npm ci quando falta dependência;
+  - na primeira vez (ou com "configurar"), perguntam a conexão com a senha oculta e a guardam em server/.env com permissão 600, só depois de preparar o banco com sucesso;
+  - sobem a API e o site (Vite em 127.0.0.1:5173, sem as variáveis DB_* no processo do site) e abrem o navegador;
+  - encerram tudo com Enter, Ctrl+C ou ao fechar a janela; os registros ficam em logs/.
+
+  A 2.0 protegia a senha com o Windows (PowerShell/DPAPI). Aqui a conexão fica no server/.env, como já indicava o README, para funcionar também no Mac e ser testável.
+- server/server.js só abre a porta quando executado diretamente e exporta o app para os testes.
+- server/db.js passou a aceitar DB_PORT; antes, só a porta 3306 funcionava.
+- package.json do site (npm start e npm test), server/package.json (start, test e preparar-banco), README.md, COMO-RODAR.md e server/.env.example (DB_PORT).
+
+**Testes (somente bancos descartáveis).**
+- npm test: 26 de 26 em MariaDB 10.11 (cerca de 7 s) e em MySQL 8.0.46 (porta 3308). Nenhum banco temporário ficou para trás. Sem MySQL, os 6 testes de unidade passam e as duas suítes de integração aparecem como puladas.
+- Sabotagem proposital, depois desfeita:
+  - sem a checagem de própria conta, 3 testes falharam;
+  - sem a proteção CSRF, 3 testes falharam;
+  - com os arquivos restaurados, 26 de 26.
+- Iniciador numa cópia limpa da pasta (sem node_modules, sem .env e sem logs), pelo atalho do Mac:
+  - A: primeira vez — instalou, perguntou, criou o banco, guardou a conexão com permissão 600 e subiu API e site (200); Enter encerrou os dois e liberou as portas;
+  - B: segunda abertura — sem perguntas, só migrações;
+  - C: porta 5173 ocupada — mensagem clara e código 1, sem processos sobrando;
+  - D: senha errada — mensagem clara e conexão não guardada;
+  - E e F: configurar, com senha contendo espaço, # e os dois tipos de aspas — guardada com a delimitação certa, lida igual pelo dotenv e pelo iniciador, e reabertura funcionando;
+  - G: MySQL 8 na porta 3308.
+- Chromium no site aberto pelo iniciador: cadastro, home pessoal com o nome, ingressos, favoritos e comunidade, publicação e saída, sem 5xx, 401, 403 inesperados ou erros de JavaScript.
+- Regressão da etapa 1 com o código novo: navegador 25 de 25 e 17 de 17, API 73 de 73, sem erros no log.
+- Ajustes feitos só no roteiro de teste do iniciador: o atalho do Mac espera Enter depois de uma falha, e o roteiro passou a reconhecer o fim pela mensagem "API e site encerrados".
+
+**Limitações conhecidas.**
+- O iniciador não foi executado num Windows real. O .cmd segue o mesmo formato do da 2.0 e chama o mesmo script Node testado aqui.
+- A senha do MySQL fica em texto no server/.env, ignorado pelo Git.
+- O iniciador usa as portas fixas 3000 e 5173.
+
 ## Escopo dos arquivos
 
-Além dos três documentos na raiz e do avatar em public/images, mudaram na Entrega 1 os estilos src/{access,forms,home,moderation,report,shared,styles,supplier,workspace}.css, src/{App,main}.jsx, src/components/{Events,Icon,Layout,Navbar,PapoBanner}.jsx e src/pages/{Account,ForumPage,Home,UserHome}.jsx. O tema do fórum também exigiu forum/src/store/ForumContext.jsx, forum/src/styles.css, forum/src/data/forum.js e o bundle em public/forum. A retomada da etapa 4 acrescentou server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e atualizou CHECKPOINT.md e HANDOFF.md. A etapa 1 da integração com a 2.0 acrescentou server/sessao.js e server/MIGRACAO_SESSAO_LOGIN.sql. Ela também alterou server/server.js, server/.env.example, README.md, src/services/{api,community,events,supplier,tickets}.js, src/context/Store.jsx, src/pages/Account.jsx e src/components/Navbar.jsx. O inventário completo por caminho é reproduzível com git diff --name-status origin/main...HEAD.
+Além dos três documentos na raiz e do avatar em public/images, mudaram na Entrega 1 os estilos src/{access,forms,home,moderation,report,shared,styles,supplier,workspace}.css, src/{App,main}.jsx, src/components/{Events,Icon,Layout,Navbar,PapoBanner}.jsx e src/pages/{Account,ForumPage,Home,UserHome}.jsx. O tema do fórum também exigiu forum/src/store/ForumContext.jsx, forum/src/styles.css, forum/src/data/forum.js e o bundle em public/forum. A retomada da etapa 4 acrescentou server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e atualizou CHECKPOINT.md e HANDOFF.md. A etapa 1 da integração com a 2.0 acrescentou server/sessao.js e server/MIGRACAO_SESSAO_LOGIN.sql. Ela também alterou server/server.js, server/.env.example, README.md, src/services/{api,community,events,supplier,tickets}.js, src/context/Store.jsx, src/pages/Account.jsx e src/components/Navbar.jsx. A etapa 2 acrescentou server/scripts/preparar-banco.js, server/tests/{apoio.js,unidade.test.js,api.test.js,banco.test.js}, scripts/iniciar.mjs, Iniciar-TrocaTicket.cmd e Iniciar-TrocaTicket.command. Ela também alterou server/server.js, server/db.js, server/package.json, server/.env.example, package.json, README.md e COMO-RODAR.md. O inventário completo por caminho é reproduzível com git diff --name-status origin/main...HEAD.
