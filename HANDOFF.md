@@ -8,8 +8,18 @@ Aplicação em documentos/Entrega 1/FULL STACK/TrocaTicket. O próximo passo ini
 Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
 Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.
 
+Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapa 4 concluída.
+
 ## Retomada atual
 
-As etapas 1–3 e as correções visuais testadas estão registradas na branch local. Consultar o relatório final em CHECKPOINT.md para arquivos, resultados, erros e decisões. A etapa 4 está bloqueada apenas na validação completa dos serviços com o esquema compatível. Foi solicitada orientação específica para obter a migração oficial ou criar a complementar. Aguardar a decisão antes de alterar o banco. Se houver autorização, testar a migração primeiro em banco descartável, repetir login, catálogo, favoritos, ingressos, trocas e comunidade e registrar os códigos HTTP. Ao concluir a etapa 4, parar e aguardar nova confirmação do usuário.
+As etapas 1–4 estão verificadas e registradas na branch local integracao-main-miguel. Os resultados, códigos HTTP e decisões estão em CHECKPOINT.md. A pendência do banco foi resolvida com a migração complementar documentos/Entrega 1/FULL STACK/TrocaTicket/server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql. O usuário autorizou o arquivo, que foi testado só em MariaDB 10.11 e MySQL 8.0 descartáveis. Com ela, favoritos, ingressos, trocas, comunidade e as rotas de fornecedores deixaram de responder HTTP 500, e o fluxo completo pelo navegador passou. Commit apenas local, sem publicação e sem merge. Aguardar confirmação do usuário.
 
-Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. Se a branch já existir, comparar os commits e preservar o trabalho local. A conexão atual recebeu 403 no GitHub. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.
+Pendências para a equipe:
+1. Confirmar se existe uma migração oficial. Se existir, compará-la com a complementar e substituí-la.
+2. Alinhar a documentação do banco. O README diz que o script base dispensa a migração, mas o SCRIPT_BANCO_V2.sql não tem as estruturas. Decidir entre incorporá-las ao script base, o que altera a Entrega 2, ou orientar no README a aplicar a migração também em instalações novas.
+3. Corrigir o histórico de trocas depois do aceite: quem propôs vê "Proposta recebida" e quem aceitou deixa de ver a troca. O problema está no server.js da main e está descrito em CHECKPOINT.md.
+4. Publicar a branch quando houver permissão de escrita. A tentativa anterior recebeu HTTP 403.
+
+Para usar a migração num banco local de testes: importar SCRIPT_BANCO_V2.sql e depois o arquivo da migração, pelo cliente mysql ou pelo Workbench. A última consulta do arquivo deve voltar vazia. Não aplicar em banco compartilhado sem aval da equipe.
+
+Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. O commit esperado está no LEIA-PRIMEIRO.txt que acompanha o bundle. Se a branch já existir, comparar os commits e preservar o trabalho local. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.
