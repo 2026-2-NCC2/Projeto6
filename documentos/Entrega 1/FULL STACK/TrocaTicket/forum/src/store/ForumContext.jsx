@@ -22,7 +22,8 @@ const estadoInicial = {
 function carregar() {
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE) || "null");
-    return salvo ? { ...estadoInicial, ...salvo } : estadoInicial;
+    const tema = localStorage.getItem("trocaticket-theme");
+    return { ...estadoInicial, ...salvo, dark: tema ? tema === "dark" : Boolean(salvo?.dark) };
   } catch {
     return estadoInicial;
   }

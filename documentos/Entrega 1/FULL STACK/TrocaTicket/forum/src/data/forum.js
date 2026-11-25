@@ -18,12 +18,12 @@ export const usuarioAtual = {
 };
 
 export const usuarios = {
-  mari_silva: { iniciais: "MS", cor: "#8b5cf6" },
+  mari_silva: { iniciais: "MS", cor: "#7046c5" },
   carlos_seguranca: { iniciais: "CS", cor: "#059669", moderador: true },
-  pedro_cultura: { iniciais: "PC", cor: "#16a34a" },
+  pedro_cultura: { iniciais: "PC", cor: "#087237" },
   lucas_rock: { iniciais: "LR", cor: "#0f172a" },
   camila_live: { iniciais: "CL", cor: "#2563eb" },
-  rodrigo_sound: { iniciais: "RS", cor: "#16a34a", flair: "Fã Frequente" },
+  rodrigo_sound: { iniciais: "RS", cor: "#087237", flair: "Fã Frequente" },
   felipe_eventos: { iniciais: "FE", cor: "#0ea5e9" },
   ana_livemusic: { iniciais: "AL", cor: "#e11d48" },
   bia_tours: { iniciais: "BT", cor: "#f59e0b" },
@@ -117,7 +117,7 @@ export const comunidades = [
     titulo: "Dicas de segurança para fãs",
     categoria: "duvidas",
     icone: "shieldCheck",
-    cor: "#16a34a",
+    cor: "#087237",
     membros: 8400,
     online: 122,
     criadaEm: "2023-02-14",

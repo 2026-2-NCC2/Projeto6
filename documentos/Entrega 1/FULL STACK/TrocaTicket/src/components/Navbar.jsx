@@ -38,54 +38,12 @@ menus.participante = menus.comprador;
  * Componente Navbar unificado.
  * Altera dinamicamente as opções exibidas de acordo com o perfil de usuário armazenado na sessão.
  */
-export default function Navbar() {
+export default function Navbar({ darkMode, toggleTheme }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { data, role, isAuthenticated, chooseRole, notify } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem('trocaticket-theme') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute(
-      'content',
-      darkMode ? '#080c14' : '#f4f7fc',
-    );
-    try {
-      localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light');
-    } catch {}
-  }, [darkMode]);
-
-  useEffect(() => {
-    const syncForumTheme = (event) => {
-      const frame = document.querySelector('.forum-frame');
-      if (frame && event.origin === window.location.origin && event.source === frame.contentWindow &&
-          event.data?.type === 'TROCATICKET_THEME_CHANGED') {
-        setDarkMode(Boolean(event.data.dark));
-      }
-    };
-    window.addEventListener('message', syncForumTheme);
-    return () => window.removeEventListener('message', syncForumTheme);
-  }, []);
-
-  function toggleTheme() {
-    const next = !darkMode;
-    setDarkMode(next);
-    document
-      .querySelector('.forum-frame')
-      ?.contentWindow?.postMessage(
-        { type: 'TROCATICKET_SET_THEME', dark: next },
-        window.location.origin,
-      );
-  }
-
   function handleLogout() {
     chooseRole('');
     try {
@@ -157,7 +115,7 @@ export default function Navbar() {
   );
 
   return (
-    <header className={`header ${!isPublicRoute ? 'app-header' : ''}`}>
+    <header className={`header ${!isPublicView ? 'app-header' : ''}`}>
       <Link className="brand" to="/" aria-label="TrocaTicket, início">
         <img src="/images/logo.png" alt="" />
         <span>
@@ -205,7 +163,7 @@ export default function Navbar() {
             aria-label="Navegação principal"
           >
             {(menus[activeRole] || menus.comprador).map(([label, to]) => (
-              <NavLink end key={to} to={to}>
+              <NavLink end key={to} to={isAuthenticated && activeRole === 'comprador' && label === 'Início' ? '/' : to}>
                 {label}
               </NavLink>
             ))}
@@ -227,7 +185,7 @@ export default function Navbar() {
               aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
               title={darkMode ? 'Modo claro' : 'Modo escuro'}
               aria-pressed={darkMode}
-            onClick={toggleTheme}
+              onClick={toggleTheme}
             >
               <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
             </button>

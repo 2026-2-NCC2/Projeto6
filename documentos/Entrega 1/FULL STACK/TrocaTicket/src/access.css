@@ -1121,3 +1121,42 @@ html[data-theme="dark"] .uh-pbar i { background: #a99aff; }
 .signup-page .access-card .divider {
   margin: 12px 0;
 }
+html[data-theme="dark"] .header a.header-cta {
+  color: #142039 !important;
+}
+
+.sp-chip-tabs button.active span {
+  background: #304c86;
+}
+html[data-theme="dark"] .workspace :is(.soft.button, .pager-summary, .rp-crumbs a, .rp-crumbs span, .sp-specs dd) {
+  color: var(--tt-ink);
+}
+html[data-theme="dark"] .workspace :is(.sp-verified, .sp-inventory-table td small.ok, .sp-cost-legend .ok) {
+  color: #75dab0;
+}
+html[data-theme="dark"] .workspace :is(.sp-demand, .sp-organizer, .sp-briefing, .sp-doc, .sp-deadline, .sp-scope-text, .sp-unit, .sp-summary-bar, .sp-specs > div, .mod-queue button.active) {
+  background: var(--tt-surface-soft);
+}
+
+html[data-theme="dark"] .sp-page {
+  --sp-soft: var(--tt-surface-soft);
+  --sp-border: var(--tt-border);
+}
+html[data-theme="dark"] .workspace :is(.ah-count, .ah-tag, .ah-pill, .ah-highlight, .ah-highlight a) {
+  color: #c5baff;
+}
+html[data-theme="dark"] .workspace :is(.ah-card dd.green, .rp-pill, .rp-kpis em, .mod-pill.green, .sp-demand-foot b.green) {
+  color: #75dab0;
+}
+html[data-theme="dark"] .workspace :is(.mod-pill.amber, .sp-deadline span, .sp-demand-foot b.amber) {
+  color: #ffcd87;
+}
+html[data-theme="dark"] .workspace :is(.rp-title span, .rp-facts dd.blue, td code, .mod-username code, .mod-link, .sp-demand-foot b.blue) {
+  color: #acc7ff;
+}
+
+.app-header .header-tools > .logout-button {
+  width: auto;
+  padding-inline: 10px;
+  font-size: 13px;
+}

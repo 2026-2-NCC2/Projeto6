@@ -257,7 +257,7 @@ h3 {
 
 .section-heading > p:last-child {
   margin-bottom: 0;
-  color: #697991;
+  color: #4f5b6e;
 }
 
 .eyebrow {
@@ -339,7 +339,7 @@ h3 {
 
 .profile-card > p {
   font-size: 13px;
-  color: #697991;
+  color: #4f5b6e;
   line-height: 1.3;
   margin-bottom: 18px;
 }
@@ -403,7 +403,7 @@ h3 {
 
 .fornecedor .profile-tag,
 .fornecedor .profile-icon {
-  color: #078d6c;
+  color: #056b52;
   background: #ebfcf5;
 }
 
@@ -447,7 +447,7 @@ h3 {
 
 .step p {
   font-size: 13px;
-  color: #697991;
+  color: #4f5b6e;
   line-height: 1.55;
   margin: 0;
 }
@@ -504,7 +504,7 @@ h3 {
 
 .event-meta {
   font-size: 11px;
-  color: #6a7890;
+  color: #505b6d;
   margin-bottom: 9px;
 }
 
@@ -525,7 +525,7 @@ h3 {
 .event-bottom small {
   display: block;
   text-transform: uppercase;
-  color: #718098;
+  color: #556173;
   font-size: 9px;
 }
 
@@ -597,7 +597,7 @@ footer a:hover {
 
 .form-card > p,
 .detail-card > p {
-  color: #697991;
+  color: #4f5b6e;
 }
 
 .form-card form {
@@ -662,7 +662,7 @@ input[aria-invalid='true'] {
 
 .success h2 {
   font-size: 22px;
-  color: #078d6c;
+  color: #056b52;
 }
 
 .catalog {
@@ -1041,7 +1041,7 @@ html[data-theme="dark"] .feedback {
 /* Identidade visual compartilhada TrocaTicket: azul frio, ardósia e superfícies limpas. */
 :root {
   --tt-ink: #121b30;
-  --tt-muted: #657997;
+  --tt-muted: #4c5b72;
   --tt-line: #dde5f0;
   --tt-surface: #f4f7fb;
   --tt-card: #ffffff;
@@ -1161,7 +1161,7 @@ html[data-theme="dark"] .eyebrow {
 }
 html[data-theme="dark"] .primary,
 html[data-theme="dark"] .button.primary {
-  background: #4f78e8;
+  background: #3c5bb0;
   color: #fff;
 }
 html[data-theme="dark"] .primary:hover,
@@ -1195,10 +1195,10 @@ html[data-theme="dark"] .button.primary:hover {
   --tt-surface: #ffffff;
   --tt-surface-soft: #f8faff;
   --tt-ink: #142039;
-  --tt-muted: #687b99;
+  --tt-muted: #4f5d74;
   --tt-border: #dfe6f1;
   --tt-border-strong: #cbd6e6;
-  --tt-blue: #4f78e8;
+  --tt-blue: #3c5bb0;
   --tt-blue-hover: #3d66d6;
   --tt-blue-soft: #edf2ff;
   --tt-navy: #0b101a;

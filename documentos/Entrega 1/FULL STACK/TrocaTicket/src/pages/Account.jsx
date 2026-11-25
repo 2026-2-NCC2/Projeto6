@@ -25,7 +25,7 @@ export default function Account({ login = false }) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { activateUser, chooseRole, notify, isAuthenticated, role } = useStore();
+  const { activateUser, chooseRole, notify, isAuthenticated } = useStore();
 
 
   async function handleSubmit(event) {
@@ -344,12 +344,12 @@ function AccountOptions({login, showPassword, onTogglePassword}) {
 }
 
 export function Profiles() {
-  const { chooseRole, isAuthenticated, role } = useStore();
+  const { chooseRole, isAuthenticated } = useStore();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/', { replace: true });
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate]);
 
   const descriptions = [
     'Descubra eventos, salve favoritos e simule os seus ingressos.',

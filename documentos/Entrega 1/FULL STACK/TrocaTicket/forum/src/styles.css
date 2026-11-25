@@ -9,7 +9,7 @@
   --borda-forte: #d5dbe7;
   --texto: #0f172a;
   --texto-2: #334155;
-  --suave: #64748b;
+  --suave: #4c5869;
   --primaria: #2563eb;
   --primaria-escura: #1d4ed8;
   --primaria-suave: #eaf1ff;
@@ -1964,7 +1964,7 @@ p {
 .editor textarea::placeholder,
 .campo::placeholder,
 .campo-titulo textarea::placeholder {
-  color: #94a3b8;
+  color: #707b8b;
 }
 .editor-preview {
   padding: 14px 16px;
@@ -2468,7 +2468,7 @@ p {
   --borda-forte: #cbd6e6;
   --texto: #121b30;
   --texto-2: #34445e;
-  --suave: #657997;
+  --suave: #4c5b72;
   --primaria: #2860ed;
   --primaria-escura: #1f50d0;
   --primaria-suave: #eaf0ff;
@@ -2476,9 +2476,9 @@ p {
   --verde-suave: #e7f7f1;
   --vermelho: #dc626b;
   --vermelho-suave: #fff0f1;
-  --laranja: #b87925;
+  --laranja: #855419;
   --laranja-suave: #fff5e6;
-  --roxo: #655fe8;
+  --roxo: #4c48b0;
   --roxo-suave: #f0edff;
 }
 [data-theme="dark"] {
@@ -2491,7 +2491,7 @@ p {
   --texto-2: #c3cddd;
   --suave: #aab7ca;
   --primaria: #6b91f5;
-  --primaria-escura: #4f78e8;
+  --primaria-escura: #3c5bb0;
   --primaria-suave: #202f50;
   --verde: #34d399;
   --verde-suave: #15372f;
@@ -2633,17 +2633,17 @@ body:has(.shell) .header .popover {
   --borda-forte: #cbd6e6;
   --texto: #142039;
   --texto-2: #40516e;
-  --suave: #687b99;
-  --primaria: #4f78e8;
+  --suave: #4f5d74;
+  --primaria: #3c5bb0;
   --primaria-escura: #3d66d6;
   --primaria-suave: #edf2ff;
-  --verde: #078a70;
+  --verde: #056855;
   --verde-suave: #e7f7f1;
-  --vermelho: #cf5965;
+  --vermelho: #9d434c;
   --vermelho-suave: #fff0f1;
-  --laranja: #b87925;
+  --laranja: #855419;
   --laranja-suave: #fff5e6;
-  --roxo: #655fe8;
+  --roxo: #4c48b0;
   --roxo-suave: #f0edff;
   --sombra: 0 8px 26px rgba(23,39,68,.055);
   --sombra-alta: 0 14px 34px rgba(23,39,68,.13);
@@ -2658,7 +2658,7 @@ body:has(.shell) .header .popover {
   --texto: #edf2fb;
   --texto-2: #c3cddd;
   --suave: #a5b3c9;
-  --primaria: #6389f2;
+  --primaria: #a6beff;
   --primaria-escura: #7b9bfa;
   --primaria-suave: #202f50;
   --verde: #34d399;
@@ -3047,3 +3047,5 @@ input, textarea, select {
   margin: 7px 8px;
   background: var(--borda);
 }
+
+html[data-theme="dark"] :is(.btn-primario, .header-criar) { color: #101a30; }

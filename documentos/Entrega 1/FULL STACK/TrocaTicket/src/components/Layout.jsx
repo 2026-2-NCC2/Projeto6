@@ -4,7 +4,7 @@ import { useStore } from '../context/Store';
 import Navbar from './Navbar';
 import { destinations } from '../data/demo';
 
-export default function Layout() {
+export default function Layout({ darkMode, toggleTheme }) {
   const { pathname } = useLocation();
   const { role, isAuthenticated, chooseRole } = useStore();
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export default function Layout() {
       </a>
 
       {/* Componente Navbar modularizado e controlado pelo perfil na sessão */}
-      <Navbar />
+      <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
 
       {!isPublicRoute && isDemoMode && (
         <div className="demo-strip">

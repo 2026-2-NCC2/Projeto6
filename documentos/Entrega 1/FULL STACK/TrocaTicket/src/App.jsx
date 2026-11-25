@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link } from 'react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -45,9 +45,51 @@ function DemoOnly({ children }) {
 }
 export default function App() {
   const { isAuthenticated } = useStore();
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem('trocaticket-theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      darkMode ? '#080c14' : '#f4f7fc',
+    );
+    try {
+      localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light');
+    } catch {}
+  }, [darkMode]);
+
+  useEffect(() => {
+    const syncForumTheme = (event) => {
+      const frame = document.querySelector('.forum-frame');
+      if (frame && event.origin === window.location.origin && event.source === frame.contentWindow &&
+          event.data?.type === 'TROCATICKET_THEME_CHANGED') {
+        setDarkMode(Boolean(event.data.dark));
+      }
+    };
+    window.addEventListener('message', syncForumTheme);
+    return () => window.removeEventListener('message', syncForumTheme);
+  }, []);
+
+  function toggleTheme() {
+    const next = !darkMode;
+    setDarkMode(next);
+    document
+      .querySelector('.forum-frame')
+      ?.contentWindow?.postMessage(
+        { type: 'TROCATICKET_SET_THEME', dark: next },
+        window.location.origin,
+      );
+  }
+
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route element={<Layout darkMode={darkMode} toggleTheme={toggleTheme} />}>
         <Route index element={isAuthenticated ? <UserHome /> : <Home />} />
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
@@ -58,6 +100,7 @@ export default function App() {
         <Route path="eventos/:id" element={<EventDetails />} />
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
+        {isAuthenticated && <Route path="comunidade/*" element={<Community />} />}
         <Route path="comunidade/eventos" element={<Community />} />
         <Route path="organizador" element={<Organizer />} />
         <Route path="organizador/eventos" element={<Organizer list />} />
@@ -115,7 +158,7 @@ export default function App() {
           }
         />
       </Route>
-      <Route path="comunidade/*" element={<ForumPage />} />
+      {!isAuthenticated && <Route path="comunidade/*" element={<ForumPage />} />}
     </Routes>
   );
 }

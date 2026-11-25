@@ -8,7 +8,7 @@
   border: 1px solid #c9d6ea;
   border-radius: 10px;
   padding: 0 14px;
-  color: #6c7f9d;
+  color: #526077;
 }
 .search-box:focus-within {
   outline: 3px solid #b8c9ff;
@@ -70,7 +70,7 @@
   border: 1px solid #a5efcf;
   border-radius: 999px;
   background: #ecfdf5;
-  color: #00855f;
+  color: #006548;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
@@ -89,7 +89,7 @@
 .rp-status.amber {
   border-color: #fde69a;
   background: #fffbeb;
-  color: #b46b00;
+  color: #885100;
 }
 
 /* Paginação */
@@ -151,7 +151,7 @@
   border: 0;
   border-radius: 8px;
   background: none;
-  color: #6c7f9d;
+  color: #526077;
 }
 .icon-action:hover {
   background: #eef1f6;

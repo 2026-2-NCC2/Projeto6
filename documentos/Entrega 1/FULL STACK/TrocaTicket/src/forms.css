@@ -25,7 +25,7 @@
 }
 .fc-section-head p {
   margin: 6px 0 0;
-  color: #657997;
+  color: #4c5b72;
   font-size: 13px;
 }
 
@@ -68,14 +68,14 @@
 }
 .fc-aside {
   font-size: 12px;
-  color: #8a98b0;
+  color: #687385;
   white-space: nowrap;
 }
 .fc-verified {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #00855f;
+  color: #006548;
   font-weight: 600;
 }
 .fc-control {
@@ -87,7 +87,7 @@
   border-radius: 8px;
   background: white;
   padding: 0 14px;
-  color: #6c7f9d;
+  color: #526077;
 }
 .fc-control:focus-within {
   border-color: #2860ed;
@@ -113,11 +113,11 @@
 }
 .fc-control.is-locked {
   background: #f1f4f8;
-  color: #8a98b0;
+  color: #687385;
 }
 .fc-control.is-locked input,
 .fc-control.is-locked select {
-  color: #8a98b0;
+  color: #687385;
   cursor: not-allowed;
 }
 .fc-select select {
@@ -140,7 +140,7 @@
   font-size: 12px;
 }
 .fc-hint {
-  color: #8a98b0;
+  color: #687385;
 }
 .fc-error {
   color: #bc2044;
@@ -165,7 +165,7 @@
 }
 .fc-subhead span {
   font-size: 13px;
-  color: #657997;
+  color: #4c5b72;
 }
 .fc-toggle {
   display: flex;
@@ -205,7 +205,7 @@
 .fc-toggle-text small {
   margin-top: 2px;
   font-size: 12px;
-  color: #657997;
+  color: #4c5b72;
 }
 .fc-badge {
   padding: 4px 12px;
@@ -219,7 +219,7 @@
 }
 .fc-badge.off {
   background: #eef1f6;
-  color: #657997;
+  color: #4c5b72;
 }
 .fc-switch {
   appearance: none;
@@ -246,7 +246,7 @@
   transition: transform 0.15s ease;
 }
 .fc-switch:checked {
-  background: #0b9a6b;
+  background: #087551;
 }
 .fc-switch:checked::after {
   transform: translateX(18px);
@@ -325,7 +325,7 @@
 .fc-photo-body p {
   margin: 14px 0 0;
   font-size: 12px;
-  color: #8a98b0;
+  color: #687385;
 }
 .fc-card > .field-error {
   margin: 14px 0 0;
@@ -349,10 +349,10 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #657997;
+  color: #4c5b72;
 }
 .fc-sync svg {
-  color: #0b9a6b;
+  color: #087551;
 }
 
 @media (max-width: 760px) {

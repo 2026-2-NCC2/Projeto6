@@ -1,6 +1,6 @@
 :root {
   --ink: #121b30;
-  --muted: #657997;
+  --muted: #4c5b72;
   --line: #dde5f0;
   --surface: #f7f9fb;
   --blue: #2860ed;
@@ -285,7 +285,7 @@ h1 {
   border-color: #ffc5cf;
 }
 .danger {
-  background: #e5234f;
+  background: #ae1a3c;
   color: white;
 }
 .text-danger {
@@ -372,7 +372,7 @@ small.muted {
 .badge.green {
   background: #ecfdf5;
   border-color: #a5efcf;
-  color: #00855f;
+  color: #006548;
 }
 .badge.blue {
   background: #eff5ff;
@@ -382,7 +382,7 @@ small.muted {
 .badge.amber {
   background: #fffbeb;
   border-color: #fde69a;
-  color: #b46b00;
+  color: #885100;
 }
 .badge.red {
   background: #fff0f3;
@@ -2508,23 +2508,23 @@ td code {
 .event-section-heading { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 20px; }
 .event-section-number { display: inline-flex; flex: 0 0 28px; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 9px; background: #edf3ff; color: #285ee8; font-size: 12px; font-weight: 750; }
 .event-section-heading h2 { margin: 2px 0 4px; font-size: 15px; line-height: 1.35; color: #17233a; }
-.event-section-heading p { margin: 0; color: #75839a; font-size: 12px; line-height: 1.5; }
+.event-section-heading p { margin: 0; color: #586375; font-size: 12px; line-height: 1.5; }
 .event-editor-layout .field { margin-bottom: 17px; }
 .event-editor-layout .field label { margin-bottom: 7px; }
 .event-editor-layout .form-grid { gap: 0 14px; }
 .event-date-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.event-field-note { margin: -2px 0 0; color: #78869c; font-size: 11px; line-height: 1.5; }
+.event-field-note { margin: -2px 0 0; color: #5b6576; font-size: 11px; line-height: 1.5; }
 .event-description-section textarea { resize: vertical; min-height: 110px; }
-.event-character-count { margin-top: -9px; text-align: right; color: #8996aa; font-size: 11px; }
+.event-character-count { margin-top: -9px; text-align: right; color: #687281; font-size: 11px; }
 .event-cover-upload { position: relative; padding: 10px; background: #fafcff; }
 .event-cover-upload img { height: 190px; margin-bottom: 12px; background: #edf1f6; }
 .event-cover-upload span { display: block; font-weight: 650; }
-.event-cover-upload small { display: block; margin-top: 5px; color: #8492a8; font-size: 11px; }
+.event-cover-upload small { display: block; margin-top: 5px; color: #646e7f; font-size: 11px; }
 .event-remove-cover { width: 100%; margin-top: 10px; font-size: 12px; }
 .event-next-step-card { margin-top: 24px; padding: 17px; border: 1px solid #e0e8f4; border-radius: 12px; background: #f7f9fd; }
 .event-next-step-icon { display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; margin-bottom: 10px; border-radius: 9px; background: #e6eeff; color: #285ee8; font-size: 18px; }
 .event-next-step-card h3 { margin: 0 0 7px; font-size: 13px; color: #1d2b44; }
-.event-next-step-card p { margin: 0; color: #6f7e95; font-size: 12px; line-height: 1.6; }
+.event-next-step-card p { margin: 0; color: #545f71; font-size: 12px; line-height: 1.6; }
 .event-editor-footer { margin-top: 24px; }
 @media (max-width: 850px) {
   .event-editor-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -2574,8 +2574,8 @@ td code {
   color: var(--ink, #152238); background: transparent; box-shadow: none;
 }
 .supplier-search input:focus { outline: 0; box-shadow: none; }
-.supplier-search input::placeholder { color: #94a3b8; }
-.supplier-clear-search { border: 0; background: transparent; color: #64748b; font-size: 20px; cursor: pointer; }
+.supplier-search input::placeholder { color: #59667a; }
+.supplier-clear-search { border: 0; background: transparent; color: #4c5869; font-size: 20px; cursor: pointer; }
 .supplier-filter select {
   width: 100%; height: 42px; padding: 0 34px 0 12px; color: #34445e;
   border: 1px solid var(--line, #d7e0ec); border-radius: 9px; background-color: #fff;
@@ -2583,7 +2583,7 @@ td code {
 .supplier-reset { padding: 8px 6px; border: 0; background: transparent; color: var(--blue, #245cf5); white-space: nowrap; cursor: pointer; font-weight: 600; }
 .supplier-results-line {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  margin: 12px 2px 14px; color: #64748b; font-size: 12px;
+  margin: 12px 2px 14px; color: #4c5869; font-size: 12px;
 }
 .supplier-results-line strong { color: #26364f; }
 .supplier-results-hint { text-align: right; }
@@ -2592,7 +2592,7 @@ td code {
 .supplier-table { width: 100%; border-collapse: collapse; text-align: left; }
 .supplier-table thead { background: #f8fafc; }
 .supplier-table th {
-  padding: 13px 16px; color: #64748b; font-size: 10px; font-weight: 750;
+  padding: 13px 16px; color: #4c5869; font-size: 10px; font-weight: 750;
   letter-spacing: .055em; text-transform: uppercase; white-space: nowrap;
   border-bottom: 1px solid var(--line, #e5ebf3);
 }
@@ -2607,7 +2607,7 @@ td code {
 }
 .supplier-name-copy { display: flex; flex-direction: column; gap: 4px; }
 .supplier-name-copy strong { color: #17243a; font-size: 12px; font-weight: 700; }
-.supplier-name-copy small { color: #94a3b8; font-size: 10px; }
+.supplier-name-copy small { color: #59667a; font-size: 10px; }
 .supplier-category { display: inline-block; max-width: 190px; padding: 5px 8px; border-radius: 7px; background: #f1f5f9; color: #52627a; line-height: 1.35; }
 .supplier-price { color: #1e2c42; font-size: 12px; white-space: nowrap; }
 .supplier-status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 999px; font-size: 10px; font-weight: 650; white-space: nowrap; }
@@ -2618,14 +2618,14 @@ td code {
 .supplier-row-actions .button { min-height: 32px; padding: 6px 10px; font-size: 11px; }
 .supplier-link-button { box-shadow: none; }
 .supplier-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 245px; padding: 28px; text-align: center; }
-.supplier-empty-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 12px; border-radius: 50%; background: #f1f5f9; color: #64748b; font-size: 25px; }
+.supplier-empty-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 12px; border-radius: 50%; background: #f1f5f9; color: #4c5869; font-size: 25px; }
 .supplier-empty strong { color: #1e293b; }
 .supplier-empty p { margin: 7px 0 16px; color: #718096; font-size: 13px; }
 .supplier-detail-modal { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 14px; }
 .supplier-modal-initials { width: 48px; height: 48px; font-size: 13px; }
 .supplier-detail-modal p { margin-top: 0; }
 .supplier-modal-price { margin: 10px 0; color: #17243a; font-size: 21px; font-weight: 750; }
-.supplier-modal-price span { color: #94a3b8; font-size: 11px; font-weight: 400; }
+.supplier-modal-price span { color: #59667a; font-size: 11px; font-weight: 400; }
 .supplier-detail-modal h3 { margin: 18px 0 8px; font-size: 15px; }
 .supplier-product-list { display: grid; gap: 8px; max-height: 240px; overflow: auto; margin: 0; padding: 0; list-style: none; }
 .supplier-product-list li { display: flex; justify-content: space-between; gap: 14px; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-raised); color: var(--ink); }
@@ -3382,12 +3382,12 @@ html[data-theme="dark"] .app-header .header-tools > a:not(.user-chip):hover {
 /* Tokens globais do produto — mesmo azul e ardósia do tema escuro. */
 :root {
   --ink: #121b30;
-  --muted: #657997;
+  --muted: #4c5b72;
   --line: #dde5f0;
   --surface: #f4f7fb;
   --blue: #2860ed;
   --green: #009c75;
-  --purple: #655fe8;
+  --purple: #4c48b0;
 }
 html[data-theme="dark"] {
   --ink: #e7eaf1;
@@ -3445,12 +3445,12 @@ html[data-theme="dark"] .app-shell .tag {
 /* TrocaTicket workspace — tokens e componentes alinhados à nova identidade. */
 :root {
   --ink: #142039;
-  --muted: #687b99;
+  --muted: #4f5d74;
   --line: #dfe6f1;
   --surface: #f4f7fc;
-  --blue: #4f78e8;
-  --green: #078a70;
-  --purple: #655fe8;
+  --blue: #3c5bb0;
+  --green: #056855;
+  --purple: #4c48b0;
 }
 html[data-theme="dark"] {
   --ink: #edf2fb;
