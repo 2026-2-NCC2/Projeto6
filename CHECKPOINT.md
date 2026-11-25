@@ -190,6 +190,69 @@ Continuação na mesma branch local, renomeada para integracao-site-2.0, com um 
 - A senha do MySQL fica em texto no server/.env, ignorado pelo Git.
 - O iniciador usa as portas fixas 3000 e 5173.
 
+## Integração com a TrocaTicket 2.0 — etapa 3: compra simulada completa (25/11/2026)
+
+Mesma branch local integracao-site-2.0, com um commit por etapa. A etapa adapta o fluxo de pedidos da 2.0 (mvp_pedido, mvp_estorno, mvp_idempotencia e transacoes/pagamentos.js) ao banco e às telas da Entrega 1.
+
+**O que mudou.**
+- server/MIGRACAO_PEDIDOS_PAGAMENTOS.sql (novo) cria:
+  - a tabela pedido, com situação, prazo da reserva, forma de pagamento simulada e motivo;
+  - a coluna ingresso.pedido_id;
+  - a tabela estorno, com um registro por ingresso devolvido;
+  - a tabela pedido_idempotencia, com a chave por ação e a resposta guardada.
+
+  Pode ser reaplicada, termina com uma conferência vazia e entrou no preparar-banco.js.
+- server/pedidos.js (novo) concentra as regras:
+  - **Reserva:** 15 minutos (RESERVA_MINUTOS), com a lotação contando ingressos ativos mais reservas no prazo, no máximo 6 por conta e evento e declaração obrigatória para meia-entrada.
+  - **Pagamento simulado:** Pix ou cartão, sem dados de pagamento. PAGAMENTO_SIMULADO define aprovado, recusado ou indisponível. Aprovado emite os ingressos ligados ao pedido; evento gratuito dispensa a forma de pagamento.
+  - **Cancelamento e expiração:** reserva não paga pode ser cancelada; reserva vencida vira "expirado".
+  - **Estorno:** até a véspera do evento, só dos ingressos que continuam com quem comprou, com as trocas pendentes canceladas. Rotas: GET /api/pedidos, GET /api/pedidos/:id, POST /api/pedidos e POST /api/pedidos/:id/{pagar,cancelar,estornar}.
+  - **Proteção de acesso:** sessão de participante; pedido de outra conta responde 404.
+  - **Idempotency-Key:** obrigatória em toda gravação de pedido.
+- server/server.js:
+  - POST /api/eventos/:id/ingressos continua com o mesmo formato e a mesma resposta 404 para evento indisponível, mas agora cria um pedido já pago ("direto") e respeita o limite por conta;
+  - PUT /api/ingressos/:id/cancelar registra o estorno quando quem cancela é quem comprou, e recusa (409) depois que o evento começa;
+  - a lista de ingressos ganhou orderId, refundOnCancel e cancellable.
+- Site:
+  - A compra na página do evento passou a ter dois passos ("Confirmar pedido" → "Pagamento simulado"): prazo visível, escolha Pix ou cartão, cancelamento da reserva e aviso ao fechar no meio.
+  - A nova página Meus pedidos (/pedidos, src/pages/Orders.jsx) mostra situação, forma de pagamento, códigos dos ingressos e valor estornado, com as ações pagar, cancelar e solicitar estorno com confirmação.
+  - Meus ingressos ganhou o atalho para pedidos e o botão "Cancelar e estornar" ou "Cancelar ingresso", conforme a origem do ingresso.
+  - Outros arquivos: menu com "Meus pedidos", proteção da rota em Layout, services/orders.js, components/PaymentChoice.jsx (reaproveita .sp-radio-cards) e algumas regras de espaçamento em workspace.css.
+  - Cada ação usa uma Idempotency-Key, reaproveitada quando a requisição fica sem resposta.
+- README.md e server/.env.example: fluxo, regras, variáveis e ordem das três migrações.
+
+**Problema encontrado e corrigido durante os testes.** Com cliques simultâneos usando a mesma chave, as repetições disputavam a trava do registro, e o banco derrubava uma delas por deadlock (500).
+
+Correções:
+- a leitura da resposta guardada passou a ser simples, sem FOR UPDATE;
+- deadlocks são repetidos até 3 vezes;
+- reservas vencidas passaram a ser marcadas fora da transação, e a contagem e o pagamento conferem o prazo diretamente.
+
+Depois disso, pedidos.test.js passou em 8 de 8 rodadas seguidas.
+
+**Testes (somente bancos descartáveis).**
+- npm test: 44 de 44, três rodadas em MariaDB 10.11 e duas em MySQL 8.0.46. Entraram 15 testes de pedidos e 3 de unidade:
+  - reserva, pagamento aprovado, recusado, indisponível e gratuito;
+  - mesma chave e chave com outro conteúdo (409); 5 cliques simultâneos com a mesma chave criam 1 pedido;
+  - 4 pedidos simultâneos para 2 lugares resultam em 2 de 201 e 2 de 409;
+  - meia-entrada, lotação, limite de 6, cancelamento e reserva vencida;
+  - estorno parcial depois de uma troca, ingresso recebido em troca sem estorno e rota antiga gerando estorno;
+  - evento já começado (409);
+  - pedido de outra conta (404), organizador (403) e sem login (401).
+- Chromium no build:
+  - fluxo de compra, 17 de 17: cartão, ingresso ligado ao pedido, estorno, meia-entrada com declaração, fechar no meio, cancelar reserva e celular sem rolagem horizontal, sem 5xx nem erros de JavaScript;
+  - pagamento recusado, 5 de 5.
+- Auditoria axe nas telas novas (os dois passos do modal, Meus pedidos com reserva aberta e Meus ingressos), nos dois temas:
+  - nenhuma violação de contraste;
+  - a falta de h2 em Meus pedidos foi corrigida;
+  - persiste o aviso label-content-name-mismatch no logotipo e no selo do usuário do menu, que já existia e também aparece em Meus ingressos.
+- Regressão: navegador 25 de 25 e 17 de 17; API 73 de 73; nenhum erro no log.
+- Iniciador: um banco da etapa 2 no MySQL 8 recebeu a migração nova ao abrir, com os dados preservados.
+
+**Limitações conhecidas.**
+- Do fluxo da 2.0, não foram trazidos a falha simulada do emissor e a recuperação da entrega, nem o estorno depois do evento via atendimento (etapa 5).
+- O cenário de pagamento é definido pelo servidor (variável de ambiente), sem tela de administração (etapa 6).
+
 ## Escopo dos arquivos
 
-Além dos três documentos na raiz e do avatar em public/images, mudaram na Entrega 1 os estilos src/{access,forms,home,moderation,report,shared,styles,supplier,workspace}.css, src/{App,main}.jsx, src/components/{Events,Icon,Layout,Navbar,PapoBanner}.jsx e src/pages/{Account,ForumPage,Home,UserHome}.jsx. O tema do fórum também exigiu forum/src/store/ForumContext.jsx, forum/src/styles.css, forum/src/data/forum.js e o bundle em public/forum. A retomada da etapa 4 acrescentou server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e atualizou CHECKPOINT.md e HANDOFF.md. A etapa 1 da integração com a 2.0 acrescentou server/sessao.js e server/MIGRACAO_SESSAO_LOGIN.sql. Ela também alterou server/server.js, server/.env.example, README.md, src/services/{api,community,events,supplier,tickets}.js, src/context/Store.jsx, src/pages/Account.jsx e src/components/Navbar.jsx. A etapa 2 acrescentou server/scripts/preparar-banco.js, server/tests/{apoio.js,unidade.test.js,api.test.js,banco.test.js}, scripts/iniciar.mjs, Iniciar-TrocaTicket.cmd e Iniciar-TrocaTicket.command. Ela também alterou server/server.js, server/db.js, server/package.json, server/.env.example, package.json, README.md e COMO-RODAR.md. O inventário completo por caminho é reproduzível com git diff --name-status origin/main...HEAD.
+Além dos três documentos na raiz e do avatar em public/images, mudaram na Entrega 1 os estilos src/{access,forms,home,moderation,report,shared,styles,supplier,workspace}.css, src/{App,main}.jsx, src/components/{Events,Icon,Layout,Navbar,PapoBanner}.jsx e src/pages/{Account,ForumPage,Home,UserHome}.jsx. O tema do fórum também exigiu forum/src/store/ForumContext.jsx, forum/src/styles.css, forum/src/data/forum.js e o bundle em public/forum. A retomada da etapa 4 acrescentou server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e atualizou CHECKPOINT.md e HANDOFF.md. A etapa 1 da integração com a 2.0 acrescentou server/sessao.js e server/MIGRACAO_SESSAO_LOGIN.sql. Ela também alterou server/server.js, server/.env.example, README.md, src/services/{api,community,events,supplier,tickets}.js, src/context/Store.jsx, src/pages/Account.jsx e src/components/Navbar.jsx. A etapa 2 acrescentou server/scripts/preparar-banco.js, server/tests/{apoio.js,unidade.test.js,api.test.js,banco.test.js}, scripts/iniciar.mjs, Iniciar-TrocaTicket.cmd e Iniciar-TrocaTicket.command. Ela também alterou server/server.js, server/db.js, server/package.json, server/.env.example, package.json, README.md e COMO-RODAR.md. A etapa 3 acrescentou server/MIGRACAO_PEDIDOS_PAGAMENTOS.sql, server/pedidos.js, server/tests/pedidos.test.js, src/pages/Orders.jsx, src/services/orders.js e src/components/PaymentChoice.jsx. Ela também alterou server/server.js, server/scripts/preparar-banco.js, server/tests/{unidade,banco}.test.js, server/.env.example, src/pages/Participant.jsx, src/App.jsx, src/components/{Navbar,Layout}.jsx, src/services/tickets.js, src/workspace.css e README.md. O inventário completo por caminho é reproduzível com git diff --name-status origin/main...HEAD.

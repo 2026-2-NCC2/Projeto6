@@ -3879,3 +3879,32 @@ html {
     transition: none;
   }
 }
+
+/* Meus pedidos e pagamento simulado (etapa 3 da integração com a TrocaTicket 2.0).
+   Só espaçamento: cores, bordas e tema vêm de .panel, .badge, .sp-radio-cards e .info-note. */
+.payment-choice {
+  margin: 12px 0;
+}
+.payment-choice small {
+  display: block;
+  margin-top: 2px;
+}
+.order-card .actions {
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.order-tickets {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+}
+.order-tickets li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+  font-size: 12px;
+}

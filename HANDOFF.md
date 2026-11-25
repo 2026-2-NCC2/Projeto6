@@ -13,16 +13,15 @@ Branch integracao-main-miguel publicada por um colega (b477108). O usuário pedi
 
 ## Retomada atual
 
-As etapas 1 (login com sessão) e 2 (testes automáticos e iniciador) estão concluídas e testadas na branch local integracao-site-2.0, criada a partir de b477108, com um commit por etapa. A etapa 1 foi desenvolvida como integracao-site-2.0-etapa1-sessao, nome que deixou de ser usado. Detalhes, arquivos e resultados estão em CHECKPOINT.md.
+As etapas 1 (login com sessão), 2 (testes automáticos e iniciador) e 3 (compra simulada completa: pedido, pagamento, cancelamento e estorno) estão concluídas e testadas na branch local integracao-site-2.0, criada a partir de b477108, com um commit por etapa. A etapa 1 foi desenvolvida como integracao-site-2.0-etapa1-sessao, nome que deixou de ser usado. Detalhes, arquivos e resultados estão em CHECKPOINT.md.
 
-A etapa 1 muda o contrato da API da main, como o usuário aceitou: as rotas de conta passam a exigir sessão e as gravações exigem X-CSRF-Token. URLs e formatos de resposta foram mantidos.
+A etapa 1 muda o contrato da API da main, como o usuário aceitou: as rotas de conta passam a exigir sessão e as gravações exigem X-CSRF-Token. URLs e formatos de resposta foram mantidos. A etapa 3 acrescenta rotas /api/pedidos (com Idempotency-Key) e mantém a compra direta antiga, que agora gera um pedido pago e respeita o limite de 6 por conta e evento. O cancelamento de ingresso passou a registrar estorno e a ser recusado depois que o evento começa.
 
-Nada foi publicado e não houve merge. Ao fim de cada etapa, o usuário recebe um ZIP acumulado (bundle a partir de b477108 e instruções para o colega publicar). A publicação depende de um colega com permissão de escrita, porque o app do Claude não tem acesso à organização 2026-2-NCC2. Aguardar confirmação do usuário antes da etapa 3.
+Nada foi publicado e não houve merge. Ao fim de cada etapa, o usuário recebe um ZIP acumulado (bundle a partir de b477108 e instruções para o colega publicar). A publicação depende de um colega com permissão de escrita, porque o app do Claude não tem acesso à organização 2026-2-NCC2. Aguardar confirmação do usuário antes da etapa 4.
 
 Para retomar: aplicar o bundle mais recente sobre um clone que contenha b477108 (ver LEIA-PRIMEIRO.txt do ZIP), depois rodar npm test (com um MySQL local que possa criar bancos) e o iniciador.
 
 Próximas etapas sugeridas, a confirmar com o usuário:
-3. Compra simulada completa: pedido, pagamento, cancelamento e estorno.
 4. Revenda, fila de espera e transferência com aceite.
 5. Portaria e atendimento.
 6. Administração ligada ao banco e exigência de aprovação de contas.
@@ -30,7 +29,7 @@ Próximas etapas sugeridas, a confirmar com o usuário:
 
 Pendências para a equipe:
 1. Confirmar se existe uma migração oficial. Se existir, compará-la com a complementar e substituí-la.
-2. Decidir se as estruturas das duas migrações entram no SCRIPT_BANCO_V2.sql, o que altera a Entrega 2. Por enquanto, o README da Entrega 1 orienta a aplicar as migrações também em instalações novas.
+2. Decidir se as estruturas das migrações entram no SCRIPT_BANCO_V2.sql, o que altera a Entrega 2. Por enquanto, o README da Entrega 1 orienta a aplicar as migrações também em instalações novas.
 3. Corrigir o histórico de trocas depois do aceite: quem propôs vê "Proposta recebida" e quem aceitou deixa de ver a troca. O problema está no server.js da main e está descrito em CHECKPOINT.md.
 4. Combinar com o grupo a mudança de contrato da API: o site da Entrega 1 já foi adaptado, mas outros clientes da API precisam enviar o cookie e o token.
 

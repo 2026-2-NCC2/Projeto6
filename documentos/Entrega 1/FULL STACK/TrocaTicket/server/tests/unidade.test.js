@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const bcrypt = require('bcrypt');
 const { criarSessoes } = require('../sessao');
 const { nomeValido, semNomeFixo, versaoSuportada } = require('../scripts/preparar-banco');
+const { centavosUnitarios, resumoConteudo, cenarioPagamento, minutosReserva, ErroPedido } = require('../pedidos');
 
 function bancoFalso() {
   const chamadas = [];
@@ -131,4 +132,43 @@ test('preparo do banco: nomes seguros, SQL sem nome fixo e versões suportadas',
     assert.equal(versaoSuportada(versao), true, versao);
   }
   for (const versao of ['8.0.15', '5.7.44', '10.4.32-MariaDB']) assert.equal(versaoSuportada(versao), false, versao);
+});
+
+test('pedidos: preço em centavos, meia-entrada pela metade e preço inválido recusado', () => {
+  assert.equal(centavosUnitarios('80.00', 'Inteira'), 8000);
+  assert.equal(centavosUnitarios('80.00', 'Meia-entrada'), 4000);
+  assert.equal(centavosUnitarios('80.55', 'Meia-entrada'), 4028);
+  assert.equal(centavosUnitarios('0.00', 'Inteira'), 0);
+  assert.throws(() => centavosUnitarios('abc', 'Inteira'), (erro) => erro instanceof ErroPedido && erro.status === 400);
+});
+
+test('pedidos: a chave de repetição compara o conteúdo, não a ordem dos campos', () => {
+  assert.equal(resumoConteudo('criar', { a: 1, b: { c: 2, d: 3 } }), resumoConteudo('criar', { b: { d: 3, c: 2 }, a: 1 }));
+  assert.notEqual(resumoConteudo('criar', { a: 1 }), resumoConteudo('pagar:1', { a: 1 }));
+  assert.notEqual(resumoConteudo('criar', { a: 1 }), resumoConteudo('criar', { a: 2 }));
+});
+
+test('pedidos: cenário de pagamento e prazo da reserva têm padrões seguros', () => {
+  const anterior = { PAGAMENTO_SIMULADO: process.env.PAGAMENTO_SIMULADO, RESERVA_MINUTOS: process.env.RESERVA_MINUTOS };
+  try {
+    delete process.env.PAGAMENTO_SIMULADO;
+    assert.equal(cenarioPagamento(), 'aprovado');
+    process.env.PAGAMENTO_SIMULADO = 'RECUSADO';
+    assert.equal(cenarioPagamento(), 'recusado');
+    process.env.PAGAMENTO_SIMULADO = 'qualquer';
+    assert.equal(cenarioPagamento(), 'aprovado');
+    delete process.env.RESERVA_MINUTOS;
+    assert.equal(minutosReserva(), 15);
+    process.env.RESERVA_MINUTOS = '5';
+    assert.equal(minutosReserva(), 5);
+    for (const valor of ['0', '500', 'abc', '2.5']) {
+      process.env.RESERVA_MINUTOS = valor;
+      assert.equal(minutosReserva(), 15, valor);
+    }
+  } finally {
+    for (const [chave, valor] of Object.entries(anterior)) {
+      if (valor === undefined) delete process.env[chave];
+      else process.env[chave] = valor;
+    }
+  }
 });

@@ -15,6 +15,7 @@ import Admin from './pages/Admin';
 import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
+import Orders from './pages/Orders';
 import ForumPage from './pages/ForumPage';
 import { useStore } from './context/Store';
 function Info({ title, children }) {
@@ -100,6 +101,7 @@ export default function App() {
         <Route path="eventos/:id" element={<EventDetails />} />
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
+        <Route path="pedidos" element={<Orders />} />
         {isAuthenticated && <Route path="comunidade/*" element={<Community />} />}
         <Route path="comunidade/eventos" element={<Community />} />
         <Route path="organizador" element={<Organizer />} />

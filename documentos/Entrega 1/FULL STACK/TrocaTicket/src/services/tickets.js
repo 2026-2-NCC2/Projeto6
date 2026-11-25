@@ -37,14 +37,6 @@ export function getParticipantTickets(userId, signal) {
   );
 }
 
-export function buySimulatedTickets(eventId, userId, type, quantity) {
-  return request(
-    `/eventos/${encodeURIComponent(eventId)}/ingressos`,
-    json('POST', { userId, type, quantity }),
-    'Não foi possível salvar a compra simulada.',
-  );
-}
-
 export function cancelParticipantTicket(ticketId, userId) {
   return request(
     `/ingressos/${encodeURIComponent(ticketId)}/cancelar`,

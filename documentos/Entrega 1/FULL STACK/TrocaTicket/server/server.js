@@ -19,6 +19,9 @@ if (!fs.existsSync(uploadsDir)) {
 const db = require('./db');
 const { criarSessoes } = require('./sessao');
 const sessoes = criarSessoes(db);
+const { criarPedidos, ErroPedido } = require('./pedidos');
+// requireUserRole é declarada mais abaixo neste arquivo (declaração de função, disponível aqui).
+const pedidos = criarPedidos({ db, requireUserRole: (...args) => requireUserRole(...args) });
 
 // Só os endereços locais do site (ou os de CORS_ORIGINS) usam a API pelo navegador, com cookie.
 app.use(sessoes.protegerOrigem);
@@ -748,6 +751,9 @@ app.post('/api/logout', async (req, res) => {
         statusCode: row.status,
         status: row.status === 'A' ? 'Ativo' : row.status === 'V' ? 'Utilizado' : 'Cancelado',
         availableForExchange: Boolean(row.availableForExchange),
+        orderId: row.orderId ? Number(row.orderId) : null,
+        refundOnCancel: Boolean(Number(row.refundOnCancel)),
+        cancellable: Boolean(Number(row.cancellable)),
       };
     }
 
@@ -1484,11 +1490,14 @@ app.post('/api/logout', async (req, res) => {
         const [rows] = await db.execute(
           `SELECT i.id, i.codigo_ingresso AS code, i.evento_id AS eventId,
                   i.tipo_ingresso AS type, i.preco AS price, i.status,
-                  i.disponivel_troca AS availableForExchange,
+                  i.disponivel_troca AS availableForExchange, i.pedido_id AS orderId,
+                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id) AS refundOnCancel,
+                  (e.data_inicio > CURRENT_DATE) AS cancellable,
                   e.titulo AS eventTitle, e.imagem_capa_url AS image,
                   DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS eventDate,
                   e.\`local\` AS location
              FROM ingresso i JOIN evento e ON e.id = i.evento_id
+             LEFT JOIN pedido p ON p.id = i.pedido_id
             WHERE i.dono_atual_id = ?
             ORDER BY i.data_compra DESC, i.id DESC`,
           [userId],
@@ -1510,65 +1519,34 @@ app.post('/api/logout', async (req, res) => {
         return res.status(400).json({ error: 'Informe evento, tipo de ingresso e quantidade válidos (1 a 6).' });
       }
 
+      // Compra direta mantida por compatibilidade: vira um pedido já pago (pedidos.js).
       let connection;
       try {
         if (!(await requireUserRole(userId, 1, res))) return;
         connection = await db.getConnection();
         await connection.beginTransaction();
-        const [events] = await connection.execute(
-          `SELECT id, titulo AS eventTitle, imagem_capa_url AS image,
-                  DATE_FORMAT(data_inicio, '%Y-%m-%d') AS eventDate,
-                  \`local\` AS location, capacidade AS capacity, preco_base AS price
-             FROM evento
-            WHERE id = ? AND status = 'Publicado' AND data_fim >= CURRENT_DATE
-            FOR UPDATE`,
-          [eventId],
-        );
-        if (!events.length) {
-          await connection.rollback();
-          return res.status(404).json({ error: 'Evento não encontrado ou indisponível para reserva.' });
-        }
-        const event = events[0];
-        const [counts] = await connection.execute(
-          `SELECT COUNT(*) AS sold FROM ingresso
-            WHERE evento_id = ? AND status = 'A'`,
-          [eventId],
-        );
-        const sold = Number(counts[0].sold);
-        if (event.capacity !== null && quantity > Number(event.capacity) - sold) {
-          await connection.rollback();
-          return res.status(409).json({ error: 'Não há ingressos suficientes para a quantidade solicitada.' });
-        }
-
-        const unitPriceCents = Math.round(Number(event.price) * (type === 'Meia-entrada' ? 50 : 100));
-        if (!Number.isSafeInteger(unitPriceCents) || unitPriceCents < 0 || unitPriceCents > 9999999999) {
-          await connection.rollback();
-          return res.status(400).json({ error: 'O preço cadastrado para o evento é inválido.' });
-        }
-        const ticketIds = [];
-        for (let index = 0; index < quantity; index += 1) {
-          const code = `TT-${eventId}-${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
-          const [result] = await connection.execute(
-            `INSERT INTO ingresso
-              (codigo_ingresso, evento_id, dono_atual_id, tipo_ingresso, preco, status, disponivel_troca)
-             VALUES (?, ?, ?, ?, ?, 'A', FALSE)`,
-            [code, eventId, userId, type, unitPriceCents / 100],
-          );
-          ticketIds.push(result.insertId);
-        }
+        const ticketIds = await pedidos.comprarDireto(connection, {
+          usuarioId: userId, eventoId: eventId, tipo: type, quantidade: quantity,
+        });
         const placeholders = ticketIds.map(() => '?').join(', ');
         const [rows] = await connection.execute(
           `SELECT i.id, i.codigo_ingresso AS code, i.evento_id AS eventId,
                   i.tipo_ingresso AS type, i.preco AS price, i.status,
-                  i.disponivel_troca AS availableForExchange,
-                  ? AS eventTitle, ? AS image, ? AS eventDate, ? AS location
-             FROM ingresso i WHERE i.id IN (${placeholders}) ORDER BY i.id`,
-          [event.eventTitle, event.image, event.eventDate, event.location, ...ticketIds],
+                  i.disponivel_troca AS availableForExchange, i.pedido_id AS orderId,
+                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id) AS refundOnCancel,
+                  (e.data_inicio > CURRENT_DATE) AS cancellable,
+                  e.titulo AS eventTitle, e.imagem_capa_url AS image,
+                  DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS eventDate, e.\`local\` AS location
+             FROM ingresso i JOIN evento e ON e.id = i.evento_id
+             LEFT JOIN pedido p ON p.id = i.pedido_id
+            WHERE i.id IN (${placeholders}) ORDER BY i.id`,
+          ticketIds,
         );
         await connection.commit();
         res.status(201).json({ tickets: rows.map(ticketFromRow), simulated: true });
       } catch (error) {
         await rollbackTransaction(connection);
+        if (error instanceof ErroPedido) return res.status(error.status).json({ error: error.message });
         console.error('Erro ao criar reserva simulada:', error);
         res.status(500).json({ error: 'Erro interno ao salvar os ingressos.' });
       } finally {
@@ -1585,34 +1563,13 @@ app.post('/api/logout', async (req, res) => {
         if (!(await requireUserRole(userId, 1, res))) return;
         connection = await db.getConnection();
         await connection.beginTransaction();
-        const [tickets] = await connection.execute(
-          `SELECT id, status FROM ingresso
-            WHERE id = ? AND dono_atual_id = ? FOR UPDATE`,
-          [ticketId, userId],
-        );
-        if (!tickets.length) {
-          await connection.rollback();
-          return res.status(404).json({ error: 'Ingresso não encontrado nesta conta.' });
-        }
-        if (tickets[0].status !== 'A') {
-          await connection.rollback();
-          return res.status(409).json({ error: 'Somente ingressos ativos podem ser cancelados.' });
-        }
-        await connection.execute(
-          `UPDATE troca_ingresso SET status = 'Cancelada', data_resposta = CURRENT_TIMESTAMP
-            WHERE status = 'Pendente'
-              AND (ingresso_solicitado_id = ? OR ingresso_ofertado_id = ?)`,
-          [ticketId, ticketId],
-        );
-        await connection.execute(
-          `UPDATE ingresso SET status = 'C', disponivel_troca = FALSE
-            WHERE id = ? AND dono_atual_id = ?`,
-          [ticketId, userId],
-        );
+        // Cancela trocas pendentes e, se o ingresso foi comprado por quem o possui, registra o estorno.
+        await pedidos.cancelarIngresso(connection, { ingressoId: ticketId, usuarioId: userId });
         await connection.commit();
         res.status(204).end();
       } catch (error) {
         await rollbackTransaction(connection);
+        if (error instanceof ErroPedido) return res.status(error.status).json({ error: error.message });
         console.error('Erro ao cancelar ingresso simulado:', error);
         res.status(500).json({ error: 'Erro interno ao cancelar o ingresso.' });
       } finally {
@@ -2135,6 +2092,9 @@ app.post('/api/logout', async (req, res) => {
         res.status(500).json({ error: 'Erro interno ao atualizar a senha.' });
       }
     });
+
+    // Pedidos, pagamento simulado, cancelamento e estorno (etapa 3, pedidos.js).
+    pedidos.registrarRotas(app);
 
     // Abre a porta só quando executado diretamente (node server.js); os testes importam o app.
     if (require.main === module) {

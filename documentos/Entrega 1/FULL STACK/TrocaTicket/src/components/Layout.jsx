@@ -39,7 +39,8 @@ export default function Layout({ darkMode, toggleTheme }) {
       pathname.startsWith('/fornecedor') ||
       pathname.startsWith('/admin') ||
       pathname === '/favoritos' ||
-      pathname === '/ingressos'
+      pathname === '/ingressos' ||
+      pathname === '/pedidos'
     )) {
       navigate('/perfis', { replace: true });
     }

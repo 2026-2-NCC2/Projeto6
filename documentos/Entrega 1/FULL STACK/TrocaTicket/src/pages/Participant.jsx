@@ -1,11 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useEvents, LoadState } from '../components/Events';
 import { useStore } from '../context/Store';
 import { Badge, Empty, Modal, PageTitle, Panel, Tabs, money } from '../components/UI';
 import EventCard from '../components/EventCard';
 import { getEventReviews, saveEventReview } from '../services/events';
-import { buySimulatedTickets } from '../services/tickets';
+import {
+  cancelarPedido,
+  criarChave,
+  horaLimite,
+  pagarPedido,
+  reservarPedido,
+} from '../services/orders';
+import PaymentChoice from '../components/PaymentChoice';
 import {
   createCommunityMessage,
   deleteCommunityMessage,
@@ -128,6 +135,12 @@ export function EventDetails() {
   const [reviewSaving, setReviewSaving] = useState(false);
   const [reservationError, setReservationError] = useState('');
   const [reserving, setReserving] = useState(false);
+  // Compra em duas etapas (etapa 3): reservar e depois pagar de forma simulada.
+  const [etapa, setEtapa] = useState('revisar');
+  const [pedido, setPedido] = useState(null);
+  const [declaracaoMeia, setDeclaracaoMeia] = useState(false);
+  const [formaPagamento, setFormaPagamento] = useState('pix');
+  const chaves = useRef({});
   const numericEventId = Number(id);
   const isDatabaseEvent = Number.isSafeInteger(numericEventId) && numericEventId > 0;
   const userId = Number(data.profile?.id);
@@ -207,15 +220,87 @@ export function EventDetails() {
       setReviewSaving(false);
     }
   }
+  // Reaproveita a mesma chave se a ação ficou sem resposta, para nunca comprar em dobro.
+  async function comChave(nome, acao) {
+    chaves.current[nome] ||= criarChave();
+    try {
+      const resultado = await acao(chaves.current[nome]);
+      delete chaves.current[nome];
+      return resultado;
+    } catch (error) {
+      if (!error.semResposta) delete chaves.current[nome];
+      throw error;
+    }
+  }
+  function fecharCheckout() {
+    setModal(false);
+    setEtapa('revisar');
+    setPedido(null);
+  }
+  function fecharModal() {
+    if (reserving) return;
+    if (etapa === 'pagar' && pedido) {
+      notify(`Sua reserva continua em Meus pedidos até ${horaLimite(pedido.secondsToExpire)}.`);
+    }
+    fecharCheckout();
+  }
+  async function pagar() {
+    setReservationError('');
+    setReserving(true);
+    try {
+      const atualizado = await comChave(`pagar:${pedido.id}`, (chave) =>
+        pagarPedido(pedido.id, pedido.total > 0 ? formaPagamento : undefined, chave),
+      );
+      if (atualizado.status === 'pago') {
+        fecharCheckout();
+        notify(
+          pedido.total > 0
+            ? 'Pagamento aprovado (simulação). Seus ingressos estão em Meus ingressos.'
+            : 'Inscrição confirmada. Seus ingressos estão em Meus ingressos.',
+        );
+        navigate('/ingressos');
+      } else {
+        setReservationError(atualizado.reason || 'O pagamento simulado não foi aprovado.');
+        setPedido(null);
+        setEtapa('revisar');
+      }
+    } catch (error) {
+      setReservationError(error.message);
+    } finally {
+      setReserving(false);
+    }
+  }
+  async function cancelarReserva() {
+    setReservationError('');
+    setReserving(true);
+    try {
+      await comChave(`cancelar:${pedido.id}`, (chave) => cancelarPedido(pedido.id, chave));
+      fecharCheckout();
+      notify('Reserva cancelada. Os lugares foram liberados.');
+    } catch (error) {
+      setReservationError(error.message);
+    } finally {
+      setReserving(false);
+    }
+  }
   async function reserve() {
     setReservationError('');
     if (canBuyTicket) {
       setReserving(true);
       try {
-        await buySimulatedTickets(numericEventId, userId, type, quantity);
-        setModal(false);
-        notify('Compra simulada salva na sua conta. Nenhum pagamento foi processado.');
-        navigate('/ingressos');
+        const novo = await comChave(`reservar:${numericEventId}:${type}:${quantity}`, (chave) =>
+          reservarPedido(
+            {
+              eventId: numericEventId,
+              type,
+              quantity,
+              halfDeclaration: type === 'Meia-entrada' ? declaracaoMeia : undefined,
+            },
+            chave,
+          ),
+        );
+        setPedido(novo);
+        setEtapa('pagar');
       } catch (error) {
         setReservationError(error.message);
       } finally {
@@ -323,11 +408,12 @@ export function EventDetails() {
                 <>
                   <h3>Escolha, reserve e acompanhe</h3>
                   <ol>
-                    <li>Selecione o tipo de ingresso.</li>
-                    <li>Confira quantidade e total.</li>
-                    <li>Simule a reserva e consulte “Meus ingressos”.</li>
+                    <li>Selecione o tipo de ingresso e a quantidade.</li>
+                    <li>Reserve: os ingressos ficam guardados por 15 minutos.</li>
+                    <li>Pague de forma simulada (Pix ou cartão) e receba os ingressos em “Meus ingressos”.</li>
+                    <li>Até a véspera do evento, peça o estorno em “Meus pedidos”.</li>
                   </ol>
-                  <p>Nenhuma cobrança é feita.</p>
+                  <p>Nenhuma cobrança é feita e nenhum dado de pagamento é pedido.</p>
                 </>
               ) : (
                 <>
@@ -461,22 +547,79 @@ export function EventDetails() {
       </div>
       {modal && (
         <Modal
-          title={isAuthenticated ? 'Confirmar compra simulada' : 'Confirmar reserva de demonstração'}
-          onClose={() => !reserving && setModal(false)}
+          title={
+            !isAuthenticated
+              ? 'Confirmar reserva de demonstração'
+              : etapa === 'pagar'
+                ? 'Pagamento simulado'
+                : 'Confirmar pedido'
+          }
+          onClose={fecharModal}
         >
           <h3>{event.title}</h3>
           <p>
-            {quantity} × {type} · <strong>{money(total)}</strong>
+            {quantity} × {type} · <strong>{money(etapa === 'pagar' && pedido ? pedido.total : total)}</strong>
           </p>
-          <p>
-            {isAuthenticated
-              ? 'Esta ação registra os ingressos na sua conta, sem processar pagamento. Eles não são válidos para entrada no evento.'
-              : 'Esta ação salva uma reserva local de demonstração. Não há pagamento e o registro não é válido para entrada.'}
-          </p>
-          {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
-          <button className="button primary full" onClick={reserve} disabled={reserving}>
-            {reserving ? 'Salvando…' : 'Confirmar compra simulada'}
-          </button>
+          {!isAuthenticated ? (
+            <>
+              <p>
+                Esta ação salva uma reserva local de demonstração. Não há pagamento e o registro não é
+                válido para entrada.
+              </p>
+              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              <button className="button primary full" onClick={reserve} disabled={reserving}>
+                {reserving ? 'Salvando…' : 'Confirmar reserva de demonstração'}
+              </button>
+            </>
+          ) : etapa === 'pagar' && pedido ? (
+            <>
+              <p className="info-note">
+                Pedido nº {pedido.id} reservado até {horaLimite(pedido.secondsToExpire)}. Se o pagamento
+                não for concluído até lá, os lugares são liberados.
+              </p>
+              {pedido.total > 0 ? (
+                <PaymentChoice value={formaPagamento} onChange={setFormaPagamento} name="forma-pagamento-evento" />
+              ) : (
+                <p>Evento gratuito: é só confirmar a inscrição.</p>
+              )}
+              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              <button className="button primary full" onClick={pagar} disabled={reserving}>
+                {reserving
+                  ? 'Processando…'
+                  : pedido.total > 0
+                    ? `Pagar ${money(pedido.total)} (simulado)`
+                    : 'Confirmar inscrição'}
+              </button>
+              <button className="button outline full" onClick={cancelarReserva} disabled={reserving}>
+                Cancelar reserva
+              </button>
+            </>
+          ) : (
+            <>
+              <p>
+                Os ingressos ficam reservados por 15 minutos enquanto você conclui o pagamento simulado.
+                Nenhum valor é cobrado e os ingressos não são válidos para entrada no evento.
+              </p>
+              {type === 'Meia-entrada' && (
+                <label className="checkbox">
+                  <input
+                    type="checkbox"
+                    checked={declaracaoMeia}
+                    onChange={(e) => setDeclaracaoMeia(e.target.checked)}
+                  />
+                  Declaro ter direito à meia-entrada (simulação; nenhum documento é conferido).
+                </label>
+              )}
+              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              <button
+                className="button primary full"
+                onClick={reserve}
+                disabled={reserving || (type === 'Meia-entrada' && !declaracaoMeia)}
+              >
+                {reserving ? 'Reservando…' : 'Reservar e ir para o pagamento'}
+              </button>
+            </>
+          )}
         </Modal>
       )}
     </div>
@@ -561,6 +704,7 @@ export function Tickets() {
           title="Meus Ingressos"
           subtitle="Gerencie seus ingressos simulados e combine trocas com outros participantes."
         >
+          <Link className="button outline" to="/pedidos">Meus pedidos</Link>
           <Link className="button primary" to="/eventos">Explorar eventos</Link>
         </PageTitle>
         {error && (
@@ -584,7 +728,9 @@ export function Tickets() {
                   <p>{ticket.date} · {ticket.location}</p>
                   <p>{ticket.type} · {money(ticket.price)}</p>
                   <code>{ticket.code}</code>
-                  <p className="muted">Compra simulada; sem pagamento e sem validade para entrada.</p>
+                  <p className="muted">
+                    {ticket.orderId ? `Pedido nº ${ticket.orderId} · ` : ''}Pagamento simulado; sem validade para entrada.
+                  </p>
                   {ticket.statusCode === 'A' && (
                     <div className="actions">
                       <button
@@ -600,17 +746,24 @@ export function Tickets() {
                       >
                         {ticket.availableForExchange ? 'Retirar da troca' : 'Oferecer para troca'}
                       </button>
-                      <button
-                        type="button"
-                        className="button danger-outline"
-                        disabled={saving}
-                        onClick={() => perform(
-                          () => cancelParticipantTicket(ticket.id, userId),
-                          'Ingresso simulado cancelado.',
-                        )}
-                      >
-                        Cancelar ingresso
-                      </button>
+                      {ticket.cancellable && (
+                        <button
+                          type="button"
+                          className="button danger-outline"
+                          disabled={saving}
+                          title={ticket.refundOnCancel
+                            ? `Cancela o ingresso e estorna ${money(ticket.price)} (simulação).`
+                            : 'Cancela o ingresso sem estorno: ele veio de uma troca.'}
+                          onClick={() => perform(
+                            () => cancelParticipantTicket(ticket.id, userId),
+                            ticket.refundOnCancel
+                              ? `Ingresso cancelado e estorno de ${money(ticket.price)} registrado (simulação).`
+                              : 'Ingresso cancelado. Como ele veio de uma troca, não há estorno.',
+                          )}
+                        >
+                          {ticket.refundOnCancel ? 'Cancelar e estornar' : 'Cancelar ingresso'}
+                        </button>
+                      )}
                     </div>
                   )}
                 </Panel>

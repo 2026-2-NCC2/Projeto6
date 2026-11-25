@@ -1,6 +1,6 @@
 // Prepara o banco MySQL da Entrega 1 a partir dos arquivos SQL versionados.
 //
-// - Banco inexistente: cria, aplica o SCRIPT_BANCO_V2.sql e as duas migrações.
+// - Banco inexistente: cria, aplica o SCRIPT_BANCO_V2.sql e as migrações.
 // - Banco existente com as tabelas base: aplica só as migrações (podem ser reaplicadas).
 // - Banco existente vazio: aplica o script base e as migrações.
 // - Banco existente com outras tabelas, mas sem as do TrocaTicket: recusa, sem alterar nada.
@@ -17,7 +17,11 @@ const RAIZ_SERVIDOR = path.resolve(__dirname, '..');
 const SCRIPT_BASE =
   process.env.SCRIPT_BANCO ||
   path.resolve(RAIZ_SERVIDOR, '../../../../Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql');
-const MIGRACOES = ['MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql', 'MIGRACAO_SESSAO_LOGIN.sql'].map(
+const MIGRACOES = [
+  'MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql',
+  'MIGRACAO_SESSAO_LOGIN.sql',
+  'MIGRACAO_PEDIDOS_PAGAMENTOS.sql',
+].map(
   (arquivo) => path.join(RAIZ_SERVIDOR, arquivo),
 );
 

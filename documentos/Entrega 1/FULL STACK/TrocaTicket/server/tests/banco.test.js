@@ -5,9 +5,10 @@ const { SEM_MYSQL, conectar, configMysql } = require('./apoio');
 const { prepararBanco } = require('../scripts/preparar-banco');
 
 const TABELAS = [
-  'administrador_detalhes', 'avaliacao', 'comunidade_mensagem', 'evento', 'evento_favorito',
+  'administrador_detalhes', 'avaliacao', 'comunidade_mensagem', 'estorno', 'evento', 'evento_favorito',
   'evento_fornecedor', 'fornecedor_detalhes', 'foto_evento', 'ingresso', 'item_proposta',
-  'organizador_detalhes', 'produto_servico', 'proposta', 'sessao', 'troca_ingresso', 'usuario',
+  'organizador_detalhes', 'pedido', 'pedido_idempotencia', 'produto_servico', 'proposta', 'sessao',
+  'troca_ingresso', 'usuario',
 ];
 
 describe('preparo do banco', { skip: !configMysql() && SEM_MYSQL }, () => {
@@ -32,7 +33,7 @@ describe('preparo do banco', { skip: !configMysql() && SEM_MYSQL }, () => {
     await conexao.end();
   });
 
-  it('cria o banco com o script base e as duas migrações', async () => {
+  it('cria o banco com o script base e as migrações', async () => {
     const nome = novoNome('novo');
     const resultado = await preparar(nome);
     assert.equal(resultado.criado, true);

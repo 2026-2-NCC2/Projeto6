@@ -28,6 +28,7 @@ export const menus = {
     ['Início', '/eventos'],
     ['Comunidade', '/comunidade'],
     ['Meus ingressos', '/ingressos'],
+    ['Meus pedidos', '/pedidos'],
     ['Favoritos', '/favoritos'],
   ],
 };
