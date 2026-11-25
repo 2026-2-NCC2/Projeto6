@@ -7,3 +7,9 @@ Ler CHECKPOINT.md e DIAGNOSTICO.md. Conferir git status, branch, commits e diff 
 Aplicação em documentos/Entrega 1/FULL STACK/TrocaTicket. O próximo passo inicial é portar o tema. Preservar a Entrega 2.
 Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
 Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.
+
+## Retomada atual
+
+As etapas 1–3 e as correções visuais testadas estão registradas na branch local. Consultar o relatório final em CHECKPOINT.md para arquivos, resultados, erros e decisões. A etapa 4 está bloqueada apenas na validação completa dos serviços com o esquema compatível. Foi solicitada orientação específica para obter a migração oficial ou criar a complementar. Aguardar a decisão antes de alterar o banco. Se houver autorização, testar a migração primeiro em banco descartável, repetir login, catálogo, favoritos, ingressos, trocas e comunidade e registrar os códigos HTTP. Ao concluir a etapa 4, parar e aguardar nova confirmação do usuário.
+
+Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. Se a branch já existir, comparar os commits e preservar o trabalho local. A conexão atual recebeu 403 no GitHub. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.
