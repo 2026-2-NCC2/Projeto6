@@ -1,11 +1,76 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// A API roda na porta 3000 do mesmo endereço em que o site foi aberto (localhost ou 127.0.0.1).
+// Assim o navegador trata site e API como o mesmo "site" e envia o cookie de sessão.
+const API_PADRAO =
+  typeof window !== 'undefined' && window.location?.hostname
+    ? `${window.location.protocol}//${window.location.hostname}:3000/api`
+    : 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL || API_PADRAO;
+
+const CSRF_KEY = 'trocaticket-csrf';
+const METODOS_SEGUROS = ['GET', 'HEAD', 'OPTIONS'];
+export const EVENTO_SESSAO_EXPIRADA = 'trocaticket:sessao-expirada';
+
+export function guardarCsrf(token) {
+    try {
+        if (token) sessionStorage.setItem(CSRF_KEY, token);
+        else sessionStorage.removeItem(CSRF_KEY);
+    } catch {}
+}
+
+export function limparSessaoLocal() {
+    try {
+        sessionStorage.removeItem('trocaticket-user');
+        sessionStorage.removeItem('trocaticket-role');
+        sessionStorage.removeItem(CSRF_KEY);
+    } catch {}
+}
+
+// Todas as chamadas à API passam por aqui: envia o cookie de sessão e, nas gravações,
+// o token CSRF. Se a sessão expirar, avisa o site para voltar ao modo deslogado.
+export async function apiFetch(url, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
+    const headers = new Headers(options.headers || {});
+    if (!METODOS_SEGUROS.includes(method)) {
+        let token = null;
+        try {
+            token = sessionStorage.getItem(CSRF_KEY);
+        } catch {}
+        if (token) headers.set('X-CSRF-Token', token);
+    }
+    const response = await globalThis.fetch(url, { ...options, headers, credentials: 'include' });
+    if (response.status === 401 && !String(url).endsWith('/login')) {
+        let tinhaSessao = false;
+        try {
+            tinhaSessao = Boolean(sessionStorage.getItem('trocaticket-user'));
+        } catch {}
+        if (tinhaSessao) {
+            limparSessaoLocal();
+            window.dispatchEvent(new CustomEvent(EVENTO_SESSAO_EXPIRADA));
+        }
+    }
+    return response;
+}
+
+// Pergunta ao servidor quem está logado neste navegador.
+export async function buscarSessao(signal) {
+    const response = await apiFetch(`${API_URL}/sessao`, { signal });
+    if (!response.ok) throw new Error('Não foi possível conferir a sessão.');
+    return response.json();
+}
+
+export async function encerrarSessao() {
+    try {
+        await apiFetch(`${API_URL}/logout`, { method: 'POST' });
+    } catch {}
+    limparSessaoLocal();
+}
 
 export async function buscarUsuario(id) {
     let response;
     let resultado;
 
     try {
-        response = await fetch(`${API_URL}/usuarios/${id}`);
+        response = await apiFetch(`${API_URL}/usuarios/${id}`);
     } catch {
         throw new Error('Não foi possível conectar ao servidor backend (http://localhost:3000).');
     }
@@ -28,7 +93,7 @@ export async function atualizarUsuario(id, dados) {
     let resultado;
 
     try {
-        response = await fetch(`${API_URL}/usuarios/${id}`, {
+        response = await apiFetch(`${API_URL}/usuarios/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +124,7 @@ export async function cadastrarUsuario(dados) {
     let resultado;
 
     try {
-        response = await fetch(`${API_URL}/usuarios`, {
+        response = await apiFetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -88,7 +153,7 @@ export async function fazerLogin(credenciais) {
     let resultado;
     
     try {
-        response = await fetch(`${API_URL}/login`, {
+        response = await apiFetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -117,7 +182,7 @@ export async function uploadFotoUsuario(id, fotoBase64) {
     let resultado;
 
     try {
-        response = await fetch(`${API_URL}/usuarios/${id}/foto`, {
+        response = await apiFetch(`${API_URL}/usuarios/${id}/foto`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -146,7 +211,7 @@ export async function excluirFotoUsuario(id) {
     let resultado;
 
     try {
-        response = await fetch(`${API_URL}/usuarios/${id}/foto`, {
+        response = await apiFetch(`${API_URL}/usuarios/${id}/foto`, {
             method: 'DELETE'
         });
     } catch {
@@ -169,7 +234,7 @@ export async function excluirFotoUsuario(id) {
 export async function atualizarSenhaUsuario(id, senhaAtual, novaSenha) {
     let response;
     try {
-        response = await fetch(`${API_URL}/usuarios/${encodeURIComponent(id)}/senha`, {
+        response = await apiFetch(`${API_URL}/usuarios/${encodeURIComponent(id)}/senha`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ senhaAtual, novaSenha })

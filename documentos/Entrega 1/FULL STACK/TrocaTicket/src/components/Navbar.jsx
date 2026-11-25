@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { destinations, roleNames } from '../data/demo';
 import { initialsOf } from '../utils/format';
+import { encerrarSessao } from '../services/api';
 
 export const menus = {
   organizador: [
@@ -44,7 +45,9 @@ export default function Navbar({ darkMode, toggleTheme }) {
   const { data, role, isAuthenticated, chooseRole, notify } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
-  function handleLogout() {
+  async function handleLogout() {
+    // Encerra a sessão no servidor (o cookie deixa de valer) e depois limpa o navegador.
+    await encerrarSessao();
     chooseRole('');
     try {
       sessionStorage.removeItem('trocaticket-user');

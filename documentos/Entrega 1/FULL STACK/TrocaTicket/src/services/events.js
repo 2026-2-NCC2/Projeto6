@@ -1,4 +1,4 @@
-import { API_URL } from './api';
+import { API_URL, apiFetch } from './api';
 
 export async function getEvents(signal, simulateError = false) {
   await new Promise((resolve) => setTimeout(resolve, 450));
@@ -10,7 +10,7 @@ export async function getEvents(signal, simulateError = false) {
 }
 
 export async function getPublishedEvents(signal) {
-  const response = await fetch(`${API_URL}/eventos/publicados`, { signal });
+  const response = await apiFetch(`${API_URL}/eventos/publicados`, { signal });
   return readApiResponse(response, 'Não foi possível carregar eventos publicados do servidor.');
 }
 
@@ -30,7 +30,7 @@ async function readApiResponse(response, fallbackMessage) {
 export async function getOrganizerEvents(organizerId, signal) {
   let response;
   try {
-    response = await fetch(
+    response = await apiFetch(
       `${API_URL}/eventos?organizadorId=${encodeURIComponent(organizerId)}`,
       { signal },
     );
@@ -44,7 +44,7 @@ export async function getOrganizerEvents(organizerId, signal) {
 export async function createEvent(organizerId, event) {
   let response;
   try {
-    response = await fetch(`${API_URL}/eventos`, {
+    response = await apiFetch(`${API_URL}/eventos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...event, organizadorId: organizerId }),
@@ -61,7 +61,7 @@ export async function createEvent(organizerId, event) {
 export async function updateEvent(eventId, organizerId, event) {
   let response;
   try {
-    response = await fetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}`, {
+    response = await apiFetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...event, organizadorId: organizerId }),
@@ -76,12 +76,12 @@ export async function updateEvent(eventId, organizerId, event) {
 }
 
 export async function getEventReviews(eventId, signal) {
-  const response = await fetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}/avaliacoes`, { signal });
+  const response = await apiFetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}/avaliacoes`, { signal });
   return readApiResponse(response, 'Não foi possível carregar as avaliações do evento.');
 }
 
 export async function saveEventReview(eventId, userId, review) {
-  const response = await fetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}/avaliacoes`, {
+  const response = await apiFetch(`${API_URL}/eventos/${encodeURIComponent(eventId)}/avaliacoes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...review, userId }),
@@ -90,12 +90,12 @@ export async function saveEventReview(eventId, userId, review) {
 }
 
 export async function getFavoriteEvents(userId, signal) {
-  const response = await fetch(`${API_URL}/usuarios/${encodeURIComponent(userId)}/favoritos`, { signal });
+  const response = await apiFetch(`${API_URL}/usuarios/${encodeURIComponent(userId)}/favoritos`, { signal });
   return readApiResponse(response, 'Não foi possível carregar seus eventos favoritos.');
 }
 
 export async function setFavoriteEvent(userId, eventId, saved) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/usuarios/${encodeURIComponent(userId)}/favoritos/${encodeURIComponent(eventId)}`,
     { method: saved ? 'POST' : 'DELETE' },
   );
@@ -104,7 +104,7 @@ export async function setFavoriteEvent(userId, eventId, saved) {
 }
 
 export async function getOrganizerProposals(organizerId, eventId, signal) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/organizadores/${encodeURIComponent(organizerId)}/eventos/${encodeURIComponent(eventId)}/propostas`,
     { signal },
   );
@@ -112,7 +112,7 @@ export async function getOrganizerProposals(organizerId, eventId, signal) {
 }
 
 export async function updateOrganizerProposal(organizerId, eventId, proposalId, status) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/organizadores/${encodeURIComponent(organizerId)}/eventos/${encodeURIComponent(eventId)}/propostas/${encodeURIComponent(proposalId)}`,
     {
       method: 'PUT',
@@ -124,7 +124,7 @@ export async function updateOrganizerProposal(organizerId, eventId, proposalId, 
 }
 
 export async function getOrganizerSuppliers(organizerId, signal) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/organizadores/${encodeURIComponent(organizerId)}/fornecedores`,
     { signal },
   );
@@ -132,7 +132,7 @@ export async function getOrganizerSuppliers(organizerId, signal) {
 }
 
 export async function getEventSuppliers(organizerId, eventId, signal) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/organizadores/${encodeURIComponent(organizerId)}/eventos/${encodeURIComponent(eventId)}/fornecedores`,
     { signal },
   );
@@ -140,7 +140,7 @@ export async function getEventSuppliers(organizerId, eventId, signal) {
 }
 
 export async function setEventSupplier(organizerId, eventId, supplierId, linked) {
-  const response = await fetch(
+  const response = await apiFetch(
     `${API_URL}/organizadores/${encodeURIComponent(organizerId)}/eventos/${encodeURIComponent(eventId)}/fornecedores/${encodeURIComponent(supplierId)}`,
     { method: linked ? 'POST' : 'DELETE' },
   );

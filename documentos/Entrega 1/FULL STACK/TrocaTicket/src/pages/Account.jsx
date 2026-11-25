@@ -6,7 +6,7 @@ import { destinations, roleNames } from '../data/demo';
 import { Field, Tabs } from '../components/UI';
 
 import { validateAccount, validateRecovery, maskDocument, normalizeEmail } from '../utils/validation';
-import { buscarUsuario, cadastrarUsuario, fazerLogin } from '../services/api';
+import { buscarUsuario, cadastrarUsuario, fazerLogin, guardarCsrf } from '../services/api';
 
 export default function Account({ login = false }) {
   const navigate = useNavigate();
@@ -65,7 +65,9 @@ export default function Account({ login = false }) {
         };
 
         const resultado = await fazerLogin(payload);
-        
+        // O cookie de sessão fica com o navegador; o token CSRF acompanha as gravações.
+        guardarCsrf(resultado.csrfToken);
+
         // Define o papel (role) retornado pela base de dados
         const roleDoBanco = resultado.user?.role || 'comprador';
         const perfilRetornado = roleDoBanco === 'participante' ? 'comprador' : roleDoBanco;
@@ -118,6 +120,8 @@ export default function Account({ login = false }) {
         };
 
         const cadResultado = await cadastrarUsuario(payload);
+        // O servidor já abre a sessão da conta nova.
+        guardarCsrf(cadResultado?.csrfToken);
 
         chooseRole(profile);
 

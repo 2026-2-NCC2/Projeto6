@@ -9,17 +9,26 @@ Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
 Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.
 
 Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapa 4 concluída.
+Branch integracao-main-miguel publicada por um colega (b477108). O usuário pediu para trazer a TrocaTicket 2.0 para a Entrega 1 por etapas, mantendo a Entrega 1 como base; cada etapa vai numa branch nova e termina com testes e parada para confirmação.
 
 ## Retomada atual
 
-As etapas 1–4 estão verificadas e registradas na branch local integracao-main-miguel. Os resultados, códigos HTTP e decisões estão em CHECKPOINT.md. A pendência do banco foi resolvida com a migração complementar documentos/Entrega 1/FULL STACK/TrocaTicket/server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql. O usuário autorizou o arquivo, que foi testado só em MariaDB 10.11 e MySQL 8.0 descartáveis. Com ela, favoritos, ingressos, trocas, comunidade e as rotas de fornecedores deixaram de responder HTTP 500, e o fluxo completo pelo navegador passou. Commit apenas local, sem publicação e sem merge. Aguardar confirmação do usuário.
+A etapa 1 da integração com a 2.0 (login com sessão) está concluída e testada na branch local integracao-site-2.0-etapa1-sessao, criada a partir de b477108. Detalhes, arquivos e resultados estão em CHECKPOINT.md. Essa etapa muda o contrato da API da main, como o usuário aceitou: as rotas de conta passam a exigir sessão e as gravações exigem X-CSRF-Token. URLs e formatos de resposta foram mantidos. Commit local, sem publicação e sem merge. A publicação depende de um colega com permissão de escrita, porque o app do Claude não tem acesso à organização 2026-2-NCC2. Aguardar confirmação do usuário antes da etapa 2.
+
+Próximas etapas sugeridas, a confirmar com o usuário:
+2. Testes automatizados da API (como na 2.0) e iniciador de um clique.
+3. Compra simulada completa: pedido, pagamento, cancelamento e estorno.
+4. Revenda, fila de espera e transferência com aceite.
+5. Portaria e atendimento.
+6. Administração ligada ao banco e exigência de aprovação de contas.
+7. Idiomas.
 
 Pendências para a equipe:
 1. Confirmar se existe uma migração oficial. Se existir, compará-la com a complementar e substituí-la.
-2. Alinhar a documentação do banco. O README diz que o script base dispensa a migração, mas o SCRIPT_BANCO_V2.sql não tem as estruturas. Decidir entre incorporá-las ao script base, o que altera a Entrega 2, ou orientar no README a aplicar a migração também em instalações novas.
+2. Decidir se as estruturas das duas migrações entram no SCRIPT_BANCO_V2.sql, o que altera a Entrega 2. Por enquanto, o README da Entrega 1 orienta a aplicar as migrações também em instalações novas.
 3. Corrigir o histórico de trocas depois do aceite: quem propôs vê "Proposta recebida" e quem aceitou deixa de ver a troca. O problema está no server.js da main e está descrito em CHECKPOINT.md.
-4. Publicar a branch quando houver permissão de escrita. A tentativa anterior recebeu HTTP 403.
+4. Combinar com o grupo a mudança de contrato da API: o site da Entrega 1 já foi adaptado, mas outros clientes da API precisam enviar o cookie e o token.
 
-Para usar a migração num banco local de testes: importar SCRIPT_BANCO_V2.sql e depois o arquivo da migração, pelo cliente mysql ou pelo Workbench. A última consulta do arquivo deve voltar vazia. Não aplicar em banco compartilhado sem aval da equipe.
+Para usar as migrações num banco local de testes: importar SCRIPT_BANCO_V2.sql, depois MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql e depois MIGRACAO_SESSAO_LOGIN.sql, pelo cliente mysql ou pelo Workbench. A última consulta de cada arquivo deve voltar vazia. Não aplicar em banco compartilhado sem aval da equipe.
 
-Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. O commit esperado está no LEIA-PRIMEIRO.txt que acompanha o bundle. Se a branch já existir, comparar os commits e preservar o trabalho local. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.
+Para recuperar os commits a partir de um clone que contenha 24f169ad133372252051e0e4b9d7bf85f6ba3a6c, usar git bundle verify no arquivo integracao-main-miguel.bundle e git fetch com o caminho do arquivo e refs/heads/integracao-main-miguel. Em clone novo, git switch -c integracao-main-miguel FETCH_HEAD. O commit esperado está no LEIA-PRIMEIRO.txt que acompanha o bundle. Para a etapa 1, um clone com integracao-main-miguel já basta como base, porque o bundle novo traz só o commit da etapa. Se a branch já existir, comparar os commits e preservar o trabalho local. Verificar permissão antes de publicar a branch. Nenhuma credencial faz parte deste material.

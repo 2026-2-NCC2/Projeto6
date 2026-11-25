@@ -1,9 +1,9 @@
-import { API_URL } from './api';
+import { API_URL, apiFetch } from './api';
 
 async function request(path, options, fallback) {
   let response;
   try {
-    response = await fetch(`${API_URL}${path}`, options);
+    response = await apiFetch(`${API_URL}${path}`, options);
   } catch (error) {
     if (error.name === 'AbortError') throw error;
     throw new Error('Não foi possível conectar à API. Verifique se o servidor e o banco estão ativos.', {

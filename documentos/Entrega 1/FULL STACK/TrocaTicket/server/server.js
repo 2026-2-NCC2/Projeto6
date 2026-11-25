@@ -16,14 +16,22 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-app.use(cors());
+const db = require('./db');
+const { criarSessoes } = require('./sessao');
+const sessoes = criarSessoes(db);
+
+// Só os endereços locais do site (ou os de CORS_ORIGINS) usam a API pelo navegador, com cookie.
+app.use(sessoes.protegerOrigem);
+app.use(cors(sessoes.corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Disponibiliza as imagens publicamente via URL
 app.use('/uploads', express.static(uploadsDir));
 
-const db = require('./db');
+// Identifica o usuário pelo cookie de sessão e protege as gravações (sessão + token CSRF).
+app.use(sessoes.carregarSessao);
+app.use(sessoes.protegerGravacoes);
 
 function positiveInteger(value) {
   const parsed = Number(value);
@@ -96,6 +104,7 @@ function eventInputError(body) {
 }
 
 async function requireOrganizer(organizerId, res) {
+  if (!sessoes.exigirPropriaConta(res, organizerId)) return false;
   const [rows] = await db.execute(
     'SELECT id FROM usuario WHERE id = ? AND tipo_perfil = 2',
     [organizerId],
@@ -388,6 +397,7 @@ app.get('/api/testar-conexao', async (req, res) => {
 app.get('/api/usuarios/:id', async (req, res) => {
   try {
       const { id } = req.params;
+      if (!sessoes.exigirPropriaConta(res, id)) return;
 
       const [rows] = await db.execute(
           `SELECT
@@ -424,6 +434,7 @@ app.get('/api/usuarios/:id', async (req, res) => {
 app.put('/api/usuarios/:id', async (req, res) => {
   try {
       const { id } = req.params;
+      if (!sessoes.exigirPropriaConta(res, id)) return;
       const { nome, email } = req.body;
 
       if (!nome || !email) {
@@ -468,6 +479,7 @@ app.post('/api/usuarios/:id/foto', async (req, res) => {
     if (!id) {
       return res.status(400).json({ error: 'Informe um ID de usuário válido.' });
     }
+    if (!sessoes.exigirPropriaConta(res, id)) return;
     if (!fotoBase64) {
       return res.status(400).json({ error: 'Nenhuma foto fornecida.' });
     }
@@ -533,6 +545,7 @@ app.delete('/api/usuarios/:id/foto', async (req, res) => {
     if (!id) {
       return res.status(400).json({ error: 'Informe um ID de usuário válido.' });
     }
+    if (!sessoes.exigirPropriaConta(res, id)) return;
 
     const [usuarios] = await db.execute('SELECT id, url_foto_perfil FROM usuario WHERE id = ?', [id]);
     if (usuarios.length === 0) {
@@ -566,15 +579,19 @@ app.delete('/api/usuarios/:id/foto', async (req, res) => {
 });
 
 app.post('/api/usuarios', async (req, res) => {
+  const { nome, email, senha, tipo_perfil, documento, nome_organizacao, telefone } = req.body;
+
+  if (!nome || !email || !senha || !tipo_perfil) {
+    return res.status(400).json({ error: 'Preencha todos os campos obrigatórios.' });
+  }
+  if (sessoes.limitarTentativas(req, email).bloqueado) {
+    return res.status(429).json({ error: 'Muitas tentativas. Aguarde alguns minutos.', code: 'RATE_LIMIT' });
+  }
+
   const connection = await db.getConnection();
+  let usuarioId;
   try {
     await connection.beginTransaction();
-
-    const { nome, email, senha, tipo_perfil, documento, nome_organizacao, telefone } = req.body;
-
-    if (!nome || !email || !senha || !tipo_perfil) {
-      return res.status(400).json({ error: 'Preencha todos os campos obrigatórios.' });
-    }
 
     const saltRounds = 10;
     const senha_hash = await bcrypt.hash(senha, saltRounds);
@@ -585,7 +602,7 @@ app.post('/api/usuarios', async (req, res) => {
       [nome, email, senha_hash, tipo_perfil]
     );
 
-    const usuarioId = userResult.insertId;
+    usuarioId = userResult.insertId;
 
     if (tipo_perfil === 2 || tipo_perfil === '2') {
       const isCnpj = documento && documento.length > 11;
@@ -616,24 +633,31 @@ app.post('/api/usuarios', async (req, res) => {
     }
 
     await connection.commit();
-    connection.release();
-
-    res.status(201).json({ 
-      message: 'Usuário cadastrado com sucesso!', 
-      usuarioId 
-    });
-
   } catch (error) {
-    await connection.rollback();
-    connection.release();
+    await connection.rollback().catch(() => {});
 
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({ error: 'Este e-mail ou documento já está cadastrado.' });
     }
 
     console.error('Erro ao cadastrar usuário:', error);
-    res.status(500).json({ error: 'Erro interno ao realizar o cadastro.' });
+    return res.status(500).json({ error: 'Erro interno ao realizar o cadastro.' });
+  } finally {
+    connection.release();
   }
+
+  // A conta nova já entra logada, como o site espera depois do cadastro.
+  let sessao = {};
+  try {
+    sessao = await sessoes.criarSessao(req, res, usuarioId);
+  } catch (error) {
+    console.error('Cadastro concluído, mas a sessão não foi criada (aplique MIGRACAO_SESSAO_LOGIN.sql):', error);
+  }
+  res.status(201).json({
+    message: 'Usuário cadastrado com sucesso!',
+    usuarioId,
+    ...sessao,
+  });
 });
 
 app.post('/api/login', async (req, res) => {
@@ -644,48 +668,48 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
     }
 
-    // 1. Buscar o utilizador pelo e-mail
+    const limite = sessoes.limitarTentativas(req, email);
+    if (limite.bloqueado) {
+      return res.status(429).json({ error: 'Muitas tentativas. Aguarde alguns minutos.', code: 'RATE_LIMIT' });
+    }
+
     const [rows] = await db.execute(
-      `SELECT id, nome, email, senha_hash, tipo_perfil, url_foto_perfil FROM usuario WHERE email = ?`,
+      `SELECT id, senha_hash FROM usuario WHERE email = ?`,
       [email]
     );
 
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
-    }
-
-    const usuario = rows[0];
-
-    // Permite comparar senha com hash bcrypt ou texto plano (caso registros tenham sido inseridos manualmente no banco)
-    const senhaValida =
-      usuario.senha_hash === senha ||
-      (await bcrypt.compare(senha, usuario.senha_hash).catch(() => false));
-
+    // A conferência leva o mesmo tempo com ou sem conta, para não revelar quais e-mails existem.
+    const senhaValida = await sessoes.conferirSenha(senha, rows[0]);
     if (!senhaValida) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
     }
 
-    const tiposMap = {
-      1: 'comprador',
-      2: 'organizador',
-      3: 'fornecedor',
-      4: 'admin'
-    };
+    sessoes.liberarTentativas(limite.chave);
+    const { user, csrfToken } = await sessoes.criarSessao(req, res, rows[0].id);
 
     res.json({
       message: 'Login realizado com sucesso!',
-      user: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        foto: usuario.url_foto_perfil || null,
-        tipo_perfil: usuario.tipo_perfil,
-        role: tiposMap[usuario.tipo_perfil] || 'comprador'
-      }
+      user,
+      csrfToken,
     });
   } catch (error) {
     console.error('Erro ao realizar login:', error);
     res.status(500).json({ error: 'Erro interno ao realizar login.' });
+  }
+});
+
+// Diz ao site quem está logado neste navegador (ou null), junto com o token CSRF da sessão.
+app.get('/api/sessao', (req, res) => {
+  res.json({ user: req.user, csrfToken: req.user ? req.csrfToken : null });
+});
+
+app.post('/api/logout', async (req, res) => {
+  try {
+    await sessoes.encerrarSessao(req, res);
+    res.status(204).end();
+  } catch (error) {
+    console.error('Erro ao encerrar a sessão:', error);
+    res.status(500).json({ error: 'Erro interno ao encerrar a sessão.' });
   }
 });
 
@@ -700,6 +724,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     async function requireUserRole(userId, role, res) {
+      if (!sessoes.exigirPropriaConta(res, userId)) return false;
       const [users] = await db.execute(
         'SELECT id FROM usuario WHERE id = ? AND tipo_perfil = ?',
         [userId, role],
@@ -2094,15 +2119,16 @@ app.post('/api/login', async (req, res) => {
       if (!userId || typeof senhaAtual !== 'string' || typeof novaSenha !== 'string' || novaSenha.length < 8) {
         return res.status(400).json({ error: 'Informe a senha atual e uma nova senha com pelo menos 8 caracteres.' });
       }
+      if (!sessoes.exigirPropriaConta(res, userId)) return;
       try {
-        const [rows] = await db.execute('SELECT senha_hash FROM usuario WHERE id = ?', [userId]);
+        const [rows] = await db.execute('SELECT id, senha_hash FROM usuario WHERE id = ?', [userId]);
         if (!rows.length) return res.status(404).json({ error: 'Usuário não encontrado.' });
-        const currentMatches =
-          rows[0].senha_hash === senhaAtual ||
-          (await bcrypt.compare(senhaAtual, rows[0].senha_hash).catch(() => false));
+        const currentMatches = await sessoes.conferirSenha(senhaAtual, rows[0]);
         if (!currentMatches) return res.status(400).json({ error: 'A senha atual está incorreta.' });
         const hash = await bcrypt.hash(novaSenha, 10);
         await db.execute('UPDATE usuario SET senha_hash = ? WHERE id = ?', [hash, userId]);
+        // As outras sessões abertas desta conta deixam de valer; a atual continua.
+        await sessoes.encerrarOutrasSessoes(req, userId);
         res.json({ message: 'Senha atualizada com sucesso.' });
       } catch (error) {
         console.error('Erro ao atualizar senha:', error);

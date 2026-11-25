@@ -1,7 +1,21 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  startTransition,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { useNavigate } from 'react-router';
 import { initialEvents, initialPeople } from '../data/demo';
 import { initialSupplierProfile, supplierInventory, supplierProposals } from '../data/supplier';
 import { getFavoriteEvents, setFavoriteEvent } from '../services/events';
+import {
+  EVENTO_SESSAO_EXPIRADA,
+  buscarSessao,
+  guardarCsrf,
+  limparSessaoLocal,
+} from '../services/api';
 const Context = createContext(null);
 const STORAGE_KEY = 'trocaticket-v2';
 const defaults = {
@@ -162,6 +176,63 @@ export function StoreProvider({ children }) {
     const saved = readStorage(accountStorageKey(user.id), accountDefaults);
     setData(accountData(saved, user));
   }
+  // O servidor é quem sabe se a sessão vale. Ao abrir o site, confere o cookie de sessão:
+  // restaura a conta numa aba nova, troca para a conta certa ou encerra a sessão local vencida.
+  const navigate = useNavigate();
+  const encerrarLocalmente = useCallback((mensagem) => {
+    limparSessaoLocal();
+    setRole('');
+    setAccountId(null);
+    setData(readStorage(STORAGE_KEY));
+    if (mensagem) setToast(mensagem);
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    buscarSessao(controller.signal)
+      .then(({ user, csrfToken }) => {
+        const local = sessionUser();
+        if (!user) {
+          if (local?.id) encerrarLocalmente('Sua sessão terminou. Entre novamente.');
+          return;
+        }
+        guardarCsrf(csrfToken);
+        let papelAtual = '';
+        try {
+          papelAtual = sessionStorage.getItem('trocaticket-role') || '';
+        } catch {}
+        const abaNova = !local?.id && !papelAtual;
+        if (Number(local?.id) === Number(user.id) || (!abaNova && !local?.id)) return;
+        const usuario = {
+          id: user.id,
+          name: user.nome || 'Usuário',
+          email: user.email,
+          photo: user.foto || '',
+          role: user.role,
+          tipo_perfil: user.tipo_perfil,
+        };
+        try {
+          sessionStorage.setItem('trocaticket-user', JSON.stringify(usuario));
+          sessionStorage.setItem('trocaticket-role', usuario.role);
+        } catch {}
+        activateUser(usuario);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+    // Só na abertura do site; as mudanças seguintes passam por login/logout.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    function aoExpirar() {
+      // Limpeza e navegação na mesma transição: assim o Layout já vê /entrar com a conta
+      // encerrada e não redireciona a página interna antiga para a escolha de perfil.
+      startTransition(() => {
+        encerrarLocalmente('Sua sessão terminou. Entre novamente.');
+        navigate('/entrar', { replace: true });
+      });
+    }
+    window.addEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirar);
+    return () => window.removeEventListener(EVENTO_SESSAO_EXPIRADA, aoExpirar);
+  }, [encerrarLocalmente, navigate]);
   const update = useCallback((key, value) => {
     setData((old) => ({ ...old, [key]: typeof value === 'function' ? value(old[key]) : value }));
   }, []);
