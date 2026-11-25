@@ -1,0 +1,765 @@
+/* ==========================================================
+   LAYOUT COMPARTILHADO — header fixo, espaço reservado e
+   interações do menu. Fonte única das medidas do header:
+   toda tela interna ou de acesso começa abaixo dele; só a
+   homepage pública deixa o header flutuar sobre o hero.
+   Importado por último em main.jsx.
+   ========================================================== */
+:root {
+  --tt-header-top: 10px;
+  --tt-header-height: 66px;
+  --tt-header-gap: 22px;
+  --tt-header-width: min(1370px, calc(100% - 32px));
+  --tt-header-offset: calc(var(--tt-header-top) + var(--tt-header-height));
+  --tt-header-space: calc(var(--tt-header-offset) + var(--tt-header-gap));
+  --tt-nav-hover-bg: rgba(157, 126, 230, 0.12);
+  --tt-nav-hover-border: rgba(157, 126, 230, 0.26);
+  --tt-nav-active: #c9c0ff;
+  --tt-nav-active-bar: #8b74ff;
+  --tt-focus-ring: #a99aff;
+  --tt-demo: #f59e0b;
+}
+@media (max-width: 850px) {
+  :root {
+    --tt-header-top: 8px;
+    --tt-header-height: 60px;
+    --tt-header-gap: 18px;
+    --tt-header-width: calc(100% - 20px);
+  }
+}
+@media (max-width: 620px) {
+  :root {
+    --tt-header-height: 56px;
+    --tt-header-gap: 14px;
+    --tt-header-width: calc(100% - 16px);
+  }
+}
+
+/* Âncoras param abaixo do header em qualquer tela. */
+html {
+  scroll-padding-top: var(--tt-header-space);
+}
+
+/* Telas internas e de acesso reservam a altura do header. */
+.app-shell,
+.account-shell {
+  padding-top: var(--tt-header-offset);
+}
+
+/* Homepage do Usuário: o hero começa no topo (atrás do header) e a faixa do modo
+   demonstração fica sobre a imagem, logo abaixo do header. */
+.app-shell.hero-shell {
+  padding-top: 0;
+}
+.hero-shell > .demo-strip {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--tt-header-offset) + 6px);
+  left: 0;
+  right: 0;
+  padding: 10px 34px 0;
+  color: #c9d3e4;
+}
+.hero-shell > .demo-strip button {
+  color: #b9c8ff;
+}
+@media (max-width: 620px) {
+  .hero-shell > .demo-strip {
+    padding: 8px 16px 0;
+  }
+}
+
+/* ---------- Cápsula do header (todas as telas) ---------- */
+.public-shell > .header,
+.account-shell > .header,
+.app-shell > .header,
+.app-shell > .app-header.header {
+  position: fixed !important;
+  z-index: 1100 !important;
+  top: var(--tt-header-top) !important;
+  left: 50% !important;
+  right: auto !important;
+  width: var(--tt-header-width) !important;
+  max-width: 1370px !important;
+  min-height: var(--tt-header-height) !important;
+  height: var(--tt-header-height) !important;
+  padding: 10px 28px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 42px !important;
+  transform: translateX(-50%) !important;
+  background: #080c14 !important;
+  color: #f7f9ff !important;
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+  box-shadow:
+    0 9px 28px rgba(9, 16, 29, 0.18),
+    0 2px 7px rgba(9, 16, 29, 0.1) !important;
+  transition:
+    box-shadow 0.22s ease,
+    background-color 0.22s ease !important;
+}
+.public-shell > .header:hover,
+.account-shell > .header:hover,
+.app-shell > .header:hover {
+  box-shadow:
+    0 12px 32px rgba(9, 16, 29, 0.22),
+    0 3px 8px rgba(9, 16, 29, 0.12) !important;
+}
+@media (max-width: 850px) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .app-shell > .app-header.header {
+    padding: 8px 18px !important;
+    border-radius: 34px !important;
+  }
+}
+@media (max-width: 620px) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .app-shell > .app-header.header {
+    padding: 7px 14px !important;
+    border-radius: 30px !important;
+  }
+}
+
+/* ---------- Logotipo: mesma animação em todas as telas ---------- */
+.header .brand {
+  border-radius: 14px;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.header .brand > span,
+.header .brand > span small {
+  transition: color 0.2s ease;
+}
+.public-shell > .header .brand,
+.account-shell > .header .brand,
+.app-shell > .header .brand,
+.public-shell > .header .brand span,
+.account-shell > .header .brand span,
+.app-shell > .header .brand span {
+  color: #f7f9ff !important;
+}
+.public-shell > .header .brand small,
+.account-shell > .header .brand small,
+.app-shell > .header .brand small {
+  color: #b3bfd2 !important;
+}
+.header .brand:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.public-shell > .header .brand:hover > span,
+.account-shell > .header .brand:hover > span,
+.app-shell > .header .brand:hover > span,
+.public-shell > .header .brand:hover > span small,
+.account-shell > .header .brand:hover > span small,
+.app-shell > .header .brand:hover > span small {
+  color: #a78bdf !important;
+}
+
+/* ---------- Menu: hover, foco e página atual iguais no público e no interno ---------- */
+.header :is(.public-navigation, .app-navigation) {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+.app-header .app-navigation {
+  justify-content: center;
+  gap: clamp(4px, 1.1vw, 16px);
+}
+.header :is(.public-navigation, .app-navigation) a:not(.header-cta) {
+  position: relative;
+  padding: 9px 15px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #eef2fb;
+  opacity: 1;
+  background: transparent;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease !important;
+}
+.header :is(.public-navigation, .app-navigation) a:not(.header-cta):hover {
+  color: #fff;
+  background: var(--tt-nav-hover-bg);
+  border-color: var(--tt-nav-hover-border);
+  transform: translateY(-1px);
+}
+.header :is(.public-navigation, .app-navigation) a:not(.header-cta):active {
+  transform: translateY(0);
+}
+.header .app-navigation a.active {
+  color: var(--tt-nav-active);
+}
+.header .app-navigation a.active::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 99px;
+  background: var(--tt-nav-active-bar);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+.header .app-navigation a.active:hover::after {
+  opacity: 0;
+}
+.header .public-navigation .header-cta {
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease !important;
+}
+.header .public-navigation .header-cta:hover {
+  transform: translateY(-1px);
+}
+
+/* Botões redondos do header (tema, notificações, menu) */
+.header .theme-toggle,
+.app-header .header-tools > .notification-button,
+.app-header .menu-toggle {
+  color: #c1cad9;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease !important;
+}
+.header .theme-toggle:hover,
+.app-header .header-tools > .notification-button:hover,
+.app-header .menu-toggle:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Foco visível para teclado em tudo que é clicável no header */
+.header :is(a, button):focus-visible {
+  outline: 2px solid var(--tt-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Menu recolhido (telas estreitas): abre logo abaixo do header */
+@media (max-width: 850px) {
+  .app-header .app-navigation.is-open {
+    top: calc(100% + 10px);
+    gap: 4px;
+  }
+  .app-header .app-navigation.is-open a {
+    justify-content: flex-start;
+  }
+  .header .app-navigation a.active::after {
+    left: 15px;
+    right: auto;
+    width: 24px;
+  }
+}
+
+/* ---------- Faixa e troca rápida do modo demonstração ---------- */
+.app-shell > .demo-strip {
+  align-items: center;
+  padding-top: 16px;
+  font-size: 11px;
+}
+.demo-strip span i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--tt-demo);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+  vertical-align: 1px;
+}
+.demo-switcher {
+  position: relative;
+}
+.app-header .header-tools > .demo-switcher > .demo-switcher-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 11px 0 10px;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f7f9ff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.app-header .header-tools > .demo-switcher > .demo-switcher-toggle:hover,
+.app-header .header-tools > .demo-switcher > .demo-switcher-toggle[aria-expanded='true'] {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.55);
+  transform: translateY(-1px);
+}
+.demo-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tt-demo);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+}
+.demo-switcher-text {
+  display: inline-flex;
+  gap: 5px;
+  text-transform: uppercase;
+}
+.demo-switcher-text b {
+  font-weight: 650;
+  color: #ffd79a;
+  text-transform: none;
+}
+.demo-caret {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.demo-switcher-panel {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 14px);
+  right: 0;
+  width: 264px;
+  padding: 14px;
+  border: 1px solid var(--tt-border, #e3e9f3);
+  border-radius: 16px;
+  background: var(--tt-surface, #fff);
+  color: var(--tt-ink, #17233a);
+  box-shadow: 0 18px 40px rgba(12, 20, 35, 0.2);
+  text-transform: none;
+  animation: demo-panel-in 0.18s ease-out;
+}
+.demo-switcher-title {
+  margin: 0 0 10px;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.demo-switcher-title small {
+  display: block;
+  margin-top: 3px;
+  color: var(--tt-muted, #5b6880);
+  font-size: 11.5px;
+  font-weight: 450;
+}
+.demo-switcher-panel ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.demo-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+.demo-option:hover {
+  background: var(--tt-surface-soft, #f3f6fb);
+}
+.demo-option[aria-current='true'] {
+  border-color: rgba(117, 101, 237, 0.35);
+  background: rgba(117, 101, 237, 0.08);
+}
+.demo-option small {
+  margin-left: auto;
+  color: #6d5bd0;
+  font-size: 11px;
+  font-weight: 600;
+}
+.demo-option-icon {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 14px;
+  background: #2860ed;
+}
+.demo-option.organizador .demo-option-icon {
+  background: #7565ed;
+}
+.demo-option.fornecedor .demo-option-icon {
+  background: #0a9e7b;
+}
+.demo-option.admin .demo-option-icon {
+  background: #d9792b;
+}
+.demo-switcher-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 4px 0;
+  border-top: 1px solid var(--tt-border, #e3e9f3);
+  font-size: 12px;
+}
+.demo-switcher-foot a,
+.demo-switcher-foot button {
+  border: 0;
+  background: none;
+  color: #2c5bd8;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.demo-switcher-foot button {
+  color: #b4233f;
+}
+html[data-theme='dark'] .demo-switcher-panel {
+  border-color: #2a3546;
+  background: #121a28;
+  color: #e7eaf1;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+html[data-theme='dark'] .demo-switcher-title small {
+  color: #9fb0c7;
+}
+html[data-theme='dark'] .demo-option:hover {
+  background: #1a2436;
+}
+html[data-theme='dark'] .demo-option[aria-current='true'] {
+  border-color: rgba(169, 154, 255, 0.4);
+  background: rgba(169, 154, 255, 0.1);
+}
+html[data-theme='dark'] .demo-option small {
+  color: #c4b8ff;
+}
+html[data-theme='dark'] .demo-switcher-foot {
+  border-color: #2a3546;
+}
+html[data-theme='dark'] .demo-switcher-foot a {
+  color: #9db8ff;
+}
+html[data-theme='dark'] .demo-switcher-foot button {
+  color: #ff9db0;
+}
+@keyframes demo-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 620px) {
+  .demo-switcher-text,
+  .demo-caret {
+    display: none;
+  }
+  .app-header .header-tools > .demo-switcher > .demo-switcher-toggle {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+  .demo-switcher-panel {
+    position: fixed;
+    top: calc(var(--tt-header-offset) + 10px);
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+}
+
+/* ---------- Header em qualquer largura: tudo cabe numa linha ---------- */
+.header .public-navigation a,
+.header .app-navigation a {
+  white-space: nowrap;
+}
+.app-shell > .app-header.header {
+  gap: clamp(10px, 1.6vw, 24px);
+}
+.app-header .app-navigation {
+  min-width: 0;
+}
+.app-header .header-tools {
+  gap: 10px;
+}
+@media (max-width: 1440px) {
+  .demo-switcher-text b {
+    display: none;
+  }
+}
+.header .app-navigation .nav-mobile-only {
+  display: none;
+}
+@media (max-width: 620px) {
+  .header .app-navigation.is-open .nav-mobile-only {
+    display: block;
+    margin-top: 6px;
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+}
+@media (max-width: 620px) {
+  /* Telas estreitas: "Entrar" sai do header (o cadastro e o login se ligam entre si). */
+  .header .public-navigation .login-link {
+    display: none;
+  }
+}
+@media (max-width: 620px) {
+  .header .brand {
+    gap: 8px;
+    font-size: 15px;
+  }
+  .header .brand img {
+    width: 34px;
+    height: 34px;
+  }
+  .header .brand small {
+    display: none;
+  }
+  .header .public-navigation {
+    gap: 4px;
+    font-size: 10.5px;
+  }
+  .header .public-navigation a:not(.header-cta) {
+    padding: 8px 10px;
+  }
+  .header .public-navigation .header-cta {
+    padding: 8px 12px;
+  }
+  .header .public-navigation .nav-long {
+    display: none;
+  }
+  .app-header .header-tools {
+    gap: 4px;
+  }
+  .app-header .header-tools > .logout-button {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+  .app-header .logout-text {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  /* Nas áreas internas o logotipo fica só com o símbolo; o nome segue no aria-label. */
+  .app-header .brand > span {
+    display: none;
+  }
+}
+@media (max-width: 400px) {
+  .header .brand > span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-shell > .header,
+  .account-shell > .header,
+  .app-shell > .header,
+  .header *,
+  .demo-switcher-panel {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+  .header :is(a, button):hover,
+  .header .brand:hover {
+    transform: none !important;
+  }
+}
+
+/* ==========================================================
+   TEMA ESCURO — tokens centralizados de status, busca e
+   paginação. O tema claro continua com as cores de cada
+   componente; no escuro todos os selos usam os mesmos tons
+   suaves (fundo translúcido, borda leve e texto claro),
+   como na referência 05 do Painel Geral.
+   ========================================================== */
+html[data-theme='dark'] {
+  --tt-status-green-bg: rgba(52, 211, 153, 0.1);
+  --tt-status-green-border: rgba(52, 211, 153, 0.26);
+  --tt-status-green-ink: #86e3bd;
+  --tt-status-blue-bg: rgba(107, 145, 245, 0.12);
+  --tt-status-blue-border: rgba(107, 145, 245, 0.3);
+  --tt-status-blue-ink: #aac1ff;
+  --tt-status-amber-bg: rgba(245, 170, 60, 0.11);
+  --tt-status-amber-border: rgba(245, 170, 60, 0.28);
+  --tt-status-amber-ink: #f2c67f;
+  --tt-status-red-bg: rgba(244, 99, 122, 0.11);
+  --tt-status-red-border: rgba(244, 99, 122, 0.28);
+  --tt-status-red-ink: #ffa3b3;
+  --tt-status-purple-bg: rgba(169, 154, 255, 0.12);
+  --tt-status-purple-border: rgba(169, 154, 255, 0.3);
+  --tt-status-purple-ink: #c9bfff;
+  --tt-status-gray-bg: rgba(160, 175, 200, 0.1);
+  --tt-status-gray-border: rgba(160, 175, 200, 0.24);
+  --tt-status-gray-ink: #c2cbd9;
+  --tt-search-bg: #111a29;
+  --tt-search-border: #33435c;
+  --tt-search-ink: #9fb0c7;
+}
+
+/* Selos de status por tom (o #root vence as regras antigas espalhadas pelos arquivos). */
+html[data-theme='dark']
+  #root
+  :is(
+    .badge.green,
+    .rp-status,
+    .mod-pill.green,
+    .supplier-status.is-confirmed,
+    .sp-pill.green,
+    .sp-tag.green
+  ) {
+  border-color: var(--tt-status-green-border);
+  background: var(--tt-status-green-bg);
+  color: var(--tt-status-green-ink);
+}
+html[data-theme='dark']
+  #root
+  :is(.badge.blue, .rp-status.blue, .sp-pill.blue, .sp-tag.blue, .mod-count, .ah-pill) {
+  border-color: var(--tt-status-blue-border);
+  background: var(--tt-status-blue-bg);
+  color: var(--tt-status-blue-ink);
+}
+html[data-theme='dark']
+  #root
+  :is(
+    .badge.amber,
+    .rp-status.amber,
+    .rp-tag,
+    .mod-pill.amber,
+    .mod-focus,
+    .supplier-status.is-pending,
+    .sp-pill.amber,
+    .sp-tag.amber
+  ) {
+  border-color: var(--tt-status-amber-border);
+  background: var(--tt-status-amber-bg);
+  color: var(--tt-status-amber-ink);
+}
+html[data-theme='dark'] #root :is(.badge.red, .sp-pill.red, .sp-tag.red) {
+  border-color: var(--tt-status-red-border);
+  background: var(--tt-status-red-bg);
+  color: var(--tt-status-red-ink);
+}
+html[data-theme='dark'] #root :is(.badge.light, .sp-pill.purple, .sp-tag.purple, .ah-tag) {
+  border-color: var(--tt-status-purple-border);
+  background: var(--tt-status-purple-bg);
+  color: var(--tt-status-purple-ink);
+}
+html[data-theme='dark'] #root :is(.sp-pill.gray, .sp-tag.gray) {
+  border-color: var(--tt-status-gray-border);
+  background: var(--tt-status-gray-bg);
+  color: var(--tt-status-gray-ink);
+}
+/* Selos que já usam variáveis próprias (--tone) recebem os mesmos tons. */
+html[data-theme='dark'] #root .workspace .mod-status {
+  --tone: var(--tt-status-amber-ink);
+  --tone-bg: var(--tt-status-amber-bg);
+  --tone-line: var(--tt-status-amber-border);
+}
+html[data-theme='dark'] #root .workspace .mod-status.blue {
+  --tone: var(--tt-status-blue-ink);
+  --tone-bg: var(--tt-status-blue-bg);
+  --tone-line: var(--tt-status-blue-border);
+}
+html[data-theme='dark'] #root .workspace .mod-status.green {
+  --tone: var(--tt-status-green-ink);
+  --tone-bg: var(--tt-status-green-bg);
+  --tone-line: var(--tt-status-green-border);
+}
+html[data-theme='dark'] #root .workspace .mod-status.red {
+  --tone: var(--tt-status-red-ink);
+  --tone-bg: var(--tt-status-red-bg);
+  --tone-line: var(--tt-status-red-border);
+}
+html[data-theme='dark'] #root .mod-chip.active {
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: color-mix(in srgb, var(--tone) 70%, #ffffff);
+}
+/* Ícones em quadradinhos coloridos */
+html[data-theme='dark']
+  #root
+  :is(.event-section-number, .event-next-step-icon, .supplier-initials) {
+  border-color: var(--tt-status-blue-border);
+  background: var(--tt-status-blue-bg);
+  color: var(--tt-status-blue-ink);
+}
+html[data-theme='dark'] #root .rp-info-icon.orange {
+  background: var(--tt-status-amber-bg);
+  color: var(--tt-status-amber-ink);
+}
+html[data-theme='dark'] #root .ah-summary i {
+  background: #4a5a73;
+}
+
+/* Campos de busca: mesma superfície escura, borda visível e texto legível. */
+html[data-theme='dark'] #root .search-box {
+  border-color: var(--tt-search-border);
+  background: var(--tt-search-bg);
+  color: var(--tt-search-ink);
+}
+html[data-theme='dark'] #root .search-box input {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--tt-ink);
+}
+html[data-theme='dark'] #root .search-box input::placeholder {
+  color: #8796ad;
+}
+html[data-theme='dark'] #root .search-box:focus-within {
+  border-color: #6b91f5;
+  outline-color: rgba(107, 145, 245, 0.45);
+}
+
+/* Paginação */
+html[data-theme='dark'] #root .pager {
+  color: var(--tt-muted);
+}
+html[data-theme='dark'] #root .pager-nav button {
+  border-color: var(--tt-border-strong);
+  background: var(--tt-surface);
+  color: var(--tt-ink);
+}
+html[data-theme='dark'] #root .pager-nav button:hover:not(:disabled):not(.active) {
+  background: var(--tt-surface-soft);
+}
+html[data-theme='dark'] #root .pager-nav button.active {
+  border-color: #3f68d3;
+  background: #3f68d3;
+  color: #fff;
+}
+html[data-theme='dark'] #root .pager-nav button:disabled {
+  color: #74839b;
+  background: transparent;
+}
+
+/* Bordas que ficavam brancas no tema escuro */
+html[data-theme='dark'] #root .ah-date {
+  border-color: var(--tt-border);
+}

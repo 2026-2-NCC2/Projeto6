@@ -7,14 +7,37 @@ const API_PADRAO =
 export const API_URL = import.meta.env.VITE_API_URL || API_PADRAO;
 
 const CSRF_KEY = 'trocaticket-csrf';
+// Marca (sem dado sensível) de que este navegador abriu uma sessão. Serve só para não
+// consultar a API à toa: visitantes e o modo demonstração funcionam sem servidor.
+const MARCA_SESSAO = 'trocaticket-sessao';
 const METODOS_SEGUROS = ['GET', 'HEAD', 'OPTIONS'];
 export const EVENTO_SESSAO_EXPIRADA = 'trocaticket:sessao-expirada';
 
 export function guardarCsrf(token) {
     try {
-        if (token) sessionStorage.setItem(CSRF_KEY, token);
-        else sessionStorage.removeItem(CSRF_KEY);
+        if (token) {
+            sessionStorage.setItem(CSRF_KEY, token);
+            localStorage.setItem(MARCA_SESSAO, '1');
+        } else sessionStorage.removeItem(CSRF_KEY);
     } catch {}
+}
+
+// O servidor respondeu que não há sessão: apaga só a marca (o modo demonstração continua).
+export function esquecerMarcaDeSessao() {
+    try {
+        localStorage.removeItem(MARCA_SESSAO);
+    } catch {}
+}
+
+// Vale a pena perguntar ao servidor pela sessão? Sim se esta aba já tem uma conta ou se
+// alguma aba deste navegador fez login (a marca é apagada no logout e na expiração).
+export function podeTerSessao() {
+    try {
+        const usuario = JSON.parse(sessionStorage.getItem('trocaticket-user') || 'null');
+        return Boolean(usuario?.id || localStorage.getItem(MARCA_SESSAO));
+    } catch {
+        return true;
+    }
 }
 
 export function limparSessaoLocal() {
@@ -22,6 +45,7 @@ export function limparSessaoLocal() {
         sessionStorage.removeItem('trocaticket-user');
         sessionStorage.removeItem('trocaticket-role');
         sessionStorage.removeItem(CSRF_KEY);
+        localStorage.removeItem(MARCA_SESSAO);
     } catch {}
 }
 

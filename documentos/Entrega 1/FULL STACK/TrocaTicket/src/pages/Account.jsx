@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { useStore } from '../context/Store';
-import { destinations, roleNames } from '../data/demo';
+import { roleNames } from '../data/demo';
+import { inicioDoPerfil } from '../data/perfis';
 import { Field, Tabs } from '../components/UI';
 
 import { validateAccount, validateRecovery, maskDocument, normalizeEmail } from '../utils/validation';
@@ -185,9 +186,9 @@ export default function Account({ login = false }) {
         {!login && (
           <Tabs
             options={[
-              'Participante',
-              'Organizador',
-              'Fornecedor'
+              roleNames.comprador,
+              roleNames.organizador,
+              roleNames.fornecedor
             ]}
             value={roleNames[profile]}
             onChange={handleProfileChange}
@@ -347,79 +348,116 @@ function AccountOptions({login, showPassword, onTogglePassword}) {
   );
 }
 
+// Cards da seleção de perfis (referência 03). O identificador é o interno do site.
+const PERFIS_DEMO = [
+  {
+    id: 'comprador',
+    tag: 'Usuário',
+    title: 'Usuário',
+    description: 'Descubra eventos, salve favoritos e reserve ingressos.',
+    items: ['Busca por nome e cidade', 'Favoritos e reservas', 'Comunidade de fãs'],
+    cta: 'Entrar como usuário',
+    icon: (
+      <>
+        <path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3Z" />
+        <path d="M14 6v12" strokeDasharray="2 3" />
+      </>
+    ),
+  },
+  {
+    id: 'organizador',
+    tag: 'Eventos',
+    title: 'Organizador',
+    description: 'Crie, publique e acompanhe seus eventos do início ao fim.',
+    items: ['Cadastro e publicação', 'Orçamento de fornecedores', 'Painel de pendências'],
+    cta: 'Entrar como organizador',
+    icon: (
+      <>
+        <path d="M3 11v3a1 1 0 0 0 1 1h3l7 4V6L7 10H4a1 1 0 0 0-1 1Z" />
+        <path d="M18 9a4 4 0 0 1 0 6" />
+      </>
+    ),
+  },
+  {
+    id: 'fornecedor',
+    tag: 'Serviços',
+    title: 'Fornecedor',
+    description: 'Encontre oportunidades e envie cotações para eventos.',
+    items: ['Oportunidades abertas', 'Cotações em tempo real', 'Gestão de inventário'],
+    cta: 'Entrar como fornecedor',
+    icon: (
+      <>
+        <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z" />
+        <path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
+      </>
+    ),
+  },
+  {
+    id: 'admin',
+    tag: 'Plataforma',
+    title: 'Admin',
+    description: 'Modere cadastros, consulte relatórios e exporte dados.',
+    items: ['Moderação de lotes', 'Relatórios por setor', 'Exportação em CSV'],
+    cta: 'Entrar como admin',
+    icon: (
+      <>
+        <path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6Z" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    ),
+  },
+];
+
 export function Profiles() {
-  const { chooseRole, isAuthenticated } = useStore();
+  const { trocarPerfilDemo, isAuthenticated } = useStore();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (isAuthenticated) navigate('/', { replace: true });
   }, [isAuthenticated, navigate]);
 
-  const descriptions = [
-    'Descubra eventos, salve favoritos e simule os seus ingressos.',
-    'Crie eventos, conecte fornecedores e consolide custos.',
-    'Gerencie o seu catálogo e envie propostas comerciais.',
-    'Acompanhe relatórios e faça a moderação de cadastros.'
-  ];
-
-  const symbols = ['♧', '⚑', '▣', '◇'];
-
+  // Só entra no perfil se a troca for permitida (sem conta autenticada).
   function handleRoleSelection(id) {
-    chooseRole(id);
-    navigate(destinations[id]);
+    if (trocarPerfilDemo(id)) navigate(inicioDoPerfil(id));
   }
 
   return (
-    <section className="auth-page profile-selection">
-
-      <div className="section-heading">
-
-        <p className="eyebrow purple">
-          Uma plataforma, muitas possibilidades
-        </p>
-
-        <h1>Como deseja explorar?</h1>
-
-        <p>
-          Escolha um perfil para conhecer os fluxos da plataforma.
-        </p>
-
+    <section className="pf-picker" aria-labelledby="pf-title">
+      <div className="pf-intro">
+        <h1 id="pf-title">Selecione o tipo de perfil</h1>
+        <p className="pf-note">Apenas disponível no Modo demonstração</p>
       </div>
 
-      <div className="role-grid">
-
-        {Object.entries(roleNames).map(([id, name], index) => (
-
+      <div className="pf-grid" role="group" aria-label="Tipo de perfil">
+        {PERFIS_DEMO.map((perfil) => (
           <button
-            className="role-card"
-            key={id}
+            key={perfil.id}
             type="button"
-            onClick={() => handleRoleSelection(id)}
+            className={`pf-card pf-${perfil.id}`}
+            onClick={() => handleRoleSelection(perfil.id)}
           >
-
-            <span className="role-symbol">
-              {symbols[index] || '◇'}
+            <span className="pf-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                {perfil.icon}
+              </svg>
             </span>
-
-            <h2>{name}</h2>
-
-            <p>
-              {descriptions[index] || 'Explore esta área da plataforma.'}
-            </p>
-
-            <strong>Aceder à área →</strong>
-
+            <span className="pf-tag">{perfil.tag}</span>
+            <h2>{perfil.title}</h2>
+            <span className="pf-desc">{perfil.description}</span>
+            <ul>
+              {perfil.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <span className="pf-cta">
+              {perfil.cta}
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            </span>
           </button>
-
         ))}
-
       </div>
-
-
-      <Link className="text-link" to="/">
-        ← Voltar ao início
-      </Link>
-
     </section>
   );
 }

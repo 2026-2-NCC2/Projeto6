@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
-import { destinations, roleNames } from '../data/demo';
+import { inicioDoPerfil, nomeDoPerfil, normalizarPerfil } from '../data/perfis';
 import { initialsOf } from '../utils/format';
 import { encerrarSessao } from '../services/api';
+import DemoSwitcher from './DemoSwitcher';
 
+// Menus de cada perfil. A página inicial de cada um fica no logotipo (inicioDoPerfil),
+// por isso não há item "Início".
 export const menus = {
   organizador: [
-    ['Início', '/organizador'],
     ['Fornecedores', '/organizador/fornecedores'],
     ['Meus eventos', '/organizador/eventos'],
     ['Novo evento', '/organizador/novo'],
   ],
   fornecedor: [
-    ['Início', '/fornecedor'],
     ['Minhas propostas', '/fornecedor/propostas'],
     ['Nova proposta', '/fornecedor/cotacao/tim-maia'],
     ['Inventário', '/fornecedor/inventario'],
@@ -25,8 +26,7 @@ export const menus = {
     ['Eventos', '/eventos'],
   ],
   comprador: [
-    ['Início', '/eventos'],
-    ['Comunidade', '/comunidade'],
+    ['Troca-Papo', '/comunidade'],
     ['Meus ingressos', '/ingressos'],
     ['Meus pedidos', '/pedidos'],
     ['Favoritos', '/favoritos'],
@@ -48,7 +48,8 @@ export default function Navbar({ darkMode, toggleTheme }) {
   const [notifications, setNotifications] = useState(false);
   async function handleLogout() {
     // Encerra a sessão no servidor (o cookie deixa de valer) e depois limpa o navegador.
-    await encerrarSessao();
+    // No modo demonstração não há sessão no servidor, então nada é enviado à API.
+    if (isAuthenticated) await encerrarSessao();
     chooseRole('');
     try {
       sessionStorage.removeItem('trocaticket-user');
@@ -69,13 +70,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
     role || (typeof window !== 'undefined' ? sessionStorage.getItem('trocaticket-role') : '') || '';
 
   // Normaliza o identificador do perfil ('participante' -> 'comprador')
-  const normalizeRole = (r) => {
-    if (!r) return '';
-    const lower = String(r).toLowerCase().trim();
-    return lower === 'participante' ? 'comprador' : lower;
-  };
-
-  const currentSessionRole = normalizeRole(sessionRole || data?.profile?.role);
+  const currentSessionRole = normalizarPerfil(sessionRole || data?.profile?.role);
   const isPublicRoute = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
 
   // A sessão define o perfil prioritariamente.
@@ -94,7 +89,9 @@ export default function Navbar({ darkMode, toggleTheme }) {
             ? 'admin'
             : 'comprador');
 
-  const isPublicView = !activeRole && !isAuthenticated;
+  // Visitante (sem conta e sem perfil de demonstração) vê sempre o header público.
+  const isPublicView = !currentSessionRole && !isAuthenticated;
+  const isDemo = !isAuthenticated && Boolean(currentSessionRole);
 
   // Informações específicas do perfil
   const supplier = activeRole === 'fornecedor' ? data?.supplierProfile : null;
@@ -102,7 +99,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
   // Caminho da página de perfil (para fornecedor é /fornecedor/perfil; para participante e outros é /perfil)
   const profileUrl = activeRole === 'fornecedor' ? '/fornecedor/perfil' : '/perfil';
-  const roleLabel = roleNames[activeRole] || 'Participante';
+  const roleLabel = nomeDoPerfil(activeRole);
 
   const userName = supplier
     ? supplierName.toUpperCase()
@@ -120,7 +117,11 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
   return (
     <header className={`header ${!isPublicView ? 'app-header' : ''}`}>
-      <Link className="brand" to="/" aria-label="TrocaTicket, início">
+      <Link
+        className="brand"
+        to={isPublicView ? '/' : inicioDoPerfil(activeRole)}
+        aria-label="TrocaTicket, página inicial"
+      >
         <img src="/images/logo.png" alt="" />
         <span>
           TrocaTicket<small>EVENTOS & INGRESSOS</small>
@@ -129,9 +130,9 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
       {isPublicView ? (
         /* Navegação para visitantes sem perfil na sessão */
-        <nav aria-label="Navegação principal">
+        <nav className="public-navigation" aria-label="Navegação principal">
           <Link to="/perfis" className="demo-link">
-            Explorar demo
+            <span className="nav-long">Explorar </span>demo
           </Link>
           <Link className="login-link" to="/entrar">
             Entrar
@@ -167,13 +168,19 @@ export default function Navbar({ darkMode, toggleTheme }) {
             aria-label="Navegação principal"
           >
             {(menus[activeRole] || menus.comprador).map(([label, to]) => (
-              <NavLink end key={to} to={isAuthenticated && activeRole === 'comprador' && label === 'Início' ? '/' : to}>
+              <NavLink end key={to} to={to}>
                 {label}
               </NavLink>
             ))}
+            {/* No celular o cartão do perfil some do header; o acesso fica no menu. */}
+            <NavLink end className="nav-mobile-only" to={profileUrl}>
+              Meu perfil
+            </NavLink>
           </nav>
 
           <div className="header-tools">
+            {isDemo && <DemoSwitcher perfilAtual={currentSessionRole} />}
+
             <button
               className="notification-button"
               aria-label="Notificações"
@@ -194,7 +201,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
               <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
             </button>
 
-            {/* Botão do perfil/participante: leva para a página de perfil (profileUrl) */}
+            {/* Botão do perfil: leva para a página de perfil (profileUrl) */}
             <Link
               className="user-chip"
               to={profileUrl}
@@ -215,7 +222,8 @@ export default function Navbar({ darkMode, toggleTheme }) {
               title="Sair da conta"
               onClick={handleLogout}
             >
-              <span aria-hidden="true">↳</span> Sair
+              <span aria-hidden="true">↳</span>
+              <span className="logout-text">Sair</span>
             </button>
           </div>
         </>
@@ -230,7 +238,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
               : 'Seu ambiente de demonstração está pronto.'}
           </p>
           <Link
-            to={destinations[activeRole] || '/eventos'}
+            to={inicioDoPerfil(activeRole)}
             onClick={() => setNotifications(false)}
           >
             Ir para meu painel →

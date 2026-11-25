@@ -8,13 +8,16 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router';
 import { initialEvents, initialPeople } from '../data/demo';
+import { normalizarPerfil, podeTrocarPerfilDemo } from '../data/perfis';
 import { initialSupplierProfile, supplierInventory, supplierProposals } from '../data/supplier';
 import { getFavoriteEvents, setFavoriteEvent } from '../services/events';
 import {
   EVENTO_SESSAO_EXPIRADA,
   buscarSessao,
   guardarCsrf,
+  esquecerMarcaDeSessao,
   limparSessaoLocal,
+  podeTerSessao,
 } from '../services/api';
 const Context = createContext(null);
 const STORAGE_KEY = 'trocaticket-v2';
@@ -166,6 +169,15 @@ export function StoreProvider({ children }) {
       setData(readStorage(STORAGE_KEY));
     }
   }
+  // Troca de perfil do modo demonstração. Só vale sem conta autenticada e só para os
+  // perfis conhecidos; não mexe em permissões reais (quem decide é o servidor).
+  function trocarPerfilDemo(perfil) {
+    const destino = normalizarPerfil(perfil);
+    const autenticado = isAuthenticated || Boolean(sessionUser()?.id);
+    if (!podeTrocarPerfilDemo({ autenticado, destino })) return false;
+    chooseRole(destino);
+    return true;
+  }
   function activateUser(user) {
     setRole(user.role || '');
     setAccountId(user.id || null);
@@ -187,12 +199,16 @@ export function StoreProvider({ children }) {
     if (mensagem) setToast(mensagem);
   }, []);
   useEffect(() => {
+    // Visitante e modo demonstração não dependem do servidor: só consulta a sessão
+    // quando este navegador já fez login.
+    if (!podeTerSessao()) return undefined;
     const controller = new AbortController();
     buscarSessao(controller.signal)
       .then(({ user, csrfToken }) => {
         const local = sessionUser();
         if (!user) {
           if (local?.id) encerrarLocalmente('Sua sessão terminou. Entre novamente.');
+          else esquecerMarcaDeSessao();
           return;
         }
         guardarCsrf(csrfToken);
@@ -272,7 +288,17 @@ export function StoreProvider({ children }) {
     }
   }
   return (
-    <Context.Provider value={{ data, update, role, isAuthenticated, chooseRole, activateUser, notify: setToast, toggleFavorite }}>
+    <Context.Provider value={{
+        data,
+        update,
+        role,
+        isAuthenticated,
+        chooseRole,
+        trocarPerfilDemo,
+        activateUser,
+        notify: setToast,
+        toggleFavorite,
+      }}>
       {children}
       {storageError && (
         <div className="storage-warning" role="alert">

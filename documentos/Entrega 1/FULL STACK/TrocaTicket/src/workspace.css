@@ -1350,9 +1350,9 @@ td code {
   font-size: 12px;
 }
 .auth-page {
-  min-height: calc(100vh - 74px);
+  min-height: calc(100svh - var(--tt-header-offset) - 64px);
   background: #f7f9fb;
-  padding: 126px 24px 65px;
+  padding: 40px 24px 65px;
 }
 .auth-card {
   max-width: 460px;
@@ -1948,7 +1948,8 @@ td code {
   .dashboard-layout,
   .consolidation-layout,
   .quote-layout {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): o conteúdo largo (abas, cartaz) não alarga a página no celular */
+    grid-template-columns: minmax(0, 1fr);
   }
   .dashboard-layout > aside {
     display: grid;
@@ -2019,7 +2020,7 @@ td code {
     height: 350px;
   }
   .auth-page {
-    padding-top: 115px;
+    padding-top: 32px;
   }
   .app-header .brand {
     font-size: 17px;
@@ -2346,7 +2347,7 @@ td code {
     font-size: 29px;
   }
   .auth-page {
-    padding: 110px 16px 40px;
+    padding: 28px 16px 40px;
   }
   .auth-card {
     padding: 26px 22px;
@@ -2588,7 +2589,7 @@ td code {
 .supplier-results-line strong { color: #26364f; }
 .supplier-results-hint { text-align: right; }
 .supplier-table-card { overflow: hidden; background: #fff; border: 1px solid var(--line, #e1e8f0); border-radius: 14px; box-shadow: 0 1px 2px rgba(15, 23, 42, .025); }
-.supplier-table-scroll { width: 100%; overflow-x: auto; }
+.supplier-table-scroll { position: relative; width: 100%; overflow-x: auto; }
 .supplier-table { width: 100%; border-collapse: collapse; text-align: left; }
 .supplier-table thead { background: #f8fafc; }
 .supplier-table th {
@@ -3822,7 +3823,6 @@ html[data-theme='dark'] .app-shell .sp-avatar-camera {
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 1.25rem;
 }
 .workspace {
   animation: workspace-enter 180ms ease-out;

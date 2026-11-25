@@ -372,7 +372,7 @@ export function EventEditor() {
               <section className="event-form-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">1</span>
-                  <div><h2>Informações do evento</h2><p>Como o evento será apresentado aos participantes.</p></div>
+                  <div><h2>Informações do evento</h2><p>Como o evento será apresentado aos usuários.</p></div>
                 </div>
                 <Field
                   label="Nome do evento *"
@@ -406,7 +406,7 @@ export function EventEditor() {
               <section className="event-form-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">2</span>
-                  <div><h2>Data, horário e capacidade</h2><p>Ajude participantes e fornecedores a se planejarem.</p></div>
+                  <div><h2>Data, horário e capacidade</h2><p>Ajude usuários e fornecedores a se planejarem.</p></div>
                 </div>
                 <div className="form-grid event-date-grid">
                   <Field label="Data de início *" name="date" type="date" value={form.date} onChange={(e) => field('date', e.target.value)} />

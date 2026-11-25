@@ -5,11 +5,27 @@ import { EventList, useEvents, currency } from '../components/Events';
 import Icon from '../components/Icon';
 import PapoBanner from '../components/PapoBanner';
 import { getParticipantTickets } from '../services/tickets';
+import { getCommunityMessages } from '../services/community';
+import { CHAVE_FORUM, notificacoesIniciais } from '../../forum/src/data/notificacoes.js';
+import {
+  ingressosAtivos,
+  notificacoesLidas,
+  notificacoesNaoLidas,
+  plural,
+  primeiroNome,
+  progressoPerfil,
+  proximoIngresso,
+  rotuloDias,
+} from '../utils/painelUsuario';
 
 const SLIDE_SECONDS = 10;
-function EventCarousel({ events }) {
+const TITULO_CARROSSEL = 'Eventos que você provavelmente vai gostar';
+
+// Carrossel da referência 01: troca a cada 10 s, segura enquanto o mouse ou o foco
+// estão nele (CSS) e tem botão de pausa. Com "reduzir movimento" começa pausado.
+function EventCarousel({ events, loading }) {
   const [index, setIndex] = useState(0);
-  const [paused] = useState(
+  const [paused, setPaused] = useState(
     () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
   );
   const total = events.length;
@@ -20,23 +36,50 @@ function EventCarousel({ events }) {
     img.src = events[(index + 1) % total].image;
   }, [index, total, events]);
 
-  if (!total) return null;
+  if (!total) {
+    return (
+      <section className="uh-car uh-car-empty" aria-label={TITULO_CARROSSEL}>
+        <div className="uh-car-top">
+          <span className="uh-k">{TITULO_CARROSSEL}</span>
+        </div>
+        <div className="uh-car-msg" role="status">
+          {loading ? (
+            <b>Carregando sugestões…</b>
+          ) : (
+            <>
+              <b>Nenhum evento à venda agora</b>
+              <span>Quando houver eventos publicados, as sugestões aparecem aqui.</span>
+              <Link to="/eventos" className="uh-go">
+                Ver catálogo
+              </Link>
+            </>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   const go = (n) => setIndex((n + total) % total);
   const event = events[index % total];
 
   return (
-    <section
-      className="uh-car"
-      aria-roledescription="carrossel"
-      aria-label="Eventos que você provavelmente vai gostar"
-    >
+    <section className="uh-car" aria-roledescription="carrossel" aria-label={TITULO_CARROSSEL}>
       <div className="uh-car-top">
-        <span className="uh-k">Eventos que você provavelmente vai gostar</span>
+        <span className="uh-k">{TITULO_CARROSSEL}</span>
         <div className="uh-nav">
           <button type="button" aria-label="Evento anterior" onClick={() => go(index - 1)}>
             ‹
           </button>
+          {total > 1 && (
+            <button
+              type="button"
+              aria-label={paused ? 'Retomar carrossel' : 'Pausar carrossel'}
+              aria-pressed={paused}
+              onClick={() => setPaused((valor) => !valor)}
+            >
+              {paused ? '▶' : '❚❚'}
+            </button>
+          )}
           <button type="button" aria-label="Próximo evento" onClick={() => go(index + 1)}>
             ›
           </button>
@@ -47,10 +90,13 @@ function EventCarousel({ events }) {
         to={`/eventos/${event.id}`}
         className="uh-slide"
         aria-live={paused ? 'polite' : 'off'}
+        aria-label={`${event.title}, ${event.date}, ${event.location}. Ver ingressos`}
       >
-        <img src={event.image} alt={event.imageAlt} decoding="async" />
-        <span className="uh-tx">
-          <span className="uh-price">A partir de {currency(event.price)}</span>
+        <img src={event.image} alt="" decoding="async" />
+        <span className="uh-tx" aria-hidden="true">
+          {Number(event.price) > 0 && (
+            <span className="uh-price">A partir de {currency(Number(event.price))}</span>
+          )}
           <b>{event.title}</b>
           <span>
             {event.date} · {event.location}
@@ -69,41 +115,56 @@ function EventCarousel({ events }) {
     </section>
   );
 }
-function daysLeft(iso) {
-  const today = new Date().setHours(0, 0, 0, 0);
-  return Math.round((new Date(`${iso}T00:00:00`) - today) / 86400000);
+
+function dataCurta(iso) {
+  const [ano, mes, dia] = String(iso || '').split('-');
+  return ano && mes && dia ? `${dia}/${mes}/${ano}` : '';
 }
 
-function dayLabel(n) {
-  if (n <= 0) return 'É hoje!';
-  return n === 1 ? 'É amanhã!' : `Faltam ${n} dias`;
+// Notificações do Troca-Papo no modo demonstração: as do fórum que ainda não foram lidas.
+function lerNotificacoesDemo() {
+  let salvo = null;
+  try {
+    salvo = localStorage.getItem(CHAVE_FORUM);
+  } catch {}
+  return notificacoesNaoLidas(notificacoesIniciais, notificacoesLidas(salvo));
 }
 
 export default function UserHome() {
-  const { data, role } = useStore();
+  const { data, isAuthenticated } = useStore();
   const state = useEvents();
   const { events } = state;
-  const userId = data.profile.id;
-  const [tickets, setTickets] = useState([]);
-  const [ticketError, setTicketError] = useState('');
+  const perfil = data.profile || {};
+  const userId = Number(perfil.id);
+  const conta = isAuthenticated && Number.isSafeInteger(userId) && userId > 0;
+
+  // Conta real: ingressos e conversas vêm da API. Demonstração: dados do navegador.
+  const [ingressosConta, setIngressosConta] = useState({ loading: conta, list: [], error: '' });
+  const [conversas, setConversas] = useState({ loading: conta, list: [], error: '' });
+  const [notificacoesDemo] = useState(() => (conta ? [] : lerNotificacoesDemo()));
+
   useEffect(() => {
-    if (role !== 'comprador') return;
+    if (!conta) return undefined;
     const controller = new AbortController();
+    const falhou = (setter, mensagem) => (error) => {
+      if (error.name !== 'AbortError' && !controller.signal.aborted)
+        setter({ loading: false, list: [], error: mensagem });
+    };
     getParticipantTickets(userId, controller.signal)
-      .then(setTickets)
-      .catch((error) => {
-        if (!controller.signal.aborted) setTicketError(error.message);
-      });
+      .then((list) => setIngressosConta({ loading: false, list: list || [], error: '' }))
+      .catch(falhou(setIngressosConta, 'Não foi possível carregar seus ingressos agora.'));
+    getCommunityMessages(userId, controller.signal)
+      .then((list) => setConversas({ loading: false, list: list || [], error: '' }))
+      .catch(falhou(setConversas, 'Não foi possível carregar as conversas agora.'));
     return () => controller.abort();
-  }, [userId, role]);
+  }, [conta, userId]);
+
+  const tickets = conta ? ingressosConta.list : data.tickets || [];
+  const ativos = ingressosAtivos(tickets);
+  const proximo = proximoIngresso(tickets);
+
   const byId = (id) => events.find((event) => String(event.id) === String(id));
-  const favorites = data.favorites;
-  const favoriteEvents = favorites.map(byId).filter(Boolean);
-  const ticketEvents = tickets.map((t) => byId(t.eventId)).filter(Boolean);
-  const pool = ticketEvents.length ? ticketEvents : favoriteEvents.length ? favoriteEvents : events;
-  const next = pool
-    .filter((e) => e.date && daysLeft(e.date) >= 0)
-    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  const favoriteEvents = (data.favorites || []).map(byId).filter(Boolean);
   const alerts = favoriteEvents
     .map((e) => ({
       e,
@@ -115,22 +176,30 @@ export default function UserHome() {
             : '',
     }))
     .filter((a) => a.text);
-  const p = data.profile || {};
-  const fields = [p.name, p.email, p.phone, p.photo];
-  const profilePct = Math.round((fields.filter(Boolean).length / fields.length) * 100);
 
+  const mensagensDeOutros = conversas.list.filter((m) => Number(m.userId) !== userId);
+  const ultimaMensagem = mensagensDeOutros[0];
+
+  const { percentual } = progressoPerfil(perfil);
+  const nome = primeiroNome(perfil.name);
 
   return (
     <div className="user-home">
-      <section className="hero">
+      <section className="hero" aria-labelledby="uh-title">
         <div className="hero-content">
           <div className="uh-two">
             <div>
               <p className="hero-badge">
                 <span /> Troca e compra segura de ingressos
               </p>
-              <h1>
-                Bem-vindo de volta, <em>{p.name}</em>!
+              <h1 id="uh-title">
+                {nome ? (
+                  <>
+                    Boas-vindas de volta, <em>{nome}</em>!
+                  </>
+                ) : (
+                  'Boas-vindas de volta!'
+                )}
               </h1>
               <p className="hero-description">
                 Gerencie seus ingressos, explore novos eventos e acompanhe suas trocas ativas na
@@ -142,36 +211,16 @@ export default function UserHome() {
                 </Link>
               </div>
             </div>
-            <EventCarousel events={events} />
+            <EventCarousel events={events} loading={state.loading} />
           </div>
 
+          <h2 className="sr-only">Resumo da sua conta</h2>
           <div className="uh-strip">
-            {next && (
-              <Link
-                to={ticketEvents.length ? '/ingressos' : `/eventos/${next.id}`}
-                className="uh-card"
-              >
-                <span className="uh-k">
-                  {ticketEvents.length ? 'Seu próximo evento' : 'Próximo evento'}
-                </span>
-                <span className="uh-big">{dayLabel(daysLeft(next.date))}</span>
-                <span className="uh-sub">
-                  {next.title} · {next.date}
-                </span>
-                <span className="uh-go">
-                  {ticketEvents.length ? 'Ver meus ingressos' : 'Ver ingressos'}
-                </span>
-              </Link>
-            )}
-
-            {ticketError && <p role="alert" className="uh-card">{ticketError}</p>}
-            {role === 'comprador' && <Link to="/favoritos" className="uh-card">
+            <Link to="/favoritos" className="uh-card">
               <span className="uh-k">Favoritos</span>
               {alerts.length ? (
                 <>
-                  <span className="uh-big">
-                    {alerts.length} {alerts.length === 1 ? 'novidade' : 'novidades'}
-                  </span>
+                  <span className="uh-big">{plural(alerts.length, 'novidade', 'novidades')}</span>
                   {alerts.slice(0, 2).map(({ e, text }) => (
                     <span key={e.id} className="uh-sub">
                       {e.title}: {text}
@@ -181,7 +230,7 @@ export default function UserHome() {
               ) : favoriteEvents.length ? (
                 <>
                   <span className="uh-big">
-                    {favoriteEvents.length} {favoriteEvents.length === 1 ? 'evento' : 'eventos'}
+                    {plural(favoriteEvents.length, 'evento', 'eventos')}
                   </span>
                   <span className="uh-thumbs">
                     {favoriteEvents.slice(0, 3).map((e) => (
@@ -196,33 +245,117 @@ export default function UserHome() {
                 </>
               )}
               <span className="uh-go">Ver favoritos</span>
-            </Link>}
+            </Link>
 
             <Link to="/comunidade" className="uh-card">
               <span className="uh-k">Troca-Papo</span>
-              <span className="uh-big">
-                Fale com outros fãs
-              </span>
-              <span className="uh-sub">Tire dúvidas e combine trocas na comunidade.</span>
+              {conta ? (
+                conversas.loading ? (
+                  <span className="uh-sub" role="status">
+                    Carregando conversas…
+                  </span>
+                ) : conversas.error ? (
+                  <>
+                    <span className="uh-big">Conversas</span>
+                    <span className="uh-sub">{conversas.error}</span>
+                  </>
+                ) : ultimaMensagem ? (
+                  <>
+                    <span className="uh-big">
+                      {plural(mensagensDeOutros.length, 'mensagem', 'mensagens')} no mural
+                    </span>
+                    <span className="uh-sub uh-clamp">
+                      {primeiroNome(ultimaMensagem.name) || 'Alguém'}: “{ultimaMensagem.text}”
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="uh-big">Nenhuma conversa ainda</span>
+                    <span className="uh-sub">Puxe assunto, tire dúvidas e combine trocas.</span>
+                  </>
+                )
+              ) : notificacoesDemo.length ? (
+                <>
+                  <span className="uh-big">
+                    {plural(notificacoesDemo.length, 'notificação nova', 'notificações novas')}
+                  </span>
+                  <span className="uh-sub uh-clamp">{notificacoesDemo[0].texto}</span>
+                </>
+              ) : (
+                <>
+                  <span className="uh-big">Tudo em dia</span>
+                  <span className="uh-sub">Nenhuma notificação nova no Troca-Papo.</span>
+                </>
+              )}
               <span className="uh-go">Entrar no Troca-Papo</span>
             </Link>
 
-            {profilePct < 100 && (
-              <Link to={role === 'fornecedor' ? '/fornecedor/perfil' : '/perfil'} className="uh-card">
-                <span className="uh-k">Complete seu perfil</span>
-                <span className="uh-big">{profilePct}%</span>
-                <span className="uh-pbar" aria-hidden="true">
-                  <i style={{ width: `${profilePct}%` }} />
+            <Link to="/perfil" className="uh-card">
+              <span className="uh-k">
+                {percentual < 100 ? 'Complete seu perfil' : 'Seu perfil'}
+              </span>
+              <span className="uh-big">
+                {percentual < 100 ? `${percentual}%` : 'Perfil completo'}
+              </span>
+              <span className="uh-pbar" aria-hidden="true">
+                <i style={{ width: `${percentual}%` }} />
+              </span>
+              <span className="uh-sub">
+                {percentual < 100
+                  ? 'Complete seus dados para trocar com mais segurança.'
+                  : 'Seus dados estão prontos para trocas seguras.'}
+              </span>
+              <span className="uh-go">{percentual < 100 ? 'Completar perfil' : 'Ver perfil'}</span>
+            </Link>
+
+            <Link to={ativos.length ? '/ingressos' : '/eventos'} className="uh-card">
+              <span className="uh-k">{proximo ? 'Seu próximo evento' : 'Meus ingressos'}</span>
+              {conta && ingressosConta.loading ? (
+                <span className="uh-sub" role="status">
+                  Carregando ingressos…
                 </span>
-                <span className="uh-sub">Complete seus dados para trocar com mais segurança.</span>
-                <span className="uh-go">Completar perfil</span>
-              </Link>
-            )}
+              ) : conta && ingressosConta.error ? (
+                <>
+                  <span className="uh-big">Ingressos</span>
+                  <span className="uh-sub">{ingressosConta.error}</span>
+                </>
+              ) : proximo ? (
+                <>
+                  <span className="uh-big">{rotuloDias(proximo.dias)}</span>
+                  <span className="uh-sub">
+                    {proximo.eventTitle} · {dataCurta(proximo.date)}
+                  </span>
+                </>
+              ) : ativos.length ? (
+                <>
+                  <span className="uh-big">
+                    {plural(ativos.length, 'ingresso reservado', 'ingressos reservados')}
+                  </span>
+                  <span className="uh-chips">
+                    {ativos.slice(0, 2).map((ingresso) => (
+                      <span key={ingresso.id}>{ingresso.eventTitle || ingresso.title}</span>
+                    ))}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="uh-big">Nenhum ingresso ainda</span>
+                  <span className="uh-sub">Escolha um evento e garanta seu lugar.</span>
+                </>
+              )}
+              <span className="uh-go">
+                {ativos.length ? 'Abrir meus ingressos' : 'Procurar eventos'}
+              </span>
+            </Link>
           </div>
         </div>
       </section>
-      <EventList state={state} />
-      <PapoBanner />
+      <EventList state={state} title="Eventos em destaque" />
+      <PapoBanner
+        eyebrow="Troca-Papo"
+        title="Dúvidas sobre uma troca?"
+        text="Converse com outros fãs, veja dicas de segurança e descubra quem está trocando ingressos para os seus eventos favoritos."
+      />
     </div>
   );
 }

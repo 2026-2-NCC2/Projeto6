@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Link } from 'react-router';
+import { Routes, Route, Link, Navigate } from 'react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import UserHome from './pages/UserHome';
@@ -18,6 +18,16 @@ import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 import Orders from './pages/Orders';
 import ForumPage from './pages/ForumPage';
 import { useStore } from './context/Store';
+import { inicioDoPerfil, normalizarPerfil } from './data/perfis';
+// Página inicial: visitante vê a homepage pública; o Usuário (conta ou demonstração)
+// vê a homepage logada; os demais perfis vão para a página inicial do próprio perfil.
+function Inicio() {
+  const { role } = useStore();
+  const perfil = normalizarPerfil(role);
+  if (!perfil) return <Home />;
+  if (perfil === 'comprador') return <UserHome />;
+  return <Navigate to={inicioDoPerfil(perfil)} replace />;
+}
 function Info({ title, children }) {
   const { isAuthenticated } = useStore();
   return (
@@ -91,7 +101,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout darkMode={darkMode} toggleTheme={toggleTheme} />}>
-        <Route index element={isAuthenticated ? <UserHome /> : <Home />} />
+        <Route index element={<Inicio />} />
         <Route path="cadastro" element={<Account key="signup" />} />
         <Route path="entrar" element={<Account key="login" login />} />
         <Route path="recuperar" element={<Recover />} />
@@ -145,7 +155,7 @@ export default function App() {
           element={
             <Info title="Ajuda & Suporte">
               Use “Explorar demo” ou “Trocar perfil” para acessar cada área. O organizador cria e
-              publica eventos; o fornecedor prepara cotações e gerencia itens; o participante salva
+              publica eventos; o fornecedor prepara cotações e gerencia itens; o usuário salva
               favoritos e simula reservas; o administrador consulta relatórios e modera cadastros
               fictícios. A integração com serviços reais ainda não faz parte deste front-end.
             </Info>

@@ -109,7 +109,7 @@ function MenuUsuario() {
         <Avatar username={f.usuario.username} size={34} online />
         <span className="usuario-btn-texto">
           <b>{f.usuario.nome || `u/${f.usuario.username}`}</b>
-          <small>{f.usuario.role ? `Conta ${{ comprador: "Participante", organizador: "Organizador", fornecedor: "Fornecedor", admin: "Administrador" }[f.usuario.role] || f.usuario.role}` : (f.usuario.vip ? "VIP Verified" : "Conta TrocaTicket")}</small>
+          <small>{f.usuario.role ? `Conta ${{ comprador: "Usuário", organizador: "Organizador", fornecedor: "Fornecedor", admin: "Administrador" }[f.usuario.role] || f.usuario.role}` : (f.usuario.vip ? "VIP Verified" : "Conta TrocaTicket")}</small>
         </span>
         <Icon name="chevronDown" size={15} />
       </button>

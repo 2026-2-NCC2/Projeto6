@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import Navbar from './Navbar';
-import { destinations } from '../data/demo';
+import { inicioDoPerfil } from '../data/perfis';
 
 export default function Layout({ darkMode, toggleTheme }) {
   const { pathname } = useLocation();
@@ -13,8 +13,20 @@ export default function Layout({ darkMode, toggleTheme }) {
     role || (typeof window !== 'undefined' ? sessionStorage.getItem('trocaticket-role') : '') || '';
 
   const isPublicRoute = ['/', '/entrar', '/cadastro', '/perfis', '/recuperar'].includes(pathname);
-  const isPublic = !sessionRole && isPublicRoute;
+  const isVisitor = !sessionRole && !isAuthenticated;
   const isDemoMode = Boolean(sessionRole) && !isAuthenticated;
+  // Só a homepage pública deixa o header flutuar sobre a imagem; as demais telas
+  // reservam o espaço do header (ver layout.css).
+  // A homepage do Usuário (referência 01) também deixa a imagem do hero passar por trás
+  // do header: "hero-shell" não reserva o espaço e o próprio hero desce o conteúdo.
+  const shellClass =
+    isVisitor && pathname === '/'
+      ? 'public-shell'
+      : isVisitor && isPublicRoute
+        ? 'account-shell'
+        : pathname === '/'
+          ? 'app-shell hero-shell'
+          : 'app-shell';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,7 +43,7 @@ export default function Layout({ darkMode, toggleTheme }) {
         (pathname.startsWith('/organizador') && role !== 'organizador') ||
         (pathname.startsWith('/fornecedor') && role !== 'fornecedor') ||
         (pathname.startsWith('/admin') && role !== 'admin');
-      if (wrongRole) navigate(destinations[role] || '/eventos', { replace: true });
+      if (wrongRole) navigate(inicioDoPerfil(role), { replace: true });
       return;
     }
     if (!sessionRole && (
@@ -40,14 +52,15 @@ export default function Layout({ darkMode, toggleTheme }) {
       pathname.startsWith('/admin') ||
       pathname === '/favoritos' ||
       pathname === '/ingressos' ||
-      pathname === '/pedidos'
+      pathname === '/pedidos' ||
+      pathname === '/perfil'
     )) {
       navigate('/perfis', { replace: true });
     }
   }, [isAuthenticated, navigate, pathname, role, sessionRole]);
 
   return (
-    <div className={pathname === '/' ? 'public-shell' : isPublic ? 'account-shell' : 'app-shell'}>
+    <div className={shellClass}>
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -55,9 +68,12 @@ export default function Layout({ darkMode, toggleTheme }) {
       {/* Componente Navbar modularizado e controlado pelo perfil na sessão */}
       <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
 
-      {!isPublicRoute && isDemoMode && (
-        <div className="demo-strip">
-          <span>Ambiente de demonstração · alterações salvas neste navegador</span>
+      {isDemoMode && pathname !== '/perfis' && (
+        <div className="demo-strip" role="note">
+          <span>
+            <i aria-hidden="true" /> Ambiente de demonstração · dados fictícios salvos neste
+            navegador
+          </span>
           <button
             onClick={() => {
               chooseRole('');

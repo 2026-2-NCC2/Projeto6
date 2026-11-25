@@ -318,18 +318,8 @@ export const initialPeople = peopleSeed.map(([name, status, time], i) => {
     document: documents[i % documents.length],
   };
 });
-export const destinations = {
-  comprador: '/eventos',
-  organizador: '/organizador',
-  fornecedor: '/fornecedor',
-  admin: '/admin',
-};
-export const roleNames = {
-  comprador: 'Participante',
-  organizador: 'Organizador',
-  fornecedor: 'Fornecedor',
-  admin: 'Administrador',
-};
+// Nomes e páginas iniciais dos perfis ficam num só lugar (data/perfis.js).
+export { destinations, roleNames } from './perfis.js';
 export const latestSuppliers = [
   {
     id: 'vibe',

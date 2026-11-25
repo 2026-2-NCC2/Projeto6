@@ -196,7 +196,7 @@ export function EventDetails() {
     const review = {
       rating,
       comment: reviewComment.trim(),
-      name: data.profile?.name || 'Participante',
+      name: data.profile?.name || 'Usuário',
       userId: Number.isSafeInteger(userId) && userId > 0 ? userId : null,
       date: new Date().toISOString().slice(0, 10),
     };
@@ -309,7 +309,7 @@ export function EventDetails() {
       return;
     }
     if (isAuthenticated) {
-      setReservationError('Entre com uma conta de participante para reservar este evento publicado.');
+      setReservationError('Entre com uma conta de usuário para reservar este evento publicado.');
       return;
     }
     update('tickets', (old) => [
@@ -350,7 +350,7 @@ export function EventDetails() {
           {data.favorites.some((favoriteId) => String(favoriteId) === String(id)) ? '♥ Salvo' : '♡ Salvar'}
         </button>
         <Link className="button outline" to="/comunidade">
-          Comunidade →
+          Troca-Papo →
         </Link>
       </PageTitle>
       <div className="dashboard-layout detail-layout">
@@ -387,7 +387,7 @@ export function EventDetails() {
                   <p>{event.description}</p>
                   <p>
                     Encontre sua entrada, escolha o tipo de ingresso e acompanhe tudo em sua área de
-                    participante.
+                    usuário.
                   </p>
                   <div className="info-note">
                     Os eventos, valores e avaliações deste protótipo são demonstrativos.
@@ -460,7 +460,7 @@ export function EventDetails() {
                     </form>
                   ) : (
                     <p className="muted">
-                      <Link to="/entrar">Entre como participante</Link> para avaliar este evento.
+                      <Link to="/entrar">Entre como usuário</Link> para avaliar este evento.
                     </p>
                   )}
                   <Link className="text-link" to="/comunidade">
@@ -478,7 +478,7 @@ export function EventDetails() {
                 <Badge>Compra indisponível</Badge>
                 <p className="muted">
                   {role !== 'comprador'
-                    ? 'A reserva simulada está disponível somente para contas de participante.'
+                    ? 'A reserva simulada está disponível somente para contas de usuário.'
                     : 'Este evento não está conectado a um evento publicado do banco.'}
                 </p>
               </>
@@ -537,10 +537,10 @@ export function EventDetails() {
               />
             )}
           </Panel>
-          <Panel title="Comunidade & Fórum">
+          <Panel title="Troca-Papo">
             <p>Encontre outras pessoas e compartilhe sua expectativa.</p>
             <Link className="button outline full" to="/comunidade">
-              Acessar comunidade →
+              Entrar no Troca-Papo →
             </Link>
           </Panel>
         </aside>
@@ -684,7 +684,7 @@ export function Tickets() {
       <div className="workspace">
         <PageTitle title="Meus Ingressos" subtitle="Suas reservas vinculadas à conta." />
         <Empty title="Reservas ainda não disponíveis">
-          Esta área está disponível para contas de participante.
+          Esta área está disponível para contas de usuário.
         </Empty>
       </div>
     );
@@ -702,7 +702,7 @@ export function Tickets() {
       <div className="workspace participant-tickets">
         <PageTitle
           title="Meus Ingressos"
-          subtitle="Gerencie seus ingressos simulados e combine trocas com outros participantes."
+          subtitle="Gerencie seus ingressos simulados e combine trocas com outros usuários."
         >
           <Link className="button outline" to="/pedidos">Meus pedidos</Link>
           <Link className="button primary" to="/eventos">Explorar eventos</Link>
@@ -817,7 +817,7 @@ export function Tickets() {
                             listing.ticketId,
                             Number(selectedOfferTickets[listing.ticketId]),
                           ),
-                          'Solicitação de troca enviada ao participante.',
+                          'Solicitação de troca enviada ao usuário.',
                         )}
                       >
                         Propor troca
@@ -979,11 +979,11 @@ export function Community() {
     return (
       <div className="workspace narrow">
         <PageTitle
-          title="Comunidade TrocaTicket"
+          title="Troca-Papo"
           subtitle="Um espaço para compartilhar suas próximas experiências."
         />
-        <Empty title="Área disponível para participantes">
-          Entre com uma conta de participante para publicar e consultar mensagens da comunidade.
+        <Empty title="Área disponível para usuários">
+          Entre com uma conta de usuário para publicar e consultar mensagens do Troca-Papo.
         </Empty>
       </div>
     );
@@ -1035,7 +1035,7 @@ export function Community() {
   return (
     <div className="workspace narrow">
       <PageTitle
-        title="Comunidade TrocaTicket"
+        title="Troca-Papo"
         subtitle="Um espaço para compartilhar suas próximas experiências."
       />
       <Panel title="O que você está planejando?">
@@ -1052,7 +1052,7 @@ export function Community() {
           <div className="form-footer">
             <small className="muted">
               {isParticipantAccount
-                ? 'Visível para os participantes cadastrados.'
+                ? 'Visível para os usuários cadastrados.'
                 : 'Visível apenas neste navegador.'}
             </small>
             <button className="button primary" disabled={submitting}>

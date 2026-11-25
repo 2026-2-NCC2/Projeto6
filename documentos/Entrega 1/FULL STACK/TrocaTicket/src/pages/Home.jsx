@@ -70,7 +70,7 @@ export default function Home() {
         <div className="section-heading">
           <p className="eyebrow">Acesso multi-perfil</p>
           <h2 id="profiles-title">Como você quer usar o Troca Ticket?</h2>
-          <p>Soluções desenhadas para participantes, organizadores e fornecedores.</p>
+          <p>Soluções desenhadas para usuários, organizadores e fornecedores.</p>
         </div>
         <div className="grid">
           {profiles.map((profile) => (

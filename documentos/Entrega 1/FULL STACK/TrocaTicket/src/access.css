@@ -508,7 +508,7 @@ html[data-theme="dark"] .account-shell small {
   --pf-ink: #121b30; --pf-muted: #6f7e96; --pf-line: #e0e7f1; --pf-surface: #fff;
   --pf-user: #2860ed; --pf-org: #7565ed; --pf-sup: #0a9e7b; --pf-adm: #d9792b;
   --pf-shadow: 0 2px 4px rgba(24,40,72,.05), 0 10px 24px -12px rgba(24,40,72,.14);
-  flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 128px 24px 72px;
+  flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 64px 24px 72px;
 }
 html[data-theme="dark"] .pf-picker {
   --pf-ink: #eef2fa; --pf-muted: #98a7bf; --pf-line: #27354a; --pf-surface: #141d2b;
@@ -536,9 +536,19 @@ html[data-theme="dark"] .pf-picker {
   position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0;
   padding: 26px 24px 22px; overflow: hidden; text-decoration: none; color: var(--pf-ink);
   background: var(--pf-surface); border: 1px solid var(--pf-line); border-radius: 20px;
-  box-shadow: var(--pf-shadow); cursor: pointer;
+  box-shadow: var(--pf-shadow); cursor: pointer; font: inherit; text-align: left;
   transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .25s ease;
 }
+.pf-picker .pf-icon svg {
+  width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.pf-picker .pf-cta svg {
+  width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; transition: transform .3s ease;
+}
+.pf-picker .pf-card:hover li:nth-child(2) { transition-delay: .04s; }
+.pf-picker .pf-card:hover li:nth-child(3) { transition-delay: .08s; }
 .pf-picker .pf-organizador { --accent: var(--pf-org); }
 .pf-picker .pf-fornecedor { --accent: var(--pf-sup); }
 .pf-picker .pf-admin { --accent: var(--pf-adm); }
@@ -598,10 +608,19 @@ html[data-theme="dark"] .pf-picker {
 .pf-picker .pf-cta .icon { transition: transform .3s ease; }
 .pf-picker .pf-card:hover .pf-cta,
 .pf-picker .pf-card:focus-visible .pf-cta { color: var(--accent); }
-.pf-picker .pf-card:hover .pf-cta .icon,
-.pf-picker .pf-card:focus-visible .pf-cta .icon { transform: translateX(6px); }
+.pf-picker .pf-card:hover .pf-cta svg,
+.pf-picker .pf-card:focus-visible .pf-cta svg { transform: translateX(6px); }
+/* Tema escuro: as regras gerais de botão e de título da área de acesso não podem
+   apagar as cores de cada perfil. */
+html[data-theme="dark"] .pf-picker button.pf-card { border-color: var(--pf-line); }
+html[data-theme="dark"] .pf-picker button.pf-card:is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--pf-line));
+}
+html[data-theme="dark"] .pf-picker .pf-intro h1,
+html[data-theme="dark"] .pf-picker .pf-card h2 { color: var(--pf-ink); }
+html[data-theme="dark"] .pf-picker .pf-card:is(:hover, :focus-visible) h2 { color: var(--accent); }
 @media (max-width: 520px) {
-  .pf-picker { padding: 112px 16px 48px; }
+  .pf-picker { padding: 40px 16px 48px; }
   .pf-picker .pf-grid { margin-top: 32px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -741,14 +760,35 @@ html[data-theme="dark"] .account-shell .header .brand small {
   }
 }
 /* ---------- Home do usuário: carrossel e cards ---------- */
-.hero.hero-full,
-.user-home .hero {
+.hero.hero-full {
   min-height: max(665px, 100vh);
   min-height: max(665px, 100svh);
 }
+/* Referência 01 (variante A): a foto desfocada cobre o topo e some no fundo da página;
+   os cards ficam sobre o fundo do tema (claro ou escuro). */
 .user-home .hero {
+  min-height: 0;
   text-align: left;
-  padding-bottom: 72px;
+  padding: calc(var(--tt-header-offset) + 90px) 24px 70px;
+  background: var(--tt-bg);
+}
+.user-home .hero::before {
+  /* some antes da borda (o ::before é maior que o hero por causa do desfoque) */
+  -webkit-mask-image: linear-gradient(#000 55%, transparent 92%);
+  mask-image: linear-gradient(#000 55%, transparent 92%);
+}
+@media (max-width: 850px) {
+  .user-home .hero {
+    padding: calc(var(--tt-header-offset) + 64px) 20px 56px;
+  }
+}
+@media (max-width: 620px) {
+  .user-home .hero {
+    padding: calc(var(--tt-header-offset) + 84px) 16px 48px;
+  }
+  .uh-car .uh-k {
+    font-size: 9.5px;
+  }
 }
 .user-home .hero-content {
   max-width: 1240px;
@@ -813,6 +853,14 @@ html[data-theme="dark"] .account-shell .header .brand small {
   font-size: 13px;
   cursor: pointer;
   transition: background 0.2s;
+}
+.uh-nav button[aria-pressed] {
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+.uh-nav button:focus-visible {
+  outline: 2px solid #a99aff;
+  outline-offset: 2px;
 }
 .uh-nav button:hover {
   background: rgba(79, 120, 232, 0.9);
@@ -907,6 +955,7 @@ html[data-theme="dark"] .account-shell .header .brand small {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 .uh-card {
+  --uh-acc: #2a52c8;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -915,16 +964,22 @@ html[data-theme="dark"] .account-shell .header .brand small {
   min-height: 176px;
   padding: 16px 18px;
   border-radius: 18px;
-  color: #f1f4fa;
-  background: rgba(17, 26, 43, 0.86);
-  border: 1px solid #263349;
+  color: var(--tt-ink);
+  background: color-mix(in srgb, var(--tt-surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--tt-border);
+  text-align: left;
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.25s;
 }
 .uh-card:hover,
 .uh-card:focus-within {
   transform: translateY(-4px) scale(1.01);
-  border-color: rgba(109, 143, 245, 0.6);
-  box-shadow: 0 22px 40px -18px rgba(109, 143, 245, 0.4);
+  border-color: color-mix(in srgb, var(--uh-acc) 55%, var(--tt-border));
+  box-shadow: 0 22px 40px -18px color-mix(in srgb, var(--uh-acc) 35%, transparent);
+}
+html[data-theme="dark"] .uh-card {
+  --uh-acc: #6d8ff5;
 }
 .uh-card:active {
   transform: translateY(-2px) scale(0.99);
@@ -944,8 +999,11 @@ html[data-theme="dark"] .account-shell .header .brand small {
   color: #9aa8bf;
   transition: color 0.25s;
 }
+.uh-card .uh-k {
+  color: var(--tt-muted);
+}
 .uh-card:hover .uh-k {
-  color: #a99aff;
+  color: var(--uh-acc);
 }
 .uh-big {
   font-size: 24px;
@@ -956,14 +1014,20 @@ html[data-theme="dark"] .account-shell .header .brand small {
 }
 .uh-sub {
   font-size: 13px;
-  color: #9aa8bf;
+  color: var(--tt-muted);
+}
+.uh-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 .uh-go {
   margin-top: auto;
   padding-top: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #8fa8ff;
+  color: var(--uh-acc, #8fa8ff);
 }
 .uh-go::after {
   content: " →";
@@ -988,8 +1052,36 @@ html[data-theme="dark"] .account-shell .header .brand small {
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 99px;
+  color: #2f6b45;
+  background: rgba(63, 160, 110, 0.14);
+}
+html[data-theme="dark"] .uh-chips span {
   color: #7be0b2;
   background: rgba(123, 224, 178, 0.14);
+}
+/* Carrossel sem eventos (conta sem eventos publicados) ou carregando */
+.uh-car-empty {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #111a2c, #1d1f45);
+}
+.uh-car-msg {
+  display: grid;
+  gap: 8px;
+  max-width: 34ch;
+  padding: 24px;
+  text-align: center;
+}
+.uh-car-msg b {
+  font-size: 20px;
+}
+.uh-car-msg span {
+  color: #c4cde0;
+  font-size: 14px;
+}
+.uh-car-msg .uh-go {
+  margin-top: 4px;
+  color: #b9c8ff;
 }
 .uh-thumbs {
   display: flex;
@@ -1082,13 +1174,15 @@ html[data-theme="dark"] .uh-pbar i { background: #a99aff; }
   width: 100%;
 }
 
+/* "Como funciona?": a seção encosta no topo da tela (anula o scroll-padding do html)
+   e reserva o espaço do header no próprio padding, sem mostrar o hero acima dela. */
 #profiles {
-  scroll-margin-top: 0;
+  scroll-margin-top: calc(-1 * var(--tt-header-space));
   min-height: 100svh;        /* a seção ocupa a tela inteira ao chegar */
   display: flex;
   flex-direction: column;
   justify-content: center;   /* título + cards ficam no centro */
-  padding-top: 96px;         /* espaço livre sob o header fixo */
+  padding-top: var(--tt-header-space);
   padding-bottom: 48px;
 }
 /* Cadastro: card compacto para caber na tela sem scroll */

@@ -12,6 +12,7 @@ import './report.css';
 import './moderation.css';
 import './home.css';
 import './access.css';
+import './layout.css';
 import { StoreProvider } from './context/Store';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

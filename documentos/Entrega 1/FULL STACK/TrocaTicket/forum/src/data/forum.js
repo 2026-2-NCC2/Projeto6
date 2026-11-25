@@ -391,8 +391,5 @@ export const comentarios = {
   ],
 };
 
-export const notificacoesIniciais = [
-  { id: "n1", texto: "u/rodrigo_sound respondeu na sua discussão sobre Allianz Parque", link: "/t/ShowsEFestivais/post/8942", criadoEm: atras(20 * MIN) },
-  { id: "n2", texto: "Novo comunicado da moderação em t/ShowsEFestivais", link: "/t/ShowsEFestivais/post/8899", criadoEm: atras(3 * HORA) },
-  { id: "n3", texto: "Sua publicação recebeu 50 upvotes 🎉", link: "/t/TrocasEIngressos/post/8915", criadoEm: atras(6 * HORA) },
-];
+// As notificações ficam em notificacoes.js (compartilhadas com o site principal).
+export { notificacoesIniciais } from "./notificacoes.js";

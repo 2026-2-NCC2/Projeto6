@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { comentarios as comentariosSeed, comunidades, notificacoesIniciais, publicacoes as publicacoesSeed, usuarioAtual } from "../data/forum.js";
+import { CHAVE_FORUM } from "../data/notificacoes.js";
 
-const CHAVE = "forum-trocaticket:v1";
+const CHAVE = CHAVE_FORUM;
 
 const estadoInicial = {
   dark: false,
@@ -71,7 +72,7 @@ export function ForumProvider({ children }) {
     const nome = identidadeSite.name || "Visitante TrocaTicket";
     const emailBase = (identidadeSite.email || "").split("@")[0];
     const username = (identidadeSite.username || emailBase || nome.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_"))
-      .replace(/^_+|_+$/g, "").toLowerCase() || "participante";
+      .replace(/^_+|_+$/g, "").toLowerCase() || "usuario";
     const iniciais = nome.split(/\\s+/).filter(Boolean).slice(0, 2).map((parte) => parte[0]).join("").toUpperCase();
     return { ...usuarioAtual, username, nome, iniciais, role: identidadeSite.role, photo: identidadeSite.photo || "" };
   }, [identidadeSite]);

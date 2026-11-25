@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/Store';
 import { Field, PageTitle, Panel } from '../components/UI';
-import { roleNames } from '../data/demo';
+import { nomeDoPerfil } from '../data/perfis';
 import { atualizarUsuario, uploadFotoUsuario, excluirFotoUsuario } from '../services/api';
 
 function syncSessionUser(updates) {
@@ -197,7 +197,7 @@ export default function Profile() {
             <Field
               label="Tipo de perfil"
               name="profile-role"
-              value={roleNames[role] || 'Participante'}
+              value={nomeDoPerfil(role)}
               readOnly
             />
             <Field

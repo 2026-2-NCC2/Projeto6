@@ -63,7 +63,7 @@ export default function ForumPage() {
       ref={frame}
       className="forum-frame"
       src="/forum/index.html"
-      title="Comunidade TrocaTicket — Fórum"
+      title="Troca-Papo — fórum da comunidade TrocaTicket"
       loading="eager"
       referrerPolicy="strict-origin-when-cross-origin"
       onLoad={() => {

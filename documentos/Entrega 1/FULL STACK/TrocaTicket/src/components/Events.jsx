@@ -6,9 +6,15 @@ import { useStore } from '../context/Store';
 
 export const currency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
+// Eventos exibidos no site:
+// - conta autenticada: só os eventos do banco (API);
+// - modo demonstração: só a vitrine local (/data/events.json), sem chamar a API;
+// - visitante: vitrine local + eventos publicados na API, quando ela estiver no ar.
+//   Se a API não responder, a vitrine local aparece normalmente, sem aviso técnico.
 export function useEvents() {
   const [params] = useSearchParams();
-  const { isAuthenticated } = useStore();
+  const { isAuthenticated, role } = useStore();
+  const isDemo = !isAuthenticated && Boolean(role);
   const simulateError = params.get('erro') === '1';
   const [state, setState] = useState({ loading: true, events: [], error: '', warning: '' });
   const [attempt, setAttempt] = useState(0);
@@ -17,20 +23,26 @@ export function useEvents() {
     setState({ loading: true, events: [], error: '', warning: '' });
     (isAuthenticated ? Promise.resolve([]) : getEvents(controller.signal, simulateError && attempt === 0))
       .then(async (events) => {
+        if (isDemo) {
+          setState({ loading: false, events, error: '', warning: '' });
+          return;
+        }
         try {
           const published = await getPublishedEvents(controller.signal);
           const byId = new Map([...events, ...published].map((event) => [String(event.id), event]));
           setState({ loading: false, events: [...byId.values()], error: '', warning: '' });
         } catch (error) {
           if (error.name === 'AbortError') return;
-          setState(isAuthenticated
-            ? { loading: false, events: [], error: `Não foi possível carregar eventos do banco de dados. ${error.message}`, warning: '' }
-            : {
-                loading: false,
-                events,
-                error: '',
-                warning: `A API não está disponível; exibindo apenas os eventos de demonstração. ${error.message}`,
-              });
+          setState(
+            isAuthenticated
+              ? {
+                  loading: false,
+                  events: [],
+                  error: `Não foi possível carregar eventos do banco de dados. ${error.message}`,
+                  warning: '',
+                }
+              : { loading: false, events, error: '', warning: '' },
+          );
         }
       })
       .catch((error) => {
@@ -38,7 +50,7 @@ export function useEvents() {
           setState({ loading: false, events: [], error: error.message, warning: '' });
       });
     return () => controller.abort();
-  }, [attempt, isAuthenticated, simulateError]);
+  }, [attempt, isAuthenticated, isDemo, simulateError]);
   return { ...state, retry: () => setAttempt((value) => value + 1) };
 }
 export function LoadState({ loading, error, retry, warning }) {
@@ -70,7 +82,7 @@ export default function Events({ catalog = false }) {
   return <EventList catalog={catalog} state={useEvents()} />;
 }
 
-export function EventList({ catalog = false, state }) {
+export function EventList({ catalog = false, state, title = 'Festivais de Música' }) {
   const [query, setQuery] = useState('');
   const events = state.events.filter((event) =>
     `${event.title} ${event.location}`
@@ -83,7 +95,7 @@ export function EventList({ catalog = false, state }) {
         <div>
           <p className="eyebrow purple">Eventos</p>
           <h2 id="events-title">
-            {catalog ? 'Encontre seu próximo evento' : 'Festivais de Música'}
+            {catalog ? 'Encontre seu próximo evento' : title}
           </h2>
         </div>
         {!catalog && (

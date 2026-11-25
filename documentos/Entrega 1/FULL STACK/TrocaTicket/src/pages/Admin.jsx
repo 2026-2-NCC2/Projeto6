@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { opportunities } from '../data/demo';
 import { STATUS_TONE, eventReports } from '../data/reports';
-import { Badge, DownloadButton, Empty, Panel, dateLabel, money } from '../components/UI';
+import { Badge, DownloadButton, Empty, PageTitle, Panel, dateLabel, money } from '../components/UI';
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
 import EventCard from '../components/EventCard';
@@ -57,6 +57,14 @@ export default function Admin() {
 
   return (
     <div className="workspace admin-home">
+      <PageTitle
+        title="Painel Geral"
+        subtitle="Visão consolidada dos eventos e relatórios de demonstração."
+      >
+        <Link className="button primary" to="/admin/moderacao">
+          Moderar cadastros <span aria-hidden="true">→</span>
+        </Link>
+      </PageTitle>
       <section className="ah-search" aria-label="Pesquisa de eventos">
         <div className="ah-search-row">
           <label className="search-box wide">

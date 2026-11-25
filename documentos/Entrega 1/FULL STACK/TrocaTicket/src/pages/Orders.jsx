@@ -70,8 +70,8 @@ export default function Orders() {
     return (
       <div className="workspace">
         <PageTitle title="Meus pedidos" subtitle="Reservas, pagamentos simulados e estornos." />
-        <Empty title="Área disponível para participantes">
-          Entre com uma conta de participante para acompanhar seus pedidos.
+        <Empty title="Área disponível para usuários">
+          Entre com uma conta de usuário para acompanhar seus pedidos.
         </Empty>
       </div>
     );
