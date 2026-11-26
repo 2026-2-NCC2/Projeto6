@@ -649,4 +649,4 @@ function criarRepasse({
   };
 }
 
-module.exports = { criarRepasse, SQL_NUNCA_REPASSADO, SQL_EM_REPASSE, minutosConvite };
+module.exports = { criarRepasse, SQL_NUNCA_REPASSADO, SQL_EM_REPASSE, minutosConvite, novoCodigo };

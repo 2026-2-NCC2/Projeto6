@@ -1,5 +1,66 @@
 # Integração TrocaTicket
 
+## Integração com a TrocaTicket 2.0 — etapa 5: portaria e atendimento (26/11/2026)
+
+Etapa iniciada com autorização do usuário depois do ZIP da etapa 4 (base 753682b) e concluída; nada foi publicado e não houve merge.
+
+**O que entrou**
+- `server/portaria.js` (novo), adaptado de carteira-portaria.js (leitura única) e atendimento-configuracao.js (atendimentos com histórico) da 2.0:
+  - **Portaria do organizador:** `GET /api/portaria/eventos`, `GET /api/portaria/eventos/:id` (entradas e ingressos ainda não usados) e `POST /api/portaria/entradas` (validação do código, com Idempotency-Key).
+  - **Atendimento:** `GET/POST /api/atendimentos` e `POST /api/atendimentos/:id/mensagens`.
+- `server/MIGRACAO_PORTARIA_ATENDIMENTO.sql` (nova, incluída no preparador): `entrada_portaria` (uma linha por ingresso; a chave primária impede uma segunda entrada), `atendimento` e `atendimento_mensagem`. Pode ser reaplicada e termina com uma conferência que deve voltar vazia.
+- `server/pedidos.js`: `rotaComPerfis` (rotas por perfil, como usuário e organizador) e ligação do novo módulo.
+- `server/server.js`:
+  - a troca aceita gera código novo para os dois ingressos (pendência da etapa 4: o dono anterior entrava com o código antigo);
+  - a lista de ingressos traz `usedAt`.
+- **Site:**
+  - páginas **Portaria** (`/organizador/portaria`) e **Atendimentos** (`/organizador/atendimentos`) no menu do organizador;
+  - página **Atendimento** (`/atendimento`) da conta de usuário, com atalhos em Meus pedidos ("Atendimento" e "Ajuda com o pedido nº…"), em Ajuda & Suporte e no painel de revenda ("Denunciar");
+  - Meus ingressos mostra quando o ingresso entrou na portaria.
+- **Testes:** `server/tests/portaria.test.js` (9 cenários) e o roteiro de navegador `scripts/e2e/portaria.py` (organizador, Ana e Bruno, com `--fotos` e `--axe`). O auditor de acessibilidade compartilhado (`repasse.py`) troca o tema pelo botão do header, sem recarregar, para auditar o estado atual da tela.
+
+**Decisões**
+- **Quem opera a portaria:** só o organizador dono do evento. O evento precisa estar publicado e não pode ter terminado; a portaria não exige o dia do evento, para permitir testes, como na 2.0.
+- **Código:** é o próprio código do ingresso (único), comparado sem diferenciar maiúsculas.
+  - Código de outro evento é recusado como "de outro evento"; código desconhecido, como "não encontrado".
+  - A segunda leitura é recusada com o horário da primeira, no horário de Brasília.
+- **Entrada e repasse:**
+  - na entrada, um anúncio ativo é encerrado e ofertas de troca pendentes são canceladas (como a 2.0 faz com o anúncio);
+  - ingresso reservado para revenda ou com convite pendente fica bloqueado até a operação terminar;
+  - ingresso utilizado não é revendido, transferido, cancelado nem estornado.
+- **Atendimento:**
+  - ligado a exatamente um pedido da conta ou a um anúncio visível para ela (dela, comprado por ela ou ainda à venda, o que permite denúncia);
+  - responde e muda a situação o organizador do evento. Na 2.0 era o administrador, que só passa a ter acesso ao banco na etapa 6;
+  - quem pediu acompanha o histórico e responde enquanto o atendimento não estiver encerrado; o organizador pode reabrir;
+  - limite de 10 atendimentos em aberto por conta (429).
+- **Privacidade:** a portaria mostra só o primeiro nome de quem entrou. O organizador vê o nome completo de quem abriu o atendimento sobre o evento dele.
+
+**Testes executados (bancos e contas descartáveis)**
+- `npm test`: site 10/10; API 69/69 em MariaDB 10.11.14 e em MySQL 8.0.46 (60 anteriores e 9 novos), sem testes pulados.
+- Sabotagens propositais, todas acusadas pelos testes:
+  - outro organizador operando a portaria;
+  - troca mantendo o código;
+  - entrada sem controle de uso único;
+  - organizador vendo atendimentos de outros eventos.
+- Navegador (Chromium 158 com Playwright, API e MariaDB reais). `scripts/e2e/portaria.py` passou em:
+  - **portaria:** entrada liberada (com código em minúsculas), segunda leitura e código inexistente recusados, contagem de entradas e "Utilizado" em Meus ingressos;
+  - **denúncia:** feita pelo atalho do painel de revenda;
+  - **atendimento:** aberto pelo pedido, resposta da organização com "Em análise", resposta da conta e encerramento;
+  - **celular:** 390 px sem rolagem lateral;
+  - nenhum erro além das recusas esperadas da portaria.
+- Regressão: `navegador.py` (`regressao`, `compra` e `recusado`) e `repasse.py` passaram. Logs da API sem erros.
+- axe 4.14.1: zero violações automáticas em 12 combinações da etapa 5 e em 20 da etapa 4.
+  - A regressão encontrou uma violação que eu tinha introduzido: o link novo de Meus pedidos tinha um nome acessível diferente do texto visível (WCAG 2.5.3).
+  - Corrigido: o link agora se chama "Ajuda com o pedido nº…".
+- O header continua cabendo nas 13 larguras testadas com os 5 itens do menu do organizador. O build passou e não há arquivo novo fora do padrão do Prettier (os 51 antigos continuam iguais).
+
+**Pendências e riscos**
+- **Cancelamento de evento:** na 2.0, o cancelamento estorna os pedidos e invalida os ingressos de uma vez. Na Entrega 1 isso ainda não existe: mudar o evento para outra situação fecha a portaria e a venda, mas os ingressos e estornos continuam individuais. Fica para a etapa 6.
+- **Administrador:** ainda não responde atendimentos nem opera a portaria (etapa 6, com a aprovação de contas).
+- **Portaria simulada:** sem câmera, sem leitura offline e sem trava de dia ou horário do evento.
+- **Achado da etapa 4:** o histórico de trocas da main continua em aberto.
+- **Próximo passo:** aguardar a confirmação do usuário para publicar ou para começar a etapa 6.
+
 ## Integração com a TrocaTicket 2.0 — etapa 4: revenda, fila de espera e transferência com aceite (26/11/2026)
 
 Retomada a partir do ZIP de continuidade: bundle verificado (requer b477108) e branch integracao-site-2.0 avançada por fast-forward de 92c66f5 para 1e0396f antes das alterações. A pendência registrada em "Interrupção durante a etapa 4" (servidor da etapa 4 ausente) foi resolvida nesta rodada. Etapa 4 concluída; nada foi publicado e não houve merge.

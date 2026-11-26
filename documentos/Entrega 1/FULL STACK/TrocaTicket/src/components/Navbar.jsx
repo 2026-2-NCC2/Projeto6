@@ -13,6 +13,8 @@ export const menus = {
     ['Fornecedores', '/organizador/fornecedores'],
     ['Meus eventos', '/organizador/eventos'],
     ['Novo evento', '/organizador/novo'],
+    ['Portaria', '/organizador/portaria'],
+    ['Atendimentos', '/organizador/atendimentos'],
   ],
   fornecedor: [
     ['Minhas propostas', '/fornecedor/propostas'],

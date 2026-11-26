@@ -54,6 +54,7 @@ export default function Layout({ darkMode, toggleTheme }) {
       pathname === '/ingressos' ||
       pathname === '/pedidos' ||
       pathname === '/repasses' ||
+      pathname === '/atendimento' ||
       pathname === '/perfil'
     )) {
       navigate('/perfis', { replace: true });

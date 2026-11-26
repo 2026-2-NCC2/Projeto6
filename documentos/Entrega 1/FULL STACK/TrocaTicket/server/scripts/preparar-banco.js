@@ -22,6 +22,7 @@ const MIGRACOES = [
   'MIGRACAO_SESSAO_LOGIN.sql',
   'MIGRACAO_PEDIDOS_PAGAMENTOS.sql',
   'MIGRACAO_REPASSE.sql',
+  'MIGRACAO_PORTARIA_ATENDIMENTO.sql',
 ].map(
   (arquivo) => path.join(RAIZ_SERVIDOR, arquivo),
 );

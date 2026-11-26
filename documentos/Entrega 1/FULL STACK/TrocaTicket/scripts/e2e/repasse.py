@@ -72,26 +72,30 @@ class Conta:
 AUDITORIA = {"axe": None, "resultados": []}
 
 
+def definir_tema(page, tema):
+    """Usa o botão de tema do header (sem recarregar), para manter o estado atual da tela."""
+    if page.evaluate("document.documentElement.dataset.theme") != tema:
+        page.get_by_role("button", name=re.compile("^Ativar modo (escuro|claro)$")).first.click()
+        page.wait_for_function("t => document.documentElement.dataset.theme === t", arg=tema)
+
+
 def auditar(conta, rotulo):
     """Roda o axe no estado atual da página, em duas larguras e nos dois temas."""
     if not AUDITORIA["axe"]:
         return
     page = conta.page
+    if not page.evaluate("Boolean(window.axe)"):
+        page.add_script_tag(content=AUDITORIA["axe"])
     for largura, altura in ((1366, 900), (390, 844)):
         for tema in ("light", "dark"):
             page.set_viewport_size({"width": largura, "height": altura})
-            page.evaluate("t => localStorage.setItem('trocaticket-theme', t)", tema)
-            page.reload()
-            page.wait_for_load_state("networkidle")
-            page.wait_for_timeout(600)
-            page.add_script_tag(content=AUDITORIA["axe"])
+            definir_tema(page, tema)
+            page.wait_for_timeout(500)
             violacoes = page.evaluate("""async () => (await axe.run(document, {resultTypes: ['violations']}))
                 .violations.map(v => `${v.id} (${v.impact}): ${v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(' | ')}`)""")
             AUDITORIA["resultados"].append((f"{rotulo} · {largura}px · {tema}", violacoes))
-    page.evaluate("localStorage.setItem('trocaticket-theme', 'light')")
+    definir_tema(page, "light")
     page.set_viewport_size({"width": 1366, "height": 900})
-    page.reload()
-    page.wait_for_load_state("networkidle")
 
 
 def oferecer(conta, ingresso_id, *, preco=None, email=None, status_esperado=201):

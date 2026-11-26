@@ -20,7 +20,7 @@ const db = require('./db');
 const { criarSessoes } = require('./sessao');
 const sessoes = criarSessoes(db);
 const { criarPedidos, ErroPedido } = require('./pedidos');
-const { SQL_NUNCA_REPASSADO, SQL_EM_REPASSE } = require('./repasse');
+const { SQL_NUNCA_REPASSADO, SQL_EM_REPASSE, novoCodigo } = require('./repasse');
 // requireUserRole é declarada mais abaixo neste arquivo (declaração de função, disponível aqui).
 const pedidos = criarPedidos({ db, requireUserRole: (...args) => requireUserRole(...args) });
 
@@ -757,6 +757,8 @@ app.post('/api/logout', async (req, res) => {
         cancellable: Boolean(Number(row.cancellable)),
         // Anunciado para revenda ou com convite de transferência pendente (etapa 4).
         inResale: Boolean(Number(row.inResale)),
+        // Quando entrou pela portaria (etapa 5).
+        usedAt: row.usedAt || null,
       };
     }
 
@@ -1500,9 +1502,11 @@ app.post('/api/logout', async (req, res) => {
                   (e.data_inicio > CURRENT_DATE) AS cancellable,
                   e.titulo AS eventTitle, e.imagem_capa_url AS image,
                   DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS eventDate,
-                  e.\`local\` AS location
+                  e.\`local\` AS location,
+                  DATE_FORMAT(ep.entrou_em, '%Y-%m-%dT%H:%i:%sZ') AS usedAt
              FROM ingresso i JOIN evento e ON e.id = i.evento_id
              LEFT JOIN pedido p ON p.id = i.pedido_id
+             LEFT JOIN entrada_portaria ep ON ep.ingresso_id = i.id
             WHERE i.dono_atual_id = ?
             ORDER BY i.data_compra DESC, i.id DESC`,
           [userId],
@@ -1819,7 +1823,7 @@ app.post('/api/logout', async (req, res) => {
         const offeredTicketId = Number(offer.offeredTicketId);
         const requesterId = Number(offer.requesterId);
         const [tickets] = await connection.execute(
-          `SELECT id, dono_atual_id AS ownerId, status, disponivel_troca AS available
+          `SELECT id, dono_atual_id AS ownerId, status, disponivel_troca AS available, evento_id AS eventId
              FROM ingresso WHERE id IN (?, ?) ORDER BY id FOR UPDATE`,
           [requestedTicketId, offeredTicketId],
         );
@@ -1842,12 +1846,18 @@ app.post('/api/logout', async (req, res) => {
             await connection.rollback();
             return res.status(409).json({ error: resaleLock });
           }
+          // Cada ingresso trocado ganha código novo: o dono anterior não entra mais com ele (etapa 5).
           await connection.execute(
             `UPDATE ingresso
                 SET dono_atual_id = CASE id WHEN ? THEN ? WHEN ? THEN ? END,
+                    codigo_ingresso = CASE id WHEN ? THEN ? WHEN ? THEN ? END,
                     disponivel_troca = FALSE
               WHERE id IN (?, ?)`,
-            [requestedTicketId, requesterId, offeredTicketId, userId, requestedTicketId, offeredTicketId],
+            [
+              requestedTicketId, requesterId, offeredTicketId, userId,
+              requestedTicketId, novoCodigo(requested.eventId), offeredTicketId, novoCodigo(offered.eventId),
+              requestedTicketId, offeredTicketId,
+            ],
           );
           await connection.execute(
             `UPDATE troca_ingresso

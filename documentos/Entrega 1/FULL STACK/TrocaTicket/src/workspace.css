@@ -3946,3 +3946,145 @@ html {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* Portaria e atendimento (etapa 5). */
+.gate-layout,
+.support-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.support-layout {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+.gate-form,
+.support-form,
+.support-reply {
+  display: grid;
+  gap: 8px;
+}
+.gate-form label,
+.support-form label,
+.support-reply label {
+  font-weight: 600;
+}
+.gate-form input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+.gate-form button,
+.support-form button,
+.support-reply button {
+  justify-self: start;
+  margin-top: 6px;
+}
+.support-form textarea,
+.support-reply textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+.gate-result {
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid;
+  border-left-width: 6px;
+  border-radius: 12px;
+}
+.gate-result strong {
+  font-size: 20px;
+}
+.gate-result p,
+.gate-result small {
+  margin: 0;
+}
+.gate-result.ok {
+  border-color: #3fa06e;
+  background: #ecfdf5;
+  color: #0b5a3a;
+}
+.gate-result.erro {
+  border-color: #d64561;
+  background: #fff1f3;
+  color: #8a1630;
+}
+html[data-theme='dark'] .gate-result.ok {
+  border-color: rgba(52, 211, 153, 0.5);
+  background: rgba(52, 211, 153, 0.1);
+  color: #a7f0cf;
+}
+html[data-theme='dark'] .gate-result.erro {
+  border-color: rgba(244, 99, 122, 0.55);
+  background: rgba(244, 99, 122, 0.1);
+  color: #ffc2cd;
+}
+.gate-count {
+  margin-top: 0;
+}
+.gate-count strong {
+  font-size: 22px;
+}
+.support-list {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.support-thread {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--tt-border, #dfe6f1);
+}
+.support-thread:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.support-thread-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.support-thread-head h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.support-thread > p {
+  margin: 0;
+}
+.support-messages {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.support-messages li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--tt-surface-soft, #f8faff);
+  border: 1px solid var(--tt-border, #dfe6f1);
+}
+.support-messages li.from-team {
+  border-left: 4px solid #7565ed;
+}
+.support-messages small {
+  color: var(--tt-muted, #4f5d74);
+}
+.support-messages p {
+  margin: 4px 0 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .gate-layout,
+  .support-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

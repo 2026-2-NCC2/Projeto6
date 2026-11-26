@@ -17,6 +17,7 @@
 
 const crypto = require('crypto');
 const { criarRepasse, SQL_NUNCA_REPASSADO, SQL_EM_REPASSE } = require('./repasse');
+const { criarPortaria } = require('./portaria');
 
 const LIMITE_POR_CONTA = 6;
 const PERCENTUAL_TIPO = { Inteira: 100, 'Meia-entrada': 50 };
@@ -375,6 +376,27 @@ function criarPedidos({ db, requireUserRole }) {
     return requireUserRole(req.user.id, 1, res);
   }
 
+  // Rota para contas de um dos perfis informados (1 usuário, 2 organizador, 3 fornecedor, 4 admin).
+  function rotaComPerfis(perfis, trabalho) {
+    return async (req, res) => {
+      try {
+        if (!req.user) {
+          res.status(401).json({ error: 'Sua sessão terminou ou você ainda não entrou. Entre novamente.', code: 'UNAUTHENTICATED' });
+          return;
+        }
+        if (!perfis.includes(req.user.tipo_perfil)) {
+          res.status(403).json({ error: 'A conta não possui o perfil necessário para esta operação.' });
+          return;
+        }
+        await trabalho(req, res);
+      } catch (error) {
+        if (error instanceof ErroPedido) return res.status(error.status).json({ error: error.message });
+        console.error('Erro ao processar a solicitação:', error);
+        res.status(500).json({ error: 'Erro interno ao processar a solicitação.' });
+      }
+    };
+  }
+
   function rota(trabalho) {
     return async (req, res) => {
       try {
@@ -399,6 +421,7 @@ function criarPedidos({ db, requireUserRole }) {
 
   function registrarRotas(app) {
     repasse.registrarRotas(app);
+    portaria.registrarRotas(app);
 
     app.get('/api/pedidos', rota(async (req, res) => {
       await expirarTudo();
@@ -604,6 +627,15 @@ function criarPedidos({ db, requireUserRole }) {
     conferirLimiteConta,
     minutosReserva,
     expirar: expirarTudo,
+  });
+
+  const portaria = criarPortaria({
+    db,
+    falhar,
+    inteiroPositivo,
+    travarEvento,
+    executarIdempotente,
+    rotaComPerfis,
   });
 
   return {

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useEvents, LoadState } from '../components/Events';
 import { useStore } from '../context/Store';
+import { horaBrasilia } from '../services/portaria';
 import { Badge, Empty, Modal, PageTitle, Panel, Tabs, money } from '../components/UI';
 import EventCard from '../components/EventCard';
 import { getEventReviews, saveEventReview } from '../services/events';
@@ -735,7 +736,10 @@ export function Tickets() {
                   <p>{ticket.type} · {money(ticket.price)}</p>
                   <code>{ticket.code}</code>
                   <p className="muted">
-                    {ticket.orderId ? `Pedido nº ${ticket.orderId} · ` : ''}Pagamento simulado; sem validade para entrada.
+                    {ticket.orderId ? `Pedido nº ${ticket.orderId} · ` : ''}
+                    {ticket.usedAt
+                      ? `Entrada registrada na portaria em ${horaBrasilia(ticket.usedAt)}.`
+                      : 'Pagamento simulado. Mostre este código na portaria do evento (simulação).'}
                   </p>
                   {ticket.statusCode === 'A' && ticket.inResale && (
                     <p className="info-note">

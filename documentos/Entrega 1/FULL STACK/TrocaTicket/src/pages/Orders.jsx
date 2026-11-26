@@ -86,6 +86,9 @@ export default function Orders() {
         <Link className="button outline" to="/ingressos">
           Meus ingressos
         </Link>
+        <Link className="button outline" to="/atendimento">
+          Atendimento
+        </Link>
         <Link className="button primary" to="/eventos">
           Explorar eventos
         </Link>
@@ -228,6 +231,9 @@ export default function Orders() {
                       </button>
                     </div>
                   )}
+                  <Link className="text-link" to={`/atendimento?pedido=${pedido.id}`}>
+                    Ajuda com o pedido nº {pedido.id}
+                  </Link>
                 </Panel>
               );
             })}

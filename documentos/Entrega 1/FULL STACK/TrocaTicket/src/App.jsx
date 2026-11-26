@@ -16,6 +16,8 @@ import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 import Orders from './pages/Orders';
+import Gate from './pages/Gate';
+import Support from './pages/Support';
 import Resale from './pages/Resale';
 import ForumPage from './pages/ForumPage';
 import { useStore } from './context/Store';
@@ -29,13 +31,14 @@ function Inicio() {
   if (perfil === 'comprador') return <UserHome />;
   return <Navigate to={inicioDoPerfil(perfil)} replace />;
 }
-function Info({ title, children }) {
+function Info({ title, children, acao }) {
   const { isAuthenticated } = useStore();
   return (
     <div className="workspace narrow">
       <section className="panel">
         <h1>{title}</h1>
         <p>{children}</p>
+        {isAuthenticated && acao}
         {!isAuthenticated && (
           <Link className="button primary" to="/perfis">
             Explorar os perfis
@@ -114,6 +117,7 @@ export default function App() {
         <Route path="ingressos" element={<Tickets />} />
         <Route path="repasses" element={<Resale />} />
         <Route path="pedidos" element={<Orders />} />
+        <Route path="atendimento" element={<Support />} />
         {isAuthenticated && <Route path="comunidade/*" element={<Community />} />}
         <Route path="comunidade/eventos" element={<Community />} />
         <Route path="organizador" element={<Organizer />} />
@@ -122,6 +126,8 @@ export default function App() {
         <Route path="organizador/eventos/:id/editar" element={<EventEditorRoute />} />
         <Route path="organizador/eventos/:id/consolidar" element={<Consolidation />} />
         <Route path="organizador/fornecedores" element={<Suppliers />} />
+        <Route path="organizador/portaria" element={<Gate />} />
+        <Route path="organizador/atendimentos" element={<Support />} />
         <Route path="fornecedor" element={<SupplierHome />} />
         <Route path="fornecedor/propostas" element={<SupplierProposals />} />
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
@@ -155,7 +161,14 @@ export default function App() {
         <Route
           path="ajuda"
           element={
-            <Info title="Ajuda & Suporte">
+            <Info
+              title="Ajuda & Suporte"
+              acao={
+                <Link className="button primary" to="/atendimento">
+                  Abrir atendimento
+                </Link>
+              }
+            >
               Use “Explorar demo” ou “Trocar perfil” para acessar cada área. O organizador cria e
               publica eventos; o fornecedor prepara cotações e gerencia itens; o usuário salva
               favoritos e simula reservas; o administrador consulta relatórios e modera cadastros

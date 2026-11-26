@@ -116,6 +116,8 @@ export function EventResale({ eventId, userId }) {
               onClick={async () => {
                 if (await gravar(`/anuncios/${item.id}/reservar`, { halfDeclaration: meia && declarou })) navigate('/pedidos');
               }}>{item.sellerId === userId ? 'Seu anúncio' : 'Reservar repasse'}</button>
+            {item.sellerId !== userId && <Link className="text-link" to={`/atendimento?anuncio=${item.id}`}
+              aria-label={`Denunciar o anúncio nº ${item.id}`}>Denunciar</Link>}
           </li>)}</ul> : <p>Nenhum anúncio disponível para este tipo de ingresso.</p>}
         {inscritos.length ? <ul className="resale-list" aria-label="Sua fila de espera">{inscritos.map((item) =>
           <ItemFila key={item.id} estado={estado} item={item} />)}</ul> :
