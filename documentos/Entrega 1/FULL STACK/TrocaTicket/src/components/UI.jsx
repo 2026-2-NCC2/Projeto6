@@ -21,12 +21,12 @@ export function Badge({ children, tone }) {
   return <span className={`badge ${color}`}>{children}</span>;
 }
 
-export function PageTitle({ title, subtitle, children, eyebrow }) {
+export function PageTitle({ title, subtitle, children, eyebrow, heading: Heading = 'h1' }) {
   return (
     <div className="page-title">
       <div>
         {eyebrow && <p className="eyebrow purple">{eyebrow}</p>}
-        <h1>{title}</h1>
+        <Heading>{title}</Heading>
         {subtitle && <p>{subtitle}</p>}
       </div>
       <div className="actions">{children}</div>
@@ -51,11 +51,11 @@ export function Panel({ title, subtitle, children, className = '', action }) {
   );
 }
 
-export function Empty({ title = 'Nenhum resultado encontrado', children }) {
+export function Empty({ title = 'Nenhum resultado encontrado', children, heading: Heading = 'h3' }) {
   return (
     <div className="empty-state">
       <span aria-hidden="true">◇</span>
-      <h3>{title}</h3>
+      <Heading>{title}</Heading>
       <p>{children || 'Tente ajustar os filtros para encontrar o que procura.'}</p>
     </div>
   );

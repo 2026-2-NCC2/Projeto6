@@ -1,17 +1,24 @@
 # Continuidade da integração
 
+## Retomada para o Claude em 26/11/2026
+
+Use o ZIP desta passagem, branch integracao-site-2.0. O refinamento do Fornecedor foi feito com as referências disponíveis, por autorização do usuário. O próximo trabalho é concluir a etapa 4 da 2.0.
+
+1. Restaure o bundle conforme LEIA-PRIMEIRO.txt. Leia a primeira seção de CHECKPOINT.md. Use git diff 92c66f5..HEAD para ver tudo que entrou após o ZIP anterior.
+2. Compare os endpoints chamados por src/pages/Resale.jsx com os seis cenários de server/tests/repasse.test.js, server/MIGRACAO_REPASSE.sql e as regras já implementadas em documentos/Site/TrocaTicket 2.0. Na Entrega 1, complete e registre as rotas no Express. Integre reserva, pagamento, estorno, expiração e troca de titularidade com o fluxo de pedidos existente. Verifique concorrência e repetição das operações.
+3. Aplique o preparador em banco descartável e rode npm test com MariaDB ou MySQL. Rode o build e os fluxos de navegador com contas distintas para venda e compra, fila e transferência com aceite, recusa e cancelamento. Reconfira a regressão do seletor da demonstração e a acessibilidade da página nova.
+4. Atualize CHECKPOINT.md e HANDOFF.md, entregue novo ZIP e pare ao fechar a etapa 4. Aguarde orientação para publicar ou avançar às etapas 5–7. Não salve credenciais.
+
 Objetivo do usuário: integrar na Entrega 1 o servidor, banco, autenticação, modelos, APIs e regras da main ao visual de alteraçõesMiguel. Trabalhar em branch nova e incrementalmente. Antes de editar, comparar todos os arquivos, decidir quais copiar, adaptar ou dispensar e conferir imports, assets, rotas e dependências. Substituir o tema por tokens, classes, toggle e persistência da referência e verificar legibilidade em todas as páginas nos dois temas. Integrar homes pública e autenticada com fundo estendido, elementos centralizados, banner Troca-Papo no fim e demais elementos da referência. Na home autenticada incluir cards personalizados, card interativo temporal e “Bem-vindo de volta, (nome do usuário)” usando sessão real. Preservar contratos e pedir orientação sobre ambiguidades ou riscos. Rodar build, iniciar, testar login, logout, temas, homes, rotas principais e chamadas reais à API, corrigir erros e reportar os resultados. Ao terminar a etapa 4, parar e aguardar confirmação.
 
 Ler CHECKPOINT.md e DIAGNOSTICO.md. Conferir git status, branch, commits e diff antes de continuar do último ponto verificado. Atualizar ambos os documentos a cada etapa com decisões, arquivos, erros, soluções, testes e pendências. Documentar preventivamente no repositório ou Drive quando autorizado, sem credenciais. Quando solicitado “Transferir para o Claude” ou “Gerar checkpoint”, entregar ambos com requisitos, situação real e próximo passo. Economizar tokens sem sacrificar qualidade, segurança ou continuidade.
 
-Aplicação em documentos/Entrega 1/FULL STACK/TrocaTicket. O próximo passo inicial é portar o tema. Preservar a Entrega 2.
-Tema portado; a etapa seguinte é integrar as homes e validar no navegador.
-Homes integradas; prosseguir com testes reais da etapa 4. Usar schema versionado da Entrega 2 só no banco de teste.
+A aplicação integrada está em documentos/Entrega 1/FULL STACK/TrocaTicket. O esquema-base da Entrega 2 e as migrações da Entrega 1 são usados em bancos de teste.
 
 Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapa 4 concluída.
 Branch integracao-main-miguel publicada por um colega (b477108). O usuário pediu para trazer a TrocaTicket 2.0 para a Entrega 1 por etapas, mantendo a Entrega 1 como base. Cada etapa termina com testes e parada para confirmação. O usuário prefere publicar só quando todas as etapas terminarem.
 
-## Retomada atual
+## Histórico até a compra simulada
 
 As etapas 1 (login com sessão), 2 (testes automáticos e iniciador) e 3 (compra simulada completa: pedido, pagamento, cancelamento e estorno) estão concluídas e testadas na branch local integracao-site-2.0, criada a partir de b477108, com um commit por etapa. A etapa 1 foi desenvolvida como integracao-site-2.0-etapa1-sessao, nome que deixou de ser usado. Detalhes, arquivos e resultados estão em CHECKPOINT.md.
 

@@ -16,6 +16,7 @@ import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 import Orders from './pages/Orders';
+import Resale from './pages/Resale';
 import ForumPage from './pages/ForumPage';
 import { useStore } from './context/Store';
 import { inicioDoPerfil, normalizarPerfil } from './data/perfis';
@@ -111,6 +112,7 @@ export default function App() {
         <Route path="eventos/:id" element={<EventDetails />} />
         <Route path="favoritos" element={<Catalog favorites />} />
         <Route path="ingressos" element={<Tickets />} />
+        <Route path="repasses" element={<Resale />} />
         <Route path="pedidos" element={<Orders />} />
         {isAuthenticated && <Route path="comunidade/*" element={<Community />} />}
         <Route path="comunidade/eventos" element={<Community />} />

@@ -120,11 +120,11 @@ export default function Navbar({ darkMode, toggleTheme }) {
       <Link
         className="brand"
         to={isPublicView ? '/' : inicioDoPerfil(activeRole)}
-        aria-label="TrocaTicket, página inicial"
+        aria-label="TrocaTicket Eventos & Ingressos, página inicial"
       >
         <img src="/images/logo.png" alt="" />
         <span>
-          TrocaTicket<small>EVENTOS & INGRESSOS</small>
+          TrocaTicket <small>EVENTOS & INGRESSOS</small>
         </span>
       </Link>
 
@@ -205,7 +205,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
             <Link
               className="user-chip"
               to={profileUrl}
-              aria-label={`Perfil de ${roleLabel}`}
+              title={`Abrir perfil de ${roleLabel}`}
             >
               <span className="avatar small">{userAvatar}</span>
               <span>

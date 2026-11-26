@@ -505,7 +505,7 @@ html[data-theme="dark"] .account-shell small {
 }
 /* ---------- Seleção de perfil (cards) ---------- */
 .pf-picker {
-  --pf-ink: #121b30; --pf-muted: #6f7e96; --pf-line: #e0e7f1; --pf-surface: #fff;
+  --pf-ink: #121b30; --pf-muted: #556780; --pf-line: #e0e7f1; --pf-surface: #fff;
   --pf-user: #2860ed; --pf-org: #7565ed; --pf-sup: #0a9e7b; --pf-adm: #d9792b;
   --pf-shadow: 0 2px 4px rgba(24,40,72,.05), 0 10px 24px -12px rgba(24,40,72,.14);
   flex: 1; width: 100%; max-width: 1120px; margin: 0 auto; padding: 64px 24px 72px;

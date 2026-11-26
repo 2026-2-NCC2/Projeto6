@@ -1616,7 +1616,7 @@ td code {
   display: block;
   margin-bottom: 15px;
 }
-.empty-state h3 {
+.empty-state :is(h2, h3) {
   font-size: 20px;
   color: var(--ink);
 }
@@ -1660,7 +1660,7 @@ td code {
 .discovery .page-title {
   margin-top: 24px;
 }
-.discovery .page-title h1 {
+.discovery .page-title :is(h1, h2) {
   font-size: 25px;
 }
 .discovery-grid {
@@ -2796,7 +2796,7 @@ html[data-theme="dark"] .discovery-body .card-actions {
 }
 html[data-theme="dark"] .discovery-body h3,
 html[data-theme="dark"] .discovery-body strong,
-html[data-theme="dark"] .empty-state h3,
+html[data-theme="dark"] .empty-state :is(h2, h3),
 html[data-theme="dark"] .panel h1,
 html[data-theme="dark"] .panel h2,
 html[data-theme="dark"] .panel h3,
@@ -3104,7 +3104,7 @@ html[data-theme="dark"] .page-title h2,
 html[data-theme="dark"] .section-heading,
 html[data-theme="dark"] .metric strong,
 html[data-theme="dark"] .summary-grid strong,
-html[data-theme="dark"] .empty-state h3 {
+html[data-theme="dark"] .empty-state :is(h2, h3) {
   color: #f3f6fc;
 }
 html[data-theme="dark"] p,

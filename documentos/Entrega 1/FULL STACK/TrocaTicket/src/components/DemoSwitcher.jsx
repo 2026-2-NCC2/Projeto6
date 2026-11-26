@@ -70,7 +70,7 @@ export default function DemoSwitcher({ perfilAtual }) {
         className="demo-switcher-toggle"
         aria-expanded={aberto}
         aria-controls={idPainel}
-        aria-label={`Modo demonstração, perfil ${nomeAtual}. Trocar perfil`}
+        aria-label={`Demo ${nomeAtual}, trocar perfil da demonstração`}
         title="Trocar perfil da demonstração"
         onClick={() => setAberto((valor) => !valor)}
       >

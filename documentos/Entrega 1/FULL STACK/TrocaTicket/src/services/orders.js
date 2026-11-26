@@ -9,7 +9,7 @@ export function criarChave() {
   return `pedido-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
-async function request(path, options, fallback) {
+export async function request(path, options, fallback) {
   let response;
   try {
     response = await apiFetch(`${API_URL}${path}`, options);
@@ -23,6 +23,7 @@ async function request(path, options, fallback) {
     semResposta.semResposta = true;
     throw semResposta;
   }
+  if (response.status === 204) return null;
   let result;
   try {
     result = await response.json();

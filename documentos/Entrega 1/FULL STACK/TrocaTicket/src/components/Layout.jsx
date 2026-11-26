@@ -53,6 +53,7 @@ export default function Layout({ darkMode, toggleTheme }) {
       pathname === '/favoritos' ||
       pathname === '/ingressos' ||
       pathname === '/pedidos' ||
+      pathname === '/repasses' ||
       pathname === '/perfil'
     )) {
       navigate('/perfis', { replace: true });
@@ -69,7 +70,7 @@ export default function Layout({ darkMode, toggleTheme }) {
       <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
 
       {isDemoMode && pathname !== '/perfis' && (
-        <div className="demo-strip" role="note">
+        <aside className="demo-strip" aria-label="Modo demonstração">
           <span>
             <i aria-hidden="true" /> Ambiente de demonstração · dados fictícios salvos neste
             navegador
@@ -82,7 +83,7 @@ export default function Layout({ darkMode, toggleTheme }) {
           >
             Trocar perfil ↗
           </button>
-        </div>
+        </aside>
       )}
 
       <main id="conteudo">

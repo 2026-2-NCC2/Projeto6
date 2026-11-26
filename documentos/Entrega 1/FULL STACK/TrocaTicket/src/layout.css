@@ -60,6 +60,11 @@ html {
   padding: 10px 34px 0;
   color: #c9d3e4;
 }
+.hero-shell > .demo-strip > :is(span, button) {
+  padding: 5px 10px;
+  border-radius: 12px;
+  background: #161f30;
+}
 .hero-shell > .demo-strip button {
   color: #b9c8ff;
 }

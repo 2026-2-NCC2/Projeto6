@@ -1,5 +1,19 @@
 # Integração TrocaTicket
 
+## Refinamento da integração 2.0 em 25/11/2026
+
+A base anterior à integração 2.0 é b477108. O pacote de entrada foi recuperado em uma árvore separada. O HEAD inicial conferido foi 92c66f59be649b33e5f70ae683352492f37627e0, posterior à compra simulada (1b69903). O ZIP de entrada é a fonte desta retomada.
+
+O refinamento recebido inclui o cabeçalho responsivo, o início por perfil no logotipo, o seletor exclusivo da demonstração, a âncora “Como funciona?”, as telas de seleção e de início do Usuário e os ajustes de tema. A tag da seleção é “Usuário”; a tag da apresentação pública é “Participante”. Os identificadores internos da API continuam os mesmos.
+
+Em 26/11 o usuário autorizou seguir com o material disponível. A home do Fornecedor recebeu um painel com atalhos de inventário e propostas, totais calculados sobre as oportunidades e filtros. Usamos as telas existentes do perfil e a imagem do Painel Geral como referência de estilo. Chromium com conta real confirmou cadastro/login, totais da API, busca, limpeza do filtro, inventário, retorno pelo logo e largura em 390 e 1366 px.
+
+**Resultados antes da etapa 4.** Site 10/10 e API 44/44 com MariaDB, sem testes pulados. Na home do Usuário com sessão real, os cards mostraram estados vazios e mudaram após salvar favorito, publicar mensagem e pagar um pedido simulado. A navegação pelos quatro cards e o retorno aos estados vazios também passaram. Compra aprovada e recusada foram verificadas em Chromium. A regressão geral passou no fluxo real; o seletor da troca de perfil na demonstração foi ajustado e a última repetição completa ainda precisa ser conferida. Novos roteiros em scripts/e2e/navegador.py e compra.py. A auditoria axe 4.14.1 registrou zero violações automáticas em oito estados, dois temas e duas larguras (32 combinações). Houve nós sobre imagens que exigem revisão humana. A busca no Painel Geral escuro mediu 15,53:1. Resultado bruto incluído no ZIP.
+
+**Interrupção durante a etapa 4 da versão 2.0.** A rota /repasses, a tela Resale.jsx, a migração MIGRACAO_REPASSE.sql, sua inclusão no preparador de banco e seis cenários em server/tests/repasse.test.js já estão na árvore. A implementação de servidor desta etapa está pendente. O front compilou na passagem (aviso de tamanho do JS). Os resultados 10/10 + 44/44 são anteriores aos testes de repasse. Não há validação ponta a ponta de revenda, fila ou transferência. Nenhum push ou merge.
+
+## Histórico das etapas anteriores
+
 Etapa 1 verificada por comparação de árvores Git. Branch local integracao-main-miguel criada a partir de main (24f169a). Referência alteraçõesMiguel (5d93188). A Entrega 1 foi confirmada pelo usuário. Inventário e decisões individuais em DIAGNOSTICO.md. Nenhum checkpoint anterior nas duas branches ou na branch integracao-visuais-miguel. O conector GitHub recusou criar a branch remota (HTTP 403).
 Etapa 2 implementada: styles.css, workspace.css, access.css, main.jsx, Navbar e ForumPage. O tema usa os tokens da referência e sincroniza o iframe com a barra de navegação. Avatar do fórum recuperado. Inspeção de imports realizada; verificação em navegador na etapa 4.
 Etapa 3 implementada em App, Layout, Account, Home, UserHome, Events, Icon e PapoBanner. A rota / usa isAuthenticated da main. Conta demonstrativa não ativa a home pessoal. Nome da sessão criada pela API, eventos publicados, favoritos da store e ingressos via serviço da main. Catálogo e carrossel compartilham a consulta. Notificações demonstrativas do fórum foram substituídas por convite à comunidade.

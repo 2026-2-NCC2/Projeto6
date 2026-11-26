@@ -90,10 +90,9 @@ function EventCarousel({ events, loading }) {
         to={`/eventos/${event.id}`}
         className="uh-slide"
         aria-live={paused ? 'polite' : 'off'}
-        aria-label={`${event.title}, ${event.date}, ${event.location}. Ver ingressos`}
       >
         <img src={event.image} alt="" decoding="async" />
-        <span className="uh-tx" aria-hidden="true">
+        <span className="uh-tx">
           {Number(event.price) > 0 && (
             <span className="uh-price">A partir de {currency(Number(event.price))}</span>
           )}

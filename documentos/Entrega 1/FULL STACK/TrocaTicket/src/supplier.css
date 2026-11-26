@@ -1945,3 +1945,39 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Painel do Fornecedor */
+.sp-home .page-title .actions {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+.sp-home-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2.25rem;
+}
+.sp-home-counts > div {
+  padding: 1.25rem;
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--sp-radius);
+}
+.sp-home-counts dt {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  color: var(--tt-muted);
+  font-weight: 600;
+}
+.sp-home-counts dd {
+  margin: .5rem 0 0;
+  color: var(--tt-ink);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.sp-home-heading { margin-bottom: 1rem; }
+.sp-home-results { color: var(--tt-muted); margin-block: 1rem; }

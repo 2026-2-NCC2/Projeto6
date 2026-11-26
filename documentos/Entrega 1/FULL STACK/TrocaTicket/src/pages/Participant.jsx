@@ -13,6 +13,7 @@ import {
   reservarPedido,
 } from '../services/orders';
 import PaymentChoice from '../components/PaymentChoice';
+import { EventResale } from './Resale';
 import {
   createCommunityMessage,
   deleteCommunityMessage,
@@ -84,6 +85,7 @@ export function Catalog({ favorites = false }) {
       {!state.loading && !state.error && (
         <>
           <PageTitle
+            heading="h2"
             title={favorites ? 'Eventos salvos' : 'Recomendados para Você'}
             subtitle={`${filtered.length} eventos encontrados`}
           />
@@ -95,6 +97,7 @@ export function Catalog({ favorites = false }) {
           {filtered.length > 4 && (
             <>
               <PageTitle
+                heading="h2"
                 title="Mais experiências para descobrir"
                 subtitle="Shows, cultura e encontros para todos os gostos."
               />
@@ -523,6 +526,7 @@ export function EventDetails() {
             )}
             {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
           </Panel>
+          {canBuyTicket && <EventResale key={numericEventId} eventId={numericEventId} userId={userId} />}
           <Panel title="Detalhes e Localização">
             <p>▦ {event.date}</p>
             <p>⌖ {event.location}</p>
@@ -704,6 +708,7 @@ export function Tickets() {
           title="Meus Ingressos"
           subtitle="Gerencie seus ingressos simulados e combine trocas com outros usuários."
         >
+          <Link className="button outline" to="/repasses">Repasses e transferências</Link>
           <Link className="button outline" to="/pedidos">Meus pedidos</Link>
           <Link className="button primary" to="/eventos">Explorar eventos</Link>
         </PageTitle>

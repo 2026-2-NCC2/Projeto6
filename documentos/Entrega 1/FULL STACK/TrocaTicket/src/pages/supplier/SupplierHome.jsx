@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import { supplierOpportunities as opportunities } from '../../data/supplier';
 import { Empty, PageTitle } from '../../components/UI';
 import SearchToolbar from '../../components/supplier/SearchToolbar';
-import SummaryBar from '../../components/supplier/SummaryBar';
+import Icon from '../../components/supplier/Icon';
 import OpportunityCard from '../../components/supplier/OpportunityCard';
-import { Chip } from '../../components/supplier/common';
 import { useStore } from '../../context/Store';
 import { getSupplierOpportunities } from '../../services/supplier';
 
@@ -16,23 +16,21 @@ const SORTS = [
 ];
 const normalize = (text) =>
   text.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/\p{Diacritic}/gu, '');
-const clock = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
 export default function SupplierHome() {
-  const { data, role } = useStore();
+  const { data, role, isAuthenticated } = useStore();
   const supplierId = Number(data.supplierProfile?.id);
   const connectedSupplier =
-    role === 'fornecedor' && Number.isSafeInteger(supplierId) && supplierId > 0;
+    isAuthenticated && role === 'fornecedor' && Number.isSafeInteger(supplierId) && supplierId > 0;
   const [databaseEvents, setDatabaseEvents] = useState([]);
   const [loadError, setLoadError] = useState('');
   const [retry, setRetry] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(connectedSupplier);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Todos');
   const [sort, setSort] = useState('date-desc');
   const [category, setCategory] = useState('Todas');
   const [onlyPending, setOnlyPending] = useState(false);
-  const [updatedAt] = useState(clock);
   const list = connectedSupplier ? databaseEvents : opportunities;
   const categories = [...new Set(list.map((event) => event.category).filter(Boolean))];
 
@@ -56,6 +54,7 @@ export default function SupplierHome() {
 
   const countBy = (value) => list.filter((event) => event.status === value).length;
   const pending = list.filter((event) => !event.proposal).length;
+  const countsReady = !loading && !loadError;
   const advancedCount = (category !== 'Todas') + onlyPending;
 
   const events = useMemo(() => {
@@ -87,7 +86,35 @@ export default function SupplierHome() {
   }
 
   return (
-    <div className="workspace sp-page">
+    <div className="workspace sp-page sp-home">
+      <PageTitle
+        title="Painel do Fornecedor"
+        subtitle={data.supplierProfile?.tradeName || data.supplierProfile?.name}
+      >
+        <Link className="button outline" to="/fornecedor/inventario">
+          <Icon name="box" /> Inventário
+        </Link>
+        <Link className="button primary" to="/fornecedor/propostas">
+          <Icon name="file" /> Minhas propostas
+        </Link>
+      </PageTitle>
+
+      <dl className="sp-home-counts" aria-label="Resumo das oportunidades">
+        <div>
+          <dt><Icon name="calendar" /> Eventos disponíveis</dt>
+          <dd>{countsReady ? list.length : '—'}</dd>
+        </div>
+        <div>
+          <dt><Icon name="clock" /> Sem proposta enviada</dt>
+          <dd>{countsReady ? pending : '—'}</dd>
+        </div>
+        <div>
+          <dt><Icon name="check" /> Com proposta enviada</dt>
+          <dd>{countsReady ? list.length - pending : '—'}</dd>
+        </div>
+      </dl>
+
+      <h2 className="sp-home-heading">Oportunidades de cotação</h2>
       <SearchToolbar
         query={query}
         onQuery={setQuery}
@@ -128,13 +155,6 @@ export default function SupplierHome() {
         }
       />
 
-      <SummaryBar
-        items={[
-          { label: 'Oportunidades em destaque', value: `${list.length} ativas` },
-          { label: 'Propostas aguardando envio', value: `${pending} pendentes`, tone: 'warning' },
-        ]}
-        trailing={`Última atualização: hoje às ${updatedAt}`}
-      />
       {loadError && (
         <div className="api-error" role="alert">
           <span>Não foi possível carregar eventos do banco: {loadError}</span>
@@ -145,21 +165,12 @@ export default function SupplierHome() {
       )}
       {loading && <p role="status" className="muted">Carregando oportunidades do banco de dados…</p>}
 
-      <PageTitle
-        title={
-          <span className="sp-title-with-chip">
-            Grade de eventos disponíveis
-            <span aria-live="polite">
-              <Chip tone="blue">
-                {events.length} {events.length === 1 ? 'oportunidade' : 'oportunidades'}
-              </Chip>
-            </span>
-          </span>
-        }
-        subtitle="Selecione uma cotação para submeter valores e gerenciar escopos contratuais."
-      />
-
-      {events.length > 0 ? (
+      {countsReady && events.length > 0 && (
+        <p className="sp-home-results" role="status">
+          {events.length} {events.length === 1 ? 'oportunidade disponível' : 'oportunidades disponíveis'}
+        </p>
+      )}
+      {countsReady && (events.length > 0 ? (
         <div className="sp-grid-cards">
           {events.map((event) => (
             // a numeração (EVENTO I, II…) acompanha a posição original, não muda ao filtrar
@@ -168,12 +179,16 @@ export default function SupplierHome() {
         </div>
       ) : (
         <Empty>
-          Nenhuma oportunidade com esses filtros.{' '}
-          <button type="button" className="sp-link-button" onClick={clearFilters}>
-            Limpar filtros
-          </button>
+          {list.length ? (
+            <>
+              Nenhuma oportunidade com esses filtros.{' '}
+              <button type="button" className="sp-link-button" onClick={clearFilters}>
+                Limpar filtros
+              </button>
+            </>
+          ) : 'Quando houver eventos publicados para cotação, eles aparecerão aqui.'}
         </Empty>
-      )}
+      ))}
     </div>
   );
 }
