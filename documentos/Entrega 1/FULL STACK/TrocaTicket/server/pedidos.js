@@ -12,8 +12,11 @@
 //    do evento (um registro de estorno por ingresso). Ingresso recebido em troca é cancelado sem
 //    estorno, porque a troca não envolve dinheiro.
 // Toda gravação exige o cabeçalho Idempotency-Key: repetir a mesma ação devolve a mesma resposta.
+// A revenda, a fila de espera e a transferência com aceite (etapa 4) ficam em repasse.js e usam
+// estes mesmos pedidos: a compra de um anúncio é um pedido ligado a ele (pedido.anuncio_id).
 
 const crypto = require('crypto');
+const { criarRepasse, SQL_NUNCA_REPASSADO, SQL_EM_REPASSE } = require('./repasse');
 
 const LIMITE_POR_CONTA = 6;
 const PERCENTUAL_TIPO = { Inteira: 100, 'Meia-entrada': 50 };
@@ -76,8 +79,34 @@ function criarPedidos({ db, requireUserRole }) {
     await conexao.execute(
       `UPDATE pedido SET status = 'expirado', motivo = 'Prazo de pagamento encerrado',
               atualizado_em = UTC_TIMESTAMP()
-        WHERE status = 'reservado' AND expira_em <= UTC_TIMESTAMP()`,
+        WHERE status = 'reservado' AND expira_em <= UTC_TIMESTAMP() AND anuncio_id IS NULL`,
     );
+  }
+
+  // Reservas de venda, convites e reservas de anúncio vencidos (estas chamam o próximo da fila).
+  async function expirarTudo() {
+    await expirarReservas(db);
+    await repasse.processarVencidos();
+  }
+
+  // Transação curta com leitura do que já foi gravado (READ COMMITTED) e nova tentativa em deadlock.
+  async function emTransacao(trabalho) {
+    for (let tentativa = 1; ; tentativa += 1) {
+      const conexao = await db.getConnection();
+      try {
+        await conexao.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        await conexao.beginTransaction();
+        const resultado = await trabalho(conexao);
+        await conexao.commit();
+        return resultado;
+      } catch (error) {
+        await conexao.rollback().catch(() => {});
+        if (error.code === 'ER_LOCK_DEADLOCK' && tentativa < 3) continue;
+        throw error;
+      } finally {
+        conexao.release();
+      }
+    }
   }
 
   async function travarEvento(conexao, eventoId, { vendas = true } = {}) {
@@ -94,24 +123,45 @@ function criarPedidos({ db, requireUserRole }) {
     return evento;
   }
 
+  // Ingressos ativos, reservas em aberto e convites de transferência pendentes da conta no evento.
+  async function contarConta(conexao, eventoId, usuarioId, { ignorarPedidoId = 0, ignorarConviteId = 0 } = {}) {
+    const [[contagem]] = await conexao.execute(
+      `SELECT
+         (SELECT COUNT(*) FROM ingresso WHERE evento_id = ? AND dono_atual_id = ? AND status = 'A')
+           + (SELECT COALESCE(SUM(quantidade), 0) FROM pedido
+               WHERE evento_id = ? AND usuario_id = ? AND status = 'reservado' AND expira_em > UTC_TIMESTAMP()
+                 AND id <> ?)
+           + (SELECT COUNT(*) FROM convite_ingresso c JOIN ingresso i ON i.id = c.ingresso_id
+               WHERE i.evento_id = ? AND c.destinatario_id = ? AND c.status = 'pending'
+                 AND c.expira_em > UTC_TIMESTAMP() AND c.id <> ?) AS total`,
+      [eventoId, usuarioId, eventoId, usuarioId, ignorarPedidoId, eventoId, usuarioId, ignorarConviteId],
+    );
+    return Number(contagem.total);
+  }
+
+  async function conferirLimiteConta(conexao, eventoId, usuarioId, quantidade, opcoes = {}) {
+    if ((await contarConta(conexao, eventoId, usuarioId, opcoes)) + quantidade > LIMITE_POR_CONTA) {
+      falhar(
+        409,
+        opcoes.mensagem || `Cada conta pode ter até ${LIMITE_POR_CONTA} ingressos ativos ou reservados por evento.`,
+      );
+    }
+  }
+
   async function conferirLotacaoELimite(conexao, evento, usuarioId, quantidade, ignorarPedidoId = 0) {
+    // Reservas de anúncio não ocupam lugar novo: o ingresso já existe e já é contado.
     const [[contagem]] = await conexao.execute(
       `SELECT
          (SELECT COUNT(*) FROM ingresso WHERE evento_id = ? AND status = 'A')
            + (SELECT COALESCE(SUM(quantidade), 0) FROM pedido
-               WHERE evento_id = ? AND status = 'reservado' AND expira_em > UTC_TIMESTAMP() AND id <> ?) AS ocupados,
-         (SELECT COUNT(*) FROM ingresso WHERE evento_id = ? AND dono_atual_id = ? AND status = 'A')
-           + (SELECT COALESCE(SUM(quantidade), 0) FROM pedido
-               WHERE evento_id = ? AND usuario_id = ? AND status = 'reservado' AND expira_em > UTC_TIMESTAMP()
-                 AND id <> ?) AS da_conta`,
-      [evento.id, evento.id, ignorarPedidoId, evento.id, usuarioId, evento.id, usuarioId, ignorarPedidoId],
+               WHERE evento_id = ? AND status = 'reservado' AND expira_em > UTC_TIMESTAMP() AND id <> ?
+                 AND anuncio_id IS NULL) AS ocupados`,
+      [evento.id, evento.id, ignorarPedidoId],
     );
     if (evento.capacidade !== null && Number(contagem.ocupados) + quantidade > Number(evento.capacidade)) {
       falhar(409, 'Não há ingressos suficientes para a quantidade solicitada.');
     }
-    if (Number(contagem.da_conta) + quantidade > LIMITE_POR_CONTA) {
-      falhar(409, `Cada conta pode ter até ${LIMITE_POR_CONTA} ingressos ativos ou reservados por evento.`);
-    }
+    await conferirLimiteConta(conexao, evento.id, usuarioId, quantidade, { ignorarPedidoId });
   }
 
   async function emitirIngressos(conexao, pedido) {
@@ -174,6 +224,8 @@ function criarPedidos({ db, requireUserRole }) {
     if (!ingresso.pedido_id) return false;
     const pedido = await lerPedido(conexao, ingresso.pedido_id, { travar: true });
     if (!pedido || pedido.usuario_id !== ingresso.dono_atual_id) return false;
+    // Ingresso que já foi revendido ou transferido não gera estorno, mesmo se voltou ao comprador.
+    if (await repasse.foiRepassado(conexao, ingresso.id)) return false;
     await conexao.execute(
       `INSERT INTO estorno (pedido_id, ingresso_id, valor, motivo, criado_em)
        VALUES (?, ?, ?, ?, UTC_TIMESTAMP())`,
@@ -186,7 +238,7 @@ function criarPedidos({ db, requireUserRole }) {
   async function pedidoParaResposta(conexao, pedidoId) {
     const [[p]] = await conexao.execute(
       `SELECT p.id, p.usuario_id, p.evento_id, p.tipo_ingresso, p.quantidade, p.valor_unitario,
-              p.valor_total, p.status, p.forma_pagamento, p.motivo,
+              p.valor_total, p.status, p.forma_pagamento, p.motivo, p.anuncio_id,
               DATE_FORMAT(p.criado_em, ${DATA_ISO}) AS criado,
               DATE_FORMAT(p.expira_em, ${DATA_ISO}) AS expira,
               DATE_FORMAT(p.pago_em, ${DATA_ISO}) AS pago,
@@ -197,20 +249,33 @@ function criarPedidos({ db, requireUserRole }) {
         WHERE p.id = ?`,
       [pedidoId],
     );
-    const [ingressos] = await conexao.execute(
-      `SELECT i.id, i.codigo_ingresso, i.status, i.preco, i.dono_atual_id, s.valor AS estornado
-         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id
-        WHERE i.pedido_id = ? ORDER BY i.id`,
-      [pedidoId],
-    );
-    const reembolsaveis = Number(p.antes_do_evento)
-      ? ingressos.filter((i) => i.status === 'A' && i.dono_atual_id === p.usuario_id)
+    const repasse = Boolean(p.anuncio_id);
+    const colunas = `i.id, i.codigo_ingresso, i.status, i.preco, i.dono_atual_id, s.valor AS estornado,
+              ${SQL_NUNCA_REPASSADO('i')} AS nunca_repassado, ${SQL_EM_REPASSE('i')} AS em_repasse
+         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id`;
+    // Na compra de um anúncio, o ingresso só aparece no pedido depois do pagamento.
+    const [ingressos] = !repasse
+      ? await conexao.execute(`SELECT ${colunas} WHERE i.pedido_id = ? ORDER BY i.id`, [pedidoId])
+      : p.status === 'pago'
+        ? await conexao.execute(
+            `SELECT ${colunas} WHERE i.id = (SELECT ingresso_id FROM anuncio_ingresso WHERE id = ?)`,
+            [p.anuncio_id],
+          )
+        : [[]];
+    // Estorno: só na venda original, até a véspera, para ingresso que nunca foi repassado e que não
+    // está anunciado nem com convite pendente.
+    const reembolsaveis = !repasse && Number(p.antes_do_evento)
+      ? ingressos.filter(
+          (i) =>
+            i.status === 'A' && i.dono_atual_id === p.usuario_id && Number(i.nunca_repassado) && !Number(i.em_repasse),
+        )
       : [];
     const reservado = p.status === 'reservado';
     return {
       id: Number(p.id),
       eventId: Number(p.evento_id),
       eventTitle: p.titulo,
+      resale: repasse,
       eventDate: p.data_evento,
       location: p.local_evento,
       image: p.imagem_capa_url || '/images/asset-5.jpg',
@@ -227,7 +292,8 @@ function criarPedidos({ db, requireUserRole }) {
       secondsToExpire: reservado ? Number(p.segundos) : 0,
       tickets: ingressos.map((i) => ({
         id: Number(i.id),
-        code: i.codigo_ingresso,
+        // O código vale como credencial: só aparece enquanto o ingresso é de quem fez o pedido.
+        code: i.dono_atual_id === p.usuario_id ? i.codigo_ingresso : null,
         status: rotuloTicket(i.status),
         withBuyer: i.dono_atual_id === p.usuario_id,
         refunded: i.estornado !== null,
@@ -248,7 +314,7 @@ function criarPedidos({ db, requireUserRole }) {
     }
     const resumo = resumoConteudo(operacao, corpo);
     // Fora da transação: vencer reservas não precisa travar os pedidos que estão sendo gravados.
-    await expirarReservas(db);
+    await expirarTudo();
     for (let tentativa = 1; ; tentativa += 1) {
       try {
         return await gravarUmaVez(req, chave, operacao, resumo, trabalho);
@@ -263,6 +329,8 @@ function criarPedidos({ db, requireUserRole }) {
   async function gravarUmaVez(req, chave, operacao, resumo, trabalho) {
     const conexao = await db.getConnection();
     try {
+      // Cada leitura enxerga o que já foi gravado por quem segurava a trava do evento antes.
+      await conexao.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       await conexao.beginTransaction();
       try {
         await conexao.execute(
@@ -330,8 +398,10 @@ function criarPedidos({ db, requireUserRole }) {
   }
 
   function registrarRotas(app) {
+    repasse.registrarRotas(app);
+
     app.get('/api/pedidos', rota(async (req, res) => {
-      await expirarReservas(db);
+      await expirarTudo();
       const [linhas] = await db.execute(
         'SELECT id FROM pedido WHERE usuario_id = ? ORDER BY id DESC LIMIT 100',
         [req.user.id],
@@ -340,7 +410,7 @@ function criarPedidos({ db, requireUserRole }) {
     }));
 
     app.get('/api/pedidos/:id', rota(async (req, res) => {
-      await expirarReservas(db);
+      await expirarTudo();
       const pedido = await pedidoDaConta(db, req);
       res.json(await pedidoParaResposta(db, pedido.id));
     }));
@@ -386,11 +456,18 @@ function criarPedidos({ db, requireUserRole }) {
         if (!gratuito && !FORMAS_PAGAMENTO.includes(paymentMethod)) {
           falhar(400, 'Escolha Pix ou cartão (pagamento simulado).');
         }
-        await conferirLotacaoELimite(conexao, evento, pedido.usuario_id, pedido.quantidade, pedido.id);
+        if (pedido.anuncio_id) {
+          await conferirLimiteConta(conexao, evento.id, pedido.usuario_id, pedido.quantidade, {
+            ignorarPedidoId: pedido.id,
+          });
+        } else {
+          await conferirLotacaoELimite(conexao, evento, pedido.usuario_id, pedido.quantidade, pedido.id);
+        }
         const cenario = gratuito ? 'aprovado' : cenarioPagamento();
         const forma = gratuito ? 'gratuito' : paymentMethod;
         if (cenario === 'aprovado') {
-          await emitirIngressos(conexao, pedido);
+          if (pedido.anuncio_id) await repasse.entregarRepasse(conexao, pedido);
+          else await emitirIngressos(conexao, pedido);
           await conexao.execute(
             `UPDATE pedido SET status = 'pago', forma_pagamento = ?, motivo = NULL,
                     pago_em = UTC_TIMESTAMP(), atualizado_em = UTC_TIMESTAMP() WHERE id = ?`,
@@ -408,6 +485,10 @@ function criarPedidos({ db, requireUserRole }) {
               pedido.id,
             ],
           );
+          if (pedido.anuncio_id) {
+            await repasse.liberarRepasse(conexao, pedido, 'left');
+            await repasse.alocarFila(conexao, evento.id);
+          }
         }
         return { status: 200, corpo: await pedidoParaResposta(conexao, pedido.id) };
       });
@@ -416,13 +497,19 @@ function criarPedidos({ db, requireUserRole }) {
 
     app.post('/api/pedidos/:id/cancelar', rota(async (req, res) => {
       const resultado = await executarIdempotente(req, `cancelar:${req.params.id}`, {}, async (conexao) => {
-        const pedido = await pedidoDaConta(conexao, req, { travar: true });
+        const previa = await pedidoDaConta(conexao, req);
+        await travarEvento(conexao, previa.evento_id, { vendas: false });
+        const pedido = await lerPedido(conexao, previa.id, { travar: true });
         if (pedido.status === 'reservado') {
           await conexao.execute(
             `UPDATE pedido SET status = 'cancelado', motivo = 'Reserva cancelada pela conta',
                     atualizado_em = UTC_TIMESTAMP() WHERE id = ?`,
             [pedido.id],
           );
+          if (pedido.anuncio_id) {
+            await repasse.liberarRepasse(conexao, pedido, 'left');
+            await repasse.alocarFila(conexao, pedido.evento_id);
+          }
         } else if (!['cancelado', 'expirado', 'recusado'].includes(pedido.status)) {
           falhar(409, 'Pedido pago não é cancelado: use a solicitação de estorno.');
         }
@@ -439,6 +526,9 @@ function criarPedidos({ db, requireUserRole }) {
         if (!['pago', 'estornado_parcial'].includes(pedido.status)) {
           falhar(409, 'Só pedidos pagos podem ser estornados.');
         }
+        if (pedido.anuncio_id) {
+          falhar(409, 'Compras de revenda não têm estorno. Você pode revender ou transferir o ingresso.');
+        }
         if (!Number(evento.antes_do_inicio)) {
           falhar(409, 'O estorno só pode ser pedido até a véspera do evento.');
         }
@@ -446,9 +536,18 @@ function criarPedidos({ db, requireUserRole }) {
           'SELECT id, preco, status, dono_atual_id, pedido_id FROM ingresso WHERE pedido_id = ? ORDER BY id FOR UPDATE',
           [pedido.id],
         );
-        const elegiveis = ingressos.filter((i) => i.status === 'A' && i.dono_atual_id === pedido.usuario_id);
+        const elegiveis = [];
+        for (const ingresso of ingressos) {
+          if (ingresso.status !== 'A' || ingresso.dono_atual_id !== pedido.usuario_id) continue;
+          if (await repasse.foiRepassado(conexao, ingresso.id)) continue;
+          if (await repasse.bloqueioDeRepasse(conexao, ingresso.id)) continue;
+          elegiveis.push(ingresso);
+        }
         if (!elegiveis.length) {
-          falhar(409, 'Nenhum ingresso deste pedido pode ser estornado (já usados, cancelados ou repassados em troca).');
+          falhar(
+            409,
+            'Nenhum ingresso deste pedido pode ser estornado (já usados, cancelados, repassados ou anunciados para revenda).',
+          );
         }
         for (const ingresso of elegiveis) await desativarIngresso(conexao, ingresso, 'Estorno solicitado pela conta');
         return { status: 200, corpo: await pedidoParaResposta(conexao, pedido.id) };
@@ -485,10 +584,35 @@ function criarPedidos({ db, requireUserRole }) {
     if (!ingresso) falhar(404, 'Ingresso não encontrado nesta conta.');
     if (ingresso.status !== 'A') falhar(409, 'Somente ingressos ativos podem ser cancelados.');
     if (!Number(ingresso.antes_do_evento)) falhar(409, 'O evento já começou; o ingresso não pode mais ser cancelado.');
+    const bloqueio = await repasse.bloqueioDeRepasse(conexao, ingresso.id);
+    if (bloqueio) falhar(409, bloqueio);
     return desativarIngresso(conexao, ingresso, 'Cancelamento do ingresso pela conta');
   }
 
-  return { registrarRotas, comprarDireto, cancelarIngresso, ErroPedido };
+  const repasse = criarRepasse({
+    db,
+    falhar,
+    inteiroPositivo,
+    limitePorConta: LIMITE_POR_CONTA,
+    travarEvento,
+    lerPedido,
+    pedidoParaResposta,
+    executarIdempotente,
+    emTransacao,
+    rota,
+    contarConta,
+    conferirLimiteConta,
+    minutosReserva,
+    expirar: expirarTudo,
+  });
+
+  return {
+    registrarRotas,
+    comprarDireto,
+    cancelarIngresso,
+    bloqueioDeRepasse: (conexao, ingressoId) => repasse.bloqueioDeRepasse(conexao, ingressoId),
+    ErroPedido,
+  };
 }
 
 module.exports = { criarPedidos, ErroPedido, centavosUnitarios, resumoConteudo, cenarioPagamento, minutosReserva };

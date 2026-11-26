@@ -729,6 +729,7 @@ export function Tickets() {
                 <Panel key={ticket.id}>
                   <img className="supplier-cover" src={ticket.image} alt={ticket.eventTitle} />
                   <Badge tone={ticket.statusCode === 'A' ? 'green' : 'gray'}>{ticket.status}</Badge>
+                  {ticket.inResale && <Badge tone="amber">Em repasse</Badge>}
                   <h3>{ticket.eventTitle}</h3>
                   <p>{ticket.date} · {ticket.location}</p>
                   <p>{ticket.type} · {money(ticket.price)}</p>
@@ -736,7 +737,13 @@ export function Tickets() {
                   <p className="muted">
                     {ticket.orderId ? `Pedido nº ${ticket.orderId} · ` : ''}Pagamento simulado; sem validade para entrada.
                   </p>
-                  {ticket.statusCode === 'A' && (
+                  {ticket.statusCode === 'A' && ticket.inResale && (
+                    <p className="info-note">
+                      Anunciado para revenda ou com convite de transferência pendente.{' '}
+                      <Link to="/repasses">Gerenciar repasse</Link>
+                    </p>
+                  )}
+                  {ticket.statusCode === 'A' && !ticket.inResale && (
                     <div className="actions">
                       <button
                         type="button"
@@ -758,12 +765,12 @@ export function Tickets() {
                           disabled={saving}
                           title={ticket.refundOnCancel
                             ? `Cancela o ingresso e estorna ${money(ticket.price)} (simulação).`
-                            : 'Cancela o ingresso sem estorno: ele veio de uma troca.'}
+                            : 'Cancela o ingresso sem estorno: ele veio de troca, revenda ou transferência.'}
                           onClick={() => perform(
                             () => cancelParticipantTicket(ticket.id, userId),
                             ticket.refundOnCancel
                               ? `Ingresso cancelado e estorno de ${money(ticket.price)} registrado (simulação).`
-                              : 'Ingresso cancelado. Como ele veio de uma troca, não há estorno.',
+                              : 'Ingresso cancelado. Como ele veio de troca, revenda ou transferência, não há estorno.',
                           )}
                         >
                           {ticket.refundOnCancel ? 'Cancelar e estornar' : 'Cancelar ingresso'}

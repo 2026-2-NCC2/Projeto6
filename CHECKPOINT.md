@@ -1,5 +1,78 @@
 # Integração TrocaTicket
 
+## Integração com a TrocaTicket 2.0 — etapa 4: revenda, fila de espera e transferência com aceite (26/11/2026)
+
+Retomada a partir do ZIP de continuidade: bundle verificado (requer b477108) e branch integracao-site-2.0 avançada por fast-forward de 92c66f5 para 1e0396f antes das alterações. A pendência registrada em "Interrupção durante a etapa 4" (servidor da etapa 4 ausente) foi resolvida nesta rodada. Etapa 4 concluída; nada foi publicado e não houve merge.
+
+**O que entrou**
+- `server/repasse.js` (novo), adaptado de reservas-fila.js, transferencias.js e contexto.js da 2.0. Rotas: `GET/POST /api/anuncios`, `DELETE /api/anuncios/:id`, `POST /api/anuncios/:id/reservar`, `GET/POST /api/fila`, `DELETE /api/fila/:id`, `GET/POST /api/transferencias` e `POST /api/transferencias/:id/aceitar|recusar|cancelar`. Todas exigem sessão de conta de usuário, CSRF e Idempotency-Key nas gravações.
+- `server/pedidos.js`: a reserva de um anúncio é um pedido da etapa 3 ligado a ele (`pedido.anuncio_id`).
+  - Pagamento aprovado passa o ingresso ao comprador com código novo.
+  - Recusa, cancelamento, saída da fila ou prazo vencido devolvem o anúncio à venda e chamam o próximo da fila.
+  - A lotação ignora reservas de revenda, porque o ingresso já existe.
+  - O limite de 6 por conta e evento passa a contar convites pendentes.
+  - O estorno ignora ingressos já repassados ou em repasse.
+  - O pedido só mostra o código do ingresso a quem ainda é dono dele.
+  - As transações de pedido usam READ COMMITTED; as reservas de anúncio vencidas são tratadas por evento.
+- `server/server.js`: as trocas da main recusam ingresso anunciado ou com convite pendente (e o repasse recusa ingresso em troca). A lista de ingressos ganhou `inResale`, e o estorno no cancelamento vale só para ingresso nunca repassado.
+- `server/MIGRACAO_REPASSE.sql` revisada:
+  - restrições nomeadas, ON DELETE e índices por conta;
+  - CHECK do tipo na fila;
+  - situação `expired` na fila, com atualização automática dos bancos que aplicaram a primeira versão do arquivo;
+  - conferência final que deve voltar vazia.
+- Site:
+  - `Resale.jsx`: listas reorganizadas e nomes de quem envia ou recebe o convite.
+  - Meus ingressos: selo "Em repasse" e ações de troca e cancelamento ocultas nesse estado.
+  - Meus pedidos: indicação "Revenda" e ingresso repassado sem código.
+  - `index.html`: o logotipo virou favicon, o que eliminou o 404 de `/favicon.ico` no console.
+- Testes: `server/tests/repasse-regras.test.js` (10 cenários novos), além dos 6 de `repasse.test.js`. O roteiro de navegador `scripts/e2e/repasse.py` usa três contas e aceita `--fotos` e `--axe`.
+
+**Decisões**
+- **Teto de revenda:** é o valor que o dono atual pagou (`ingresso.preco`), equivalente a min(original, custo) da 2.0. A revenda passa o preço pago ao comprador; o convite aceito zera o teto, então quem recebeu de graça só transfere de graça.
+- **Código do ingresso:** troca a cada revenda ou transferência, equivalente à credencial revogada da 2.0. O antigo dono deixa de ver o código.
+- **Estorno:**
+  - compra de revenda não tem estorno;
+  - ingresso que já foi revendido ou transferido não gera estorno, mesmo se voltar a quem o comprou;
+  - ingresso anunciado ou com convite pendente fica fora do estorno.
+- **Fila:**
+  - tem prioridade sobre a reserva direta;
+  - quem está no limite de 6 é pulado e continua na fila;
+  - reserva vencida marca `expired`; recusa, cancelamento e saída marcam `left`; pagamento marca `completed`.
+- **Convite:**
+  - vale por 24 horas (`CONVITE_MINUTOS`), em vez dos 10 minutos do MVP da 2.0;
+  - só para conta de usuário (tipo 1);
+  - o e-mail só precisa ter o formato mínimo, porque o cadastro atual aceita e-mails com espaço;
+  - o status de aprovação da conta ainda não é exigido (fica para a etapa 6).
+- **Privacidade:** anúncios de outras contas não mostram vendedor nem ingresso.
+- **Ordem das travas:** sempre começa pelo evento, como nos pedidos. As trocas da main travam só os ingressos, e a exclusividade é conferida depois dessa trava.
+
+**Testes executados (bancos e contas descartáveis)**
+- `npm test`: site 10/10; API 60/60 em MariaDB 10.11.14 e em MySQL 8.0.46 (44 anteriores, 6 do roteiro e 10 novos), sem testes pulados.
+- Sabotagens propositais, todas acusadas pelos testes:
+  - troca ignorando revenda;
+  - código mantido na revenda;
+  - fila ignorando o limite.
+- Migração, nos dois bancos:
+  - um banco com a versão antiga de MIGRACAO_REPASSE.sql foi atualizado para a nova, ganhou `expired` e manteve os dados;
+  - a nova versão foi reaplicada duas vezes;
+  - a instalação do zero foi feita duas vezes.
+- Navegador (Chromium 158 com Playwright, API e MariaDB reais). `scripts/e2e/repasse.py`, com as contas Vera, Ana e Bruno, passou em:
+  - **revenda:** anúncio, reserva pelo evento, pagamento em Meus pedidos, código novo e anúncio "Vendido";
+  - **fila:** posição 1, anúncio entregue direto à fila e pagamento concluído;
+  - **transferência:** recusa, cancelamento, aceite, teto zero e só a opção gratuita;
+  - **celular:** 390 px sem rolagem lateral;
+  - nenhum erro de console e nenhuma resposta 4xx ou 5xx.
+- Regressão: `navegador.py` passou nos fluxos `regressao` (inclui o seletor da demonstração, que estava pendente), `compra` e `recusado`. Logs da API sem erros.
+- axe 4.14.1: zero violações automáticas em 20 combinações (5 estados × 1366 e 390 px × tema claro e escuro). A auditoria automática não substitui uma revisão humana.
+- Build passou, com o aviso conhecido de tamanho do chunk. Prettier: nenhum arquivo novo fora do padrão (os 51 que já falhavam continuam iguais).
+
+**Pendências e riscos**
+- A aprovação de conta não é exigida para revender, entrar na fila ou receber convite (etapa 6).
+- O convite informa se existe uma conta de usuário com aquele e-mail, como na 2.0.
+- As trocas da main mantêm o código do ingresso quando ele muda de dono. A portaria (etapa 5) deve considerar isso.
+- O achado do histórico de trocas da main continua em aberto.
+- Próximo passo: aguardar a confirmação do usuário para publicar ou para começar a etapa 5 (portaria e atendimento).
+
 ## Refinamento da integração 2.0 em 25/11/2026
 
 A base anterior à integração 2.0 é b477108. O pacote de entrada foi recuperado em uma árvore separada. O HEAD inicial conferido foi 92c66f59be649b33e5f70ae683352492f37627e0, posterior à compra simulada (1b69903). O ZIP de entrada é a fonte desta retomada.

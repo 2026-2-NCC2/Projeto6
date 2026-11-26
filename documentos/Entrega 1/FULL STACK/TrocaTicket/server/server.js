@@ -20,6 +20,7 @@ const db = require('./db');
 const { criarSessoes } = require('./sessao');
 const sessoes = criarSessoes(db);
 const { criarPedidos, ErroPedido } = require('./pedidos');
+const { SQL_NUNCA_REPASSADO, SQL_EM_REPASSE } = require('./repasse');
 // requireUserRole é declarada mais abaixo neste arquivo (declaração de função, disponível aqui).
 const pedidos = criarPedidos({ db, requireUserRole: (...args) => requireUserRole(...args) });
 
@@ -754,6 +755,8 @@ app.post('/api/logout', async (req, res) => {
         orderId: row.orderId ? Number(row.orderId) : null,
         refundOnCancel: Boolean(Number(row.refundOnCancel)),
         cancellable: Boolean(Number(row.cancellable)),
+        // Anunciado para revenda ou com convite de transferência pendente (etapa 4).
+        inResale: Boolean(Number(row.inResale)),
       };
     }
 
@@ -1491,7 +1494,9 @@ app.post('/api/logout', async (req, res) => {
           `SELECT i.id, i.codigo_ingresso AS code, i.evento_id AS eventId,
                   i.tipo_ingresso AS type, i.preco AS price, i.status,
                   i.disponivel_troca AS availableForExchange, i.pedido_id AS orderId,
-                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id) AS refundOnCancel,
+                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id
+                    AND ${SQL_NUNCA_REPASSADO('i')}) AS refundOnCancel,
+                  ${SQL_EM_REPASSE('i')} AS inResale,
                   (e.data_inicio > CURRENT_DATE) AS cancellable,
                   e.titulo AS eventTitle, e.imagem_capa_url AS image,
                   DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS eventDate,
@@ -1533,7 +1538,9 @@ app.post('/api/logout', async (req, res) => {
           `SELECT i.id, i.codigo_ingresso AS code, i.evento_id AS eventId,
                   i.tipo_ingresso AS type, i.preco AS price, i.status,
                   i.disponivel_troca AS availableForExchange, i.pedido_id AS orderId,
-                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id) AS refundOnCancel,
+                  (p.usuario_id IS NOT NULL AND p.usuario_id = i.dono_atual_id
+                    AND ${SQL_NUNCA_REPASSADO('i')}) AS refundOnCancel,
+                  ${SQL_EM_REPASSE('i')} AS inResale,
                   (e.data_inicio > CURRENT_DATE) AS cancellable,
                   e.titulo AS eventTitle, e.imagem_capa_url AS image,
                   DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS eventDate, e.\`local\` AS location
@@ -1633,6 +1640,12 @@ app.post('/api/logout', async (req, res) => {
         if (tickets[0].status !== 'A') {
           await connection.rollback();
           return res.status(409).json({ error: 'Somente ingressos ativos podem ser oferecidos para troca.' });
+        }
+        // Revenda/transferência (etapa 4) e troca não podem acontecer ao mesmo tempo no mesmo ingresso.
+        const resaleLock = available ? await pedidos.bloqueioDeRepasse(connection, ticketId) : null;
+        if (resaleLock) {
+          await connection.rollback();
+          return res.status(409).json({ error: resaleLock });
         }
         if (!available) {
           await connection.execute(
@@ -1739,6 +1752,12 @@ app.post('/api/logout', async (req, res) => {
           await connection.rollback();
           return res.status(409).json({ error: 'Um dos ingressos não está mais disponível para troca.' });
         }
+        const resaleLock = (await pedidos.bloqueioDeRepasse(connection, offeredTicketId)) ||
+          (await pedidos.bloqueioDeRepasse(connection, requestedTicketId));
+        if (resaleLock) {
+          await connection.rollback();
+          return res.status(409).json({ error: resaleLock });
+        }
         const [pending] = await connection.execute(
           `SELECT id FROM troca_ingresso
             WHERE status = 'Pendente'
@@ -1816,6 +1835,12 @@ app.post('/api/logout', async (req, res) => {
               Number(offered.ownerId) !== requesterId || !requested.available) {
             await connection.rollback();
             return res.status(409).json({ error: 'Os ingressos não estão mais disponíveis para concluir a troca.' });
+          }
+          const resaleLock = (await pedidos.bloqueioDeRepasse(connection, requestedTicketId)) ||
+            (await pedidos.bloqueioDeRepasse(connection, offeredTicketId));
+          if (resaleLock) {
+            await connection.rollback();
+            return res.status(409).json({ error: resaleLock });
           }
           await connection.execute(
             `UPDATE ingresso

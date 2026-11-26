@@ -70,13 +70,16 @@ function Estado({ estado }) {
 
 function ItemFila({ item, estado }) {
   return (
-    <li>
-      <strong>{item.eventTitle}</strong> · {item.type} · {situacoes[item.status] || item.status}
-      {item.status === 'queued' && <>
-        {item.position != null && <span> · Posição {item.position}</span>}
-        <button className="button outline tiny" disabled={estado.ocupado}
-          onClick={() => estado.gravar(`/fila/${item.id}`, {}, 'DELETE')}>Sair da fila</button>
-      </>}
+    <li className="resale-item">
+      <span className="resale-item-text">
+        <strong>{item.eventTitle}</strong>
+        <small>
+          {item.type} · {situacoes[item.status] || item.status}
+          {item.status === 'queued' && item.position != null && ` · Posição ${item.position}`}
+        </small>
+      </span>
+      {item.status === 'queued' && <button className="button outline tiny" disabled={estado.ocupado}
+        onClick={() => estado.gravar(`/fila/${item.id}`, {}, 'DELETE')}>Sair da fila</button>}
       {item.status === 'reserved' && <Link className="button primary tiny" to="/pedidos">Abrir reserva</Link>}
     </li>
   );
@@ -105,14 +108,16 @@ export function EventResale({ eventId, userId }) {
         </select>
         {meia && <label className="checkbox"><input type="checkbox" checked={declarou}
           onChange={(e) => setDeclarou(e.target.checked)} />Declaro ter direito à meia-entrada neste repasse.</label>}
-        {visiveis.length ? <ul className="order-tickets">{visiveis.map((item) =>
-          <li key={item.id}><strong>{money(item.priceCents / 100)}</strong>
+        {visiveis.length ? <ul className="resale-list" aria-label="Anúncios de revenda">{visiveis.map((item) =>
+          <li key={item.id} className="resale-item">
+            <span className="resale-item-text"><strong>{money(item.priceCents / 100)}</strong>
+              <small>{item.type} · revenda</small></span>
             <button className="button primary tiny" disabled={ocupado || item.sellerId === userId || (meia && !declarou)}
               onClick={async () => {
                 if (await gravar(`/anuncios/${item.id}/reservar`, { halfDeclaration: meia && declarou })) navigate('/pedidos');
               }}>{item.sellerId === userId ? 'Seu anúncio' : 'Reservar repasse'}</button>
           </li>)}</ul> : <p>Nenhum anúncio disponível para este tipo de ingresso.</p>}
-        {inscritos.length ? <ul className="order-tickets">{inscritos.map((item) =>
+        {inscritos.length ? <ul className="resale-list" aria-label="Sua fila de espera">{inscritos.map((item) =>
           <ItemFila key={item.id} estado={estado} item={item} />)}</ul> :
           <button className="button outline" disabled={ocupado || (meia && !declarou)}
             onClick={() => gravar('/fila', { eventId, type: tipo, halfDeclaration: meia && declarou })}>
@@ -196,30 +201,37 @@ function Carteira({ usuarioId }) {
     <Estado estado={estado} />
     {dados && <>
       <Oferta ingressos={disponiveis} estado={estado} />
-      <Panel title="Meus anúncios">{dados.anuncios.length ? <ul className="order-tickets">{dados.anuncios.map((a) =>
-        <li key={a.id}><strong>{a.eventTitle}</strong> · {a.type} · {money(a.priceCents / 100)}
+      <Panel title="Meus anúncios">{dados.anuncios.length ? <ul className="resale-list">{dados.anuncios.map((a) =>
+        <li key={a.id} className="resale-item">
+          <span className="resale-item-text"><strong>{a.eventTitle}</strong>
+            <small>{a.type} · {money(a.priceCents / 100)}</small></span>
           <Badge>{situacoes[a.status] || a.status}</Badge>
           {a.status === 'active' && <button className="button outline" disabled={ocupado}
             onClick={() => gravar(`/anuncios/${a.id}`, {}, 'DELETE')}>Retirar anúncio</button>}
         </li>)}</ul> : <p>Nenhum anúncio em aberto.</p>}</Panel>
-      <Panel title="Minhas filas de espera">{dados.fila.length ? <ul className="order-tickets">{dados.fila.map((item) =>
+      <Panel title="Minhas filas de espera">{dados.fila.length ? <ul className="resale-list">{dados.fila.map((item) =>
         <ItemFila key={item.id} estado={estado} item={item} />)}</ul> : <p>Você ainda não entrou em uma fila.</p>}</Panel>
       <Panel title="Convites de transferência">
-        {dados.convites.length ? <ul>{dados.convites.map((c) => {
+        {dados.convites.length ? <ul className="resale-list">{dados.convites.map((c) => {
           const recebido = c.toUserId === usuarioId;
-          return <li key={c.id}>
-            <h3>{c.eventTitle}</h3><p>{recebido ? 'Convite recebido' : 'Convite enviado'} · {situacoes[c.status] || c.status}</p>
-            {c.status === 'pending' && <>
-              <p>Vencimento: {new Date(c.expiresAt).toLocaleString('pt-BR')}</p>
+          return <li key={c.id} className="resale-item">
+            <span className="resale-item-text">
+              <strong>{c.eventTitle}</strong>
+              <small>{recebido ? `Convite recebido de ${c.fromName}` : `Convite enviado para ${c.toName}`} · {c.type}</small>
+              {c.status === 'pending' && <small>Vence em {new Date(c.expiresAt).toLocaleString('pt-BR')}</small>}
+              {c.status === 'pending' && recebido &&
+                <small>Ao aceitar gratuitamente, seu teto para revenda passa a zero.</small>}
+            </span>
+            <Badge>{situacoes[c.status] || c.status}</Badge>
+            {c.status === 'pending' && <span className="resale-item-actions">
               {recebido ? <>
-                <p>Ao aceitar gratuitamente, seu teto para revenda passa a zero.</p>
                 <button className="button primary" disabled={ocupado}
                   onClick={() => gravar(`/transferencias/${c.id}/aceitar`)}>Aceitar transferência gratuita</button>
                 <button className="button outline" disabled={ocupado}
                   onClick={() => gravar(`/transferencias/${c.id}/recusar`)}>Recusar convite</button>
               </> : <button className="button outline" disabled={ocupado}
                 onClick={() => gravar(`/transferencias/${c.id}/cancelar`)}>Cancelar convite</button>}
-            </>}
+            </span>}
           </li>;
         })}</ul> : <p>Nenhum convite nesta conta.</p>}
       </Panel>

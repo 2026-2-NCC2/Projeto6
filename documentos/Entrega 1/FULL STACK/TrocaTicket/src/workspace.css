@@ -3908,3 +3908,41 @@ html {
   gap: 6px 10px;
   font-size: 12px;
 }
+
+/* Repasses e transferências (etapa 4): listas de anúncios, filas e convites. */
+.resale-list {
+  display: grid;
+  gap: 0;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.resale-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--tt-border, #dfe6f1);
+}
+.resale-item:last-child {
+  border-bottom: 0;
+}
+.resale-item-text {
+  display: grid;
+  flex: 1 1 220px;
+  gap: 3px;
+  min-width: 0;
+}
+.resale-item-text strong {
+  overflow-wrap: anywhere;
+}
+.resale-item-text small {
+  color: var(--tt-muted, #4f5d74);
+  font-size: 13px;
+}
+.resale-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

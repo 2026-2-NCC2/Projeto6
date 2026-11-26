@@ -124,6 +124,7 @@ export default function Orders() {
                   </p>
                   <p className="muted">
                     Pedido nº {pedido.id}
+                    {pedido.resale ? ' · Revenda' : ''}
                     {pedido.paymentMethod
                       ? ` · ${FORMA_PAGAMENTO[pedido.paymentMethod] || pedido.paymentMethod}`
                       : ''}
@@ -135,8 +136,10 @@ export default function Orders() {
                   {pedido.canPay && (
                     <>
                       <p className="info-note">
-                        Reservado até {horaLimite(pedido.secondsToExpire)}. Depois disso, os lugares
-                        são liberados.
+                        Reservado até {horaLimite(pedido.secondsToExpire)}.{' '}
+                        {pedido.resale
+                          ? 'Depois disso, o ingresso volta para a revenda e passa para o próximo da fila.'
+                          : 'Depois disso, os lugares são liberados.'}
                       </p>
                       {pedido.total > 0 && (
                         <PaymentChoice
@@ -192,12 +195,16 @@ export default function Orders() {
                     <ul className="order-tickets" aria-label={`Ingressos do pedido ${pedido.id}`}>
                       {pedido.tickets.map((ticket) => (
                         <li key={ticket.id}>
-                          <code>{ticket.code}</code>
+                          {ticket.code ? (
+                            <code>{ticket.code}</code>
+                          ) : (
+                            <span>Ingresso nº {ticket.id}</span>
+                          )}
                           <span className="muted">
                             {ticket.refunded
                               ? 'Estornado'
                               : !ticket.withBuyer
-                                ? 'Repassado em troca'
+                                ? 'Repassado (troca, revenda ou transferência)'
                                 : ticket.status}
                           </span>
                         </li>
