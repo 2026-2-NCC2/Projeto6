@@ -14,8 +14,8 @@
 // Atendimento:
 // - A conta de usuário abre uma solicitação ligada a um pedido seu ou a um anúncio que pode ver
 //   (inclusive para denunciar), com assunto e mensagem.
-// - Quem responde e muda a situação (aberto, em análise, encerrado) é o organizador do evento.
-//   O administrador passa a responder quando a área administrativa for ligada ao banco (etapa 6).
+// - Quem responde e muda a situação (aberto, em análise, encerrado) é o organizador do evento ou
+//   a administração (etapa 6), que vê os atendimentos de todos os eventos.
 // - Quem pediu acompanha o histórico e pode responder enquanto não estiver encerrado.
 
 const DATA_ISO = "'%Y-%m-%dT%H:%i:%sZ'";
@@ -26,6 +26,10 @@ const MAX_ABERTOS = 10;
 function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdempotente, rotaComPerfis }) {
   const ORGANIZADOR = 2;
   const USUARIO = 1;
+  const ADMIN = 4;
+  // Quem responde pela organização: o organizador dono do evento ou a administração (etapa 6).
+  const respondePeloEvento = (organizadorId, usuario) =>
+    usuario.tipo_perfil === ADMIN || (usuario.tipo_perfil === ORGANIZADOR && organizadorId === usuario.id);
 
   const primeiroNome = (nome) => String(nome || '').trim().split(/\s+/)[0] || 'Titular';
   const horarioBrasilia = (iso) =>
@@ -101,7 +105,7 @@ function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdem
     const ids = linhas.map((linha) => linha.id);
     const [mensagens] = await conexao.query(
       `SELECT m.id, m.atendimento_id, m.usuario_id, m.mensagem, DATE_FORMAT(m.criado_em, ${DATA_ISO}) AS criada,
-              u.nome
+              u.nome, u.tipo_perfil
          FROM atendimento_mensagem m JOIN usuario u ON u.id = m.usuario_id
         WHERE m.atendimento_id IN (?) ORDER BY m.id`,
       [ids],
@@ -118,13 +122,14 @@ function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdem
       updatedAt: a.atualizado,
       requesterName: a.solicitante,
       mine: a.usuario_id === usuario.id,
-      canReply: a.usuario_id === usuario.id ? a.status !== 'encerrado' : a.organizador_id === usuario.id,
-      canChangeStatus: a.organizador_id === usuario.id && usuario.tipo_perfil === ORGANIZADOR,
+      canReply: a.usuario_id === usuario.id ? a.status !== 'encerrado' : respondePeloEvento(a.organizador_id, usuario),
+      canChangeStatus: respondePeloEvento(a.organizador_id, usuario),
       messages: mensagens
         .filter((m) => m.atendimento_id === a.id)
         .map((m) => ({
           id: Number(m.id),
-          author: m.usuario_id === a.usuario_id ? 'solicitante' : 'organizacao',
+          author:
+            m.usuario_id === a.usuario_id ? 'solicitante' : m.tipo_perfil === ADMIN ? 'administracao' : 'organizacao',
           authorName: m.usuario_id === a.usuario_id ? a.solicitante : primeiroNome(m.nome),
           message: m.mensagem,
           createdAt: m.criada,
@@ -275,13 +280,18 @@ function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdem
       res.status(resultado.status).json(resultado.corpo);
     }));
 
-    // Atendimentos: a conta de usuário vê os próprios; o organizador, os dos seus eventos.
-    app.get('/api/atendimentos', rotaComPerfis([USUARIO, ORGANIZADOR], async (req, res) => {
-      const filtro = req.user.tipo_perfil === ORGANIZADOR ? 'e.organizador_id = ?' : 'a.usuario_id = ?';
+    // A conta de usuário vê os próprios; o organizador, os dos seus eventos; a administração, todos.
+    app.get('/api/atendimentos', rotaComPerfis([USUARIO, ORGANIZADOR, ADMIN], async (req, res) => {
+      const filtro =
+        req.user.tipo_perfil === ADMIN
+          ? '1 = 1'
+          : req.user.tipo_perfil === ORGANIZADOR
+            ? 'e.organizador_id = ?'
+            : 'a.usuario_id = ?';
       const [linhas] = await db.execute(
         `${SELECT_ATENDIMENTO} WHERE ${filtro}
           ORDER BY (a.status = 'encerrado'), a.atualizado_em DESC, a.id DESC LIMIT 100`,
-        [req.user.id],
+        req.user.tipo_perfil === ADMIN ? [] : [req.user.id],
       );
       res.json(await atendimentosParaResposta(db, linhas, req.user));
     }));
@@ -326,7 +336,7 @@ function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdem
       res.status(resultado.status).json(resultado.corpo);
     }));
 
-    app.post('/api/atendimentos/:id/mensagens', rotaComPerfis([USUARIO, ORGANIZADOR], async (req, res) => {
+    app.post('/api/atendimentos/:id/mensagens', rotaComPerfis([USUARIO, ORGANIZADOR, ADMIN], async (req, res) => {
       const atendimentoId = inteiroPositivo(req.params.id);
       if (!atendimentoId) falhar(400, 'Informe um atendimento válido.');
       const { message, status } = req.body || {};
@@ -344,7 +354,7 @@ function criarPortaria({ db, falhar, inteiroPositivo, travarEvento, executarIdem
             [atendimentoId],
           );
           const solicitante = atendimento?.usuario_id === req.user.id;
-          const organizacao = atendimento?.organizador_id === req.user.id && req.user.tipo_perfil === ORGANIZADOR;
+          const organizacao = Boolean(atendimento) && respondePeloEvento(atendimento.organizador_id, req.user);
           if (!solicitante && !organizacao) falhar(404, 'Atendimento não encontrado.');
           if (status !== undefined && !organizacao) falhar(403, 'Só a organização do evento muda a situação do atendimento.');
           if (!organizacao && atendimento.status === 'encerrado') {

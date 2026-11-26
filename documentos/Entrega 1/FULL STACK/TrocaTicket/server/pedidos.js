@@ -18,6 +18,7 @@
 const crypto = require('crypto');
 const { criarRepasse, SQL_NUNCA_REPASSADO, SQL_EM_REPASSE } = require('./repasse');
 const { criarPortaria } = require('./portaria');
+const { criarAdministracao } = require('./administracao');
 
 const LIMITE_POR_CONTA = 6;
 const PERCENTUAL_TIPO = { Inteira: 100, 'Meia-entrada': 50 };
@@ -199,9 +200,11 @@ function criarPedidos({ db, requireUserRole }) {
   }
 
   async function atualizarSituacaoEstorno(conexao, pedidoId) {
+    // Conta só os estornos feitos a este pedido: no cancelamento do evento (etapa 6), o ingresso
+    // revendido é estornado a quem o comprou na revenda, não a quem o comprou primeiro.
     const [[situacao]] = await conexao.execute(
       `SELECT COUNT(*) AS total, SUM(s.id IS NOT NULL) AS estornados
-         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id
+         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id AND s.pedido_id = i.pedido_id
         WHERE i.pedido_id = ?`,
       [pedidoId],
     );
@@ -245,22 +248,25 @@ function criarPedidos({ db, requireUserRole }) {
               DATE_FORMAT(p.pago_em, ${DATA_ISO}) AS pago,
               GREATEST(TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), p.expira_em), 0) AS segundos,
               e.titulo, e.imagem_capa_url, DATE_FORMAT(e.data_inicio, '%Y-%m-%d') AS data_evento,
-              e.\`local\` AS local_evento, (e.data_inicio > CURRENT_DATE) AS antes_do_evento
+              e.\`local\` AS local_evento, (e.data_inicio > CURRENT_DATE) AS antes_do_evento,
+              e.status AS situacao_evento, e.motivo_cancelamento,
+              (SELECT COALESCE(SUM(valor), 0) FROM estorno WHERE pedido_id = p.id) AS total_estornado
          FROM pedido p JOIN evento e ON e.id = p.evento_id
         WHERE p.id = ?`,
       [pedidoId],
     );
     const repasse = Boolean(p.anuncio_id);
+    // O estorno conta para o pedido que o recebeu (venda original ou revenda).
     const colunas = `i.id, i.codigo_ingresso, i.status, i.preco, i.dono_atual_id, s.valor AS estornado,
               ${SQL_NUNCA_REPASSADO('i')} AS nunca_repassado, ${SQL_EM_REPASSE('i')} AS em_repasse
-         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id`;
+         FROM ingresso i LEFT JOIN estorno s ON s.ingresso_id = i.id AND s.pedido_id = ?`;
     // Na compra de um anúncio, o ingresso só aparece no pedido depois do pagamento.
     const [ingressos] = !repasse
-      ? await conexao.execute(`SELECT ${colunas} WHERE i.pedido_id = ? ORDER BY i.id`, [pedidoId])
-      : p.status === 'pago'
+      ? await conexao.execute(`SELECT ${colunas} WHERE i.pedido_id = ? ORDER BY i.id`, [pedidoId, pedidoId])
+      : ['pago', 'estornado'].includes(p.status)
         ? await conexao.execute(
             `SELECT ${colunas} WHERE i.id = (SELECT ingresso_id FROM anuncio_ingresso WHERE id = ?)`,
-            [p.anuncio_id],
+            [pedidoId, p.anuncio_id],
           )
         : [[]];
     // Estorno: só na venda original, até a véspera, para ingresso que nunca foi repassado e que não
@@ -277,6 +283,8 @@ function criarPedidos({ db, requireUserRole }) {
       eventId: Number(p.evento_id),
       eventTitle: p.titulo,
       resale: repasse,
+      eventCancelled: p.situacao_evento === 'Cancelado',
+      cancelReason: p.situacao_evento === 'Cancelado' ? p.motivo_cancelamento : null,
       eventDate: p.data_evento,
       location: p.local_evento,
       image: p.imagem_capa_url || '/images/asset-5.jpg',
@@ -299,7 +307,7 @@ function criarPedidos({ db, requireUserRole }) {
         withBuyer: i.dono_atual_id === p.usuario_id,
         refunded: i.estornado !== null,
       })),
-      refundedAmount: ingressos.reduce((soma, i) => soma + (i.estornado === null ? 0 : centavos(i.estornado)), 0) / 100,
+      refundedAmount: centavos(p.total_estornado) / 100,
       refundableAmount: reembolsaveis.reduce((soma, i) => soma + centavos(i.preco), 0) / 100,
       canPay: reservado,
       canCancel: reservado,
@@ -388,6 +396,17 @@ function criarPedidos({ db, requireUserRole }) {
           res.status(403).json({ error: 'A conta não possui o perfil necessário para esta operação.' });
           return;
         }
+        // Gravações exigem conta aprovada pela administração (etapa 6).
+        if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.user.aprovacao !== 'A') {
+          res.status(403).json({
+            error:
+              req.user.aprovacao === 'R'
+                ? 'Sua conta foi recusada pela administração e esta ação continua bloqueada. O motivo aparece no aviso da sua conta.'
+                : 'Sua conta aguarda aprovação da administração. Esta ação fica liberada depois da aprovação.',
+            code: 'APPROVAL_REQUIRED',
+          });
+          return;
+        }
         await trabalho(req, res);
       } catch (error) {
         if (error instanceof ErroPedido) return res.status(error.status).json({ error: error.message });
@@ -422,6 +441,7 @@ function criarPedidos({ db, requireUserRole }) {
   function registrarRotas(app) {
     repasse.registrarRotas(app);
     portaria.registrarRotas(app);
+    administracao.registrarRotas(app);
 
     app.get('/api/pedidos', rota(async (req, res) => {
       await expirarTudo();
@@ -636,6 +656,16 @@ function criarPedidos({ db, requireUserRole }) {
     travarEvento,
     executarIdempotente,
     rotaComPerfis,
+  });
+
+  const administracao = criarAdministracao({
+    db,
+    falhar,
+    inteiroPositivo,
+    travarEvento,
+    executarIdempotente,
+    rotaComPerfis,
+    atualizarSituacaoEstorno,
   });
 
   return {

@@ -55,6 +55,8 @@ function usuarioDaSessao(row) {
     foto: row.url_foto_perfil || null,
     tipo_perfil: Number(row.tipo_perfil),
     role: PERFIS[row.tipo_perfil] || 'comprador',
+    // A aprovada, P aguardando a administração, R recusada (etapa 6).
+    aprovacao: row.status_aprovacao || 'P',
   };
 }
 
@@ -89,7 +91,7 @@ function criarSessoes(db) {
     if (!codigo) return next();
     try {
       const [rows] = await db.execute(
-        `SELECT u.id, u.nome, u.email, u.url_foto_perfil, u.tipo_perfil, s.csrf_token
+        `SELECT u.id, u.nome, u.email, u.url_foto_perfil, u.tipo_perfil, u.status_aprovacao, s.csrf_token
            FROM sessao s JOIN usuario u ON u.id = s.usuario_id
           WHERE s.id_hash = ? AND s.revogada_em IS NULL AND s.expira_em > UTC_TIMESTAMP()`,
         [resumo(codigo)],
@@ -131,6 +133,20 @@ function criarSessoes(db) {
   }
 
   // Usado pelas rotas que recebem o ID da conta: só a própria conta logada passa.
+  // Gravações de contas ainda não aprovadas (ou recusadas) pela administração são recusadas.
+  function exigirAprovacao(res) {
+    const user = res.req.user;
+    if (user?.aprovacao === 'A') return true;
+    res.status(403).json({
+      error:
+        user?.aprovacao === 'R'
+          ? 'Sua conta foi recusada pela administração e esta ação continua bloqueada. O motivo aparece no aviso da sua conta.'
+          : 'Sua conta aguarda aprovação da administração. Esta ação fica liberada depois da aprovação.',
+      code: 'APPROVAL_REQUIRED',
+    });
+    return false;
+  }
+
   function exigirPropriaConta(res, userId) {
     const user = res.req.user;
     if (!user) {
@@ -204,7 +220,7 @@ function criarSessoes(db) {
     );
     res.cookie(COOKIE, codigo, { ...opcoesCookie(), maxAge: HORAS_SESSAO * 3600 * 1000 });
     const [rows] = await db.execute(
-      'SELECT id, nome, email, url_foto_perfil, tipo_perfil FROM usuario WHERE id = ?',
+      'SELECT id, nome, email, url_foto_perfil, tipo_perfil, status_aprovacao FROM usuario WHERE id = ?',
       [userId],
     );
     return { user: usuarioDaSessao(rows[0]), csrfToken };
@@ -234,6 +250,7 @@ function criarSessoes(db) {
     carregarSessao,
     protegerGravacoes,
     exigirPropriaConta,
+    exigirAprovacao,
     limitarTentativas,
     liberarTentativas,
     conferirSenha,

@@ -5,6 +5,7 @@ Com site e API já iniciados num banco local descartável (pagamento simulado ap
 python scripts/e2e/repasse.py [--chromium caminho] [--fotos pasta] [--axe caminho/axe.min.js]
 Com --axe, cada estado principal é auditado em 1366 e 390 px, nos temas claro e escuro.
 O roteiro cria um organizador, um evento publicado e as contas Vera, Ana e Bruno a cada execução.
+Etapa 6: defina TT_ADMIN_EMAIL e TT_ADMIN_SENHA (conta de npm run criar-admin) para aprovar o organizador.
 """
 import argparse
 import os

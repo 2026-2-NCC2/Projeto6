@@ -107,7 +107,8 @@ function eventInputError(body) {
   return null;
 }
 
-async function requireOrganizer(organizerId, res) {
+// aprovada: a ação exige conta aprovada pela administração (etapa 6). Rascunhos não exigem.
+async function requireOrganizer(organizerId, res, { aprovada = false } = {}) {
   if (!sessoes.exigirPropriaConta(res, organizerId)) return false;
   const [rows] = await db.execute(
     'SELECT id FROM usuario WHERE id = ? AND tipo_perfil = 2',
@@ -117,6 +118,16 @@ async function requireOrganizer(organizerId, res) {
     res.status(403).json({ error: 'É necessário usar uma conta de organizador cadastrada.' });
     return false;
   }
+  if (aprovada && !sessoes.exigirAprovacao(res)) return false;
+  return true;
+}
+
+// Situações que só a rota de cancelamento (com estorno) pode aplicar.
+function statusDeEventoProibido(status, res) {
+  if (status !== 'Cancelado') return false;
+  res.status(409).json({
+    error: 'Para cancelar um evento, use "Cancelar evento": o cancelamento também estorna quem pagou.',
+  });
   return true;
 }
 
@@ -200,6 +211,8 @@ function eventFromRow(row) {
     status: row.status,
     image: row.image || '/images/asset-5.jpg',
     description: row.description || '',
+    // Motivo do cancelamento (etapa 6); null se o evento não foi cancelado.
+    cancelReason: row.cancelReason || null,
     suppliers: [],
   };
 }
@@ -239,7 +252,8 @@ const eventSelect = `
          preco_base AS price,
          status,
          imagem_capa_url AS image,
-         descricao AS description
+         descricao AS description,
+         motivo_cancelamento AS cancelReason
     FROM evento`;
 
 app.get('/api/eventos', async (req, res) => {
@@ -285,7 +299,9 @@ app.post('/api/eventos', async (req, res) => {
   let connection;
   let uploadedImage;
   try {
-    if (!(await requireOrganizer(organizerId, res))) return;
+    if (statusDeEventoProibido(req.body.status, res)) return;
+    // Publicar exige conta aprovada; rascunho pode ser feito enquanto a aprovação não sai.
+    if (!(await requireOrganizer(organizerId, res, { aprovada: req.body.status === 'Publicado' }))) return;
     connection = await db.getConnection();
     await connection.beginTransaction();
     const {
@@ -339,16 +355,21 @@ app.put('/api/eventos/:id', async (req, res) => {
   let uploadedImage;
   let previousImage;
   try {
-    if (!(await requireOrganizer(organizerId, res))) return;
+    if (statusDeEventoProibido(req.body.status, res)) return;
+    if (!(await requireOrganizer(organizerId, res, { aprovada: req.body.status === 'Publicado' }))) return;
     connection = await db.getConnection();
     await connection.beginTransaction();
     const [events] = await connection.execute(
-      'SELECT imagem_capa_url AS image FROM evento WHERE id = ? AND organizador_id = ? FOR UPDATE',
+      'SELECT imagem_capa_url AS image, status FROM evento WHERE id = ? AND organizador_id = ? FOR UPDATE',
       [eventId, organizerId],
     );
     if (!events.length) {
       await connection.rollback();
       return res.status(404).json({ error: 'Evento não encontrado para este organizador.' });
+    }
+    if (events[0].status === 'Cancelado') {
+      await connection.rollback();
+      return res.status(409).json({ error: 'Este evento foi cancelado e não pode mais ser editado.' });
     }
     previousImage = events[0].image;
     const {
@@ -583,10 +604,16 @@ app.delete('/api/usuarios/:id/foto', async (req, res) => {
 });
 
 app.post('/api/usuarios', async (req, res) => {
-  const { nome, email, senha, tipo_perfil, documento, nome_organizacao, telefone } = req.body;
+  const { nome, email, senha, documento, nome_organizacao, telefone } = req.body;
+  // O cadastro pelo site cria só usuário (1), organizador (2) ou fornecedor (3). Contas de
+  // administração são criadas pelo script server/scripts/criar-admin.js (etapa 6).
+  const tipo_perfil = Number(req.body.tipo_perfil);
 
-  if (!nome || !email || !senha || !tipo_perfil) {
+  if (!nome || !email || !senha || !req.body.tipo_perfil) {
     return res.status(400).json({ error: 'Preencha todos os campos obrigatórios.' });
+  }
+  if (![1, 2, 3].includes(tipo_perfil)) {
+    return res.status(400).json({ error: 'Escolha o tipo de conta: usuário, organizador ou fornecedor.' });
   }
   if (sessoes.limitarTentativas(req, email).bloqueado) {
     return res.status(429).json({ error: 'Muitas tentativas. Aguarde alguns minutos.', code: 'RATE_LIMIT' });
@@ -600,15 +627,16 @@ app.post('/api/usuarios', async (req, res) => {
     const saltRounds = 10;
     const senha_hash = await bcrypt.hash(senha, saltRounds);
 
+    // Conta de usuário é aprovada na hora; organizador e fornecedor aguardam a administração.
     const [userResult] = await connection.execute(
-      `INSERT INTO usuario (nome, email, senha_hash, tipo_perfil, status_aprovacao) 
-       VALUES (?, ?, ?, ?, 'P')`,
-      [nome, email, senha_hash, tipo_perfil]
+      `INSERT INTO usuario (nome, email, senha_hash, tipo_perfil, status_aprovacao)
+       VALUES (?, ?, ?, ?, ?)`,
+      [nome, email, senha_hash, tipo_perfil, tipo_perfil === 1 ? 'A' : 'P']
     );
 
     usuarioId = userResult.insertId;
 
-    if (tipo_perfil === 2 || tipo_perfil === '2') {
+    if (tipo_perfil === 2) {
       const isCnpj = documento && documento.length > 11;
       await connection.execute(
         `INSERT INTO organizador_detalhes (usuario_id, nome_organizacao, telefone, cpf, cnpj) 
@@ -621,7 +649,7 @@ app.post('/api/usuarios', async (req, res) => {
           isCnpj ? documento : null
         ]
       );
-    } else if (tipo_perfil === 3 || tipo_perfil === '3') {
+    } else if (tipo_perfil === 3) {
       const isCnpj = documento && documento.length > 11;
       await connection.execute(
         `INSERT INTO fornecedor_detalhes (usuario_id, nome_fantasia, telefone, cpf, cnpj) 
@@ -727,15 +755,20 @@ app.post('/api/logout', async (req, res) => {
       }
     }
 
-    async function requireUserRole(userId, role, res) {
+    // Por padrão, gravações exigem conta aprovada pela administração (etapa 6); leituras, não.
+    async function requireUserRole(userId, role, res, { aprovada } = {}) {
       if (!sessoes.exigirPropriaConta(res, userId)) return false;
       const [users] = await db.execute(
         'SELECT id FROM usuario WHERE id = ? AND tipo_perfil = ?',
         [userId, role],
       );
-      if (users.length) return true;
-      res.status(403).json({ error: 'A conta não possui o perfil necessário para esta operação.' });
-      return false;
+      if (!users.length) {
+        res.status(403).json({ error: 'A conta não possui o perfil necessário para esta operação.' });
+        return false;
+      }
+      const exigir = aprovada ?? !['GET', 'HEAD', 'OPTIONS'].includes(res.req.method);
+      if (exigir && !sessoes.exigirAprovacao(res)) return false;
+      return true;
     }
 
     function ticketFromRow(row) {
@@ -908,7 +941,8 @@ app.post('/api/logout', async (req, res) => {
 
       let connection;
       try {
-        if (!(await requireUserRole(supplierId, 3, res))) return;
+        // O perfil pode ser completado enquanto a conta aguarda aprovação.
+        if (!(await requireUserRole(supplierId, 3, res, { aprovada: false }))) return;
         connection = await db.getConnection();
         await connection.beginTransaction();
         const [suppliers] = await connection.execute(
@@ -1058,7 +1092,7 @@ app.post('/api/logout', async (req, res) => {
         return res.status(400).json({ error: 'Informe IDs válidos para organizador, evento e fornecedor.' });
       }
       try {
-        if (!(await requireOrganizer(organizerId, res))) return;
+        if (!(await requireOrganizer(organizerId, res, { aprovada: true }))) return;
         const [events] = await db.execute(
           'SELECT id FROM evento WHERE id = ? AND organizador_id = ?',
           [eventId, organizerId],
@@ -1089,7 +1123,7 @@ app.post('/api/logout', async (req, res) => {
         return res.status(400).json({ error: 'Informe IDs válidos para organizador, evento e fornecedor.' });
       }
       try {
-        if (!(await requireOrganizer(organizerId, res))) return;
+        if (!(await requireOrganizer(organizerId, res, { aprovada: true }))) return;
         const [events] = await db.execute(
           'SELECT id FROM evento WHERE id = ? AND organizador_id = ?',
           [eventId, organizerId],
@@ -2079,7 +2113,7 @@ app.post('/api/logout', async (req, res) => {
         return res.status(400).json({ error: 'Informe IDs válidos e um status permitido para a proposta.' });
       }
       try {
-        if (!(await requireOrganizer(organizerId, res))) return;
+        if (!(await requireOrganizer(organizerId, res, { aprovada: true }))) return;
         const [result] = await db.execute(
           `UPDATE proposta p
              JOIN evento e ON e.id = p.evento_id

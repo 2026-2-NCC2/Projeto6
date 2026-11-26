@@ -3,6 +3,7 @@
 Instale com python -m pip install playwright e python -m playwright install chromium.
 Com site e API já iniciados num banco local descartável (pagamento simulado aprovado), execute:
 python scripts/e2e/portaria.py [--chromium caminho] [--fotos pasta] [--axe caminho/axe.min.js]
+Etapa 6: defina TT_ADMIN_EMAIL e TT_ADMIN_SENHA (conta de npm run criar-admin) para aprovar o organizador.
 O roteiro cria o organizador, o evento e as contas a cada execução.
 """
 import argparse
@@ -17,7 +18,7 @@ from playwright.sync_api import expect, sync_playwright
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from compra import gravar  # noqa: E402
-from navegador import resposta  # noqa: E402
+from navegador import aprovar_conta, resposta  # noqa: E402
 import repasse  # noqa: E402
 from repasse import AUDITORIA, Conta, auditar  # noqa: E402
 
@@ -36,6 +37,7 @@ def criar_organizador(pw, site, api, rodada):
         })
         assert cadastro.status == 201, f"Cadastro de organizador: HTTP {cadastro.status}"
         dados = cadastro.json()
+        aprovar_conta(pw, site, api, dados["usuarioId"])  # etapa 6: organizador aprovado publica
         dia = (date.today() + timedelta(days=15)).isoformat()
         evento = cliente.post(api + "/eventos", headers={"X-CSRF-Token": dados["csrfToken"]}, data={
             "organizadorId": dados["usuarioId"], "title": f"Festival Portaria {rodada}",

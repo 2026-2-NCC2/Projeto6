@@ -4,7 +4,7 @@
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { randomUUID } = require('node:crypto');
-const { Cliente, SEM_MYSQL, configMysql, conectar, criarBancoTemporario, iniciarApi } = require('./apoio');
+const { Cliente, SEM_MYSQL, aprovarConta, configMysql, conectar, criarBancoTemporario, iniciarApi } = require('./apoio');
 
 describe('regras de revenda, fila e transferência (banco temporário)', { skip: !configMysql() && SEM_MYSQL }, () => {
   let banco;
@@ -19,6 +19,7 @@ describe('regras de revenda, fila e transferência (banco temporário)', { skip:
     if (tipo === 2) Object.assign(dados, { documento: '12345678000199', nome_organizacao: 'Produtora Teste' });
     const r = await cliente.cadastrar(dados);
     assert.equal(r.status, 201);
+    if (tipo !== 1) await aprovarConta(sql, r.json.usuarioId);
     return { cliente, email, id: r.json.usuarioId };
   }
 

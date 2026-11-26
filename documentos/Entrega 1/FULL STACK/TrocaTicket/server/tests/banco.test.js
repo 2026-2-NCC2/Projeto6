@@ -5,7 +5,7 @@ const { SEM_MYSQL, conectar, configMysql } = require('./apoio');
 const { prepararBanco } = require('../scripts/preparar-banco');
 
 const TABELAS = [
-  'administrador_detalhes', 'anuncio_ingresso', 'atendimento', 'atendimento_mensagem', 'avaliacao',
+  'administrador_detalhes', 'anuncio_ingresso', 'aprovacao_conta', 'atendimento', 'atendimento_mensagem', 'avaliacao',
   'comunidade_mensagem', 'convite_ingresso', 'entrada_portaria', 'estorno', 'evento', 'evento_favorito',
   'evento_fornecedor', 'fila_repasse', 'fornecedor_detalhes', 'foto_evento', 'ingresso', 'item_proposta',
   'organizador_detalhes', 'pedido', 'pedido_idempotencia', 'produto_servico', 'proposta', 'sessao',

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import Navbar from './Navbar';
+import AvisoAprovacao from './AvisoAprovacao';
 import { inicioDoPerfil } from '../data/perfis';
 
 export default function Layout({ darkMode, toggleTheme }) {
@@ -69,6 +70,9 @@ export default function Layout({ darkMode, toggleTheme }) {
 
       {/* Componente Navbar modularizado e controlado pelo perfil na sessão */}
       <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
+
+      {/* Conta aguardando aprovação ou recusada pela administração (etapa 6). */}
+      <AvisoAprovacao />
 
       {isDemoMode && pathname !== '/perfis' && (
         <aside className="demo-strip" aria-label="Modo demonstração">

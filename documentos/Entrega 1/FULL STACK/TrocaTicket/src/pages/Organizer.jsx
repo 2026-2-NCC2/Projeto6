@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useStore } from '../context/Store';
 import { suppliers } from '../data/demo';
 import EventCard from '../../src/components/EventCard';
+import CancelarEvento from '../components/CancelarEvento';
+import { mensagemCancelamento } from '../services/admin';
 import {
   createEvent,
   getOrganizerEvents,
@@ -793,7 +795,9 @@ export function Consolidation() {
           </div>
           <p className="muted">Estimativa considera lotação completa e somente propostas aprovadas; não inclui impostos, taxas ou demais despesas.</p>
           <p className="consolidation-guidance">
-            {pendingCount
+            {isCancelled
+              ? `Evento cancelado${event.cancelReason ? `. Motivo: ${event.cancelReason}` : ''}.`
+              : pendingCount
               ? `${pendingCount} proposta${pendingCount === 1 ? '' : 's'} aguardam análise.`
               : isPublished
                 ? isDatabaseEvent
@@ -834,7 +838,25 @@ export function Consolidation() {
         </section>
       )}
 
-      {modal && (
+      {/* Evento do banco (etapa 6): cancela com motivo e estorna quem pagou. */}
+      {modal && isDatabaseEvent && (
+        <CancelarEvento
+          evento={event}
+          aoFechar={() => setModal(false)}
+          aoConcluir={(resultado) => {
+            setModal(false);
+            update('events', (old) =>
+              old.map((item) =>
+                String(item.id) === id
+                  ? { ...item, status: 'Cancelado', cancelReason: resultado.reason }
+                  : item,
+              ),
+            );
+            notify(mensagemCancelamento(resultado));
+          }}
+        />
+      )}
+      {modal && !isDatabaseEvent && (
         <Modal title="Cancelar este evento?" onClose={() => setModal(false)}>
           <p>O evento ficará marcado como cancelado. Você ainda poderá consultar os dados posteriormente.</p>
           <div className="actions">

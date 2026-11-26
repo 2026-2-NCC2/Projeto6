@@ -2,7 +2,7 @@
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
-const { Cliente, SEM_MYSQL, conectar, configMysql, criarBancoTemporario, iniciarApi } = require('./apoio');
+const { Cliente, SEM_MYSQL, aprovarConta, conectar, configMysql, criarBancoTemporario, iniciarApi } = require('./apoio');
 
 const novaChave = () => `teste-${crypto.randomUUID()}`;
 const senha = () => `Teste-${crypto.randomBytes(9).toString('base64url')}`;
@@ -42,6 +42,7 @@ describe('pedidos, pagamento simulado e estorno (banco temporário)', { skip: !c
       assert.equal(r.status, 201);
       contas[chave] = { ...conta, id: r.json.usuarioId };
     }
+    await aprovarConta(sql, contas.org.id);
     const criar = async (nome, { inicio = 30, preco = 80, capacidade = 50 } = {}) => {
       const r = await c.org.req('POST', '/eventos', {
         organizadorId: contas.org.id, title: nome, category: 'Música', date: dia(inicio), endDate: dia(inicio + 1),

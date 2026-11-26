@@ -91,6 +91,8 @@ export default function Account({ login = false }) {
           photo: resultado.user?.foto || dadosExtras?.url_foto_perfil || '',
           role: perfilRetornado,
           tipo_perfil: resultado.user?.tipo_perfil || dadosExtras?.tipo_perfil || 1,
+          // Situação na aprovação da administração (etapa 6): A, P ou R.
+          aprovacao: resultado.user?.aprovacao || '',
         };
 
         activateUser(usuarioFinal);
@@ -133,6 +135,7 @@ export default function Account({ login = false }) {
           role: profile,
           tipo_perfil: mapPerfil[profile] || 1,
           document: data.document || '',
+          aprovacao: cadResultado?.user?.aprovacao || (profile === 'comprador' ? 'A' : 'P'),
         };
 
         activateUser(novoUsuario);
@@ -142,7 +145,11 @@ export default function Account({ login = false }) {
           sessionStorage.setItem('trocaticket-role', profile);
         } catch {}
 
-        notify('Cadastro gravado na base de dados com sucesso!');
+        notify(
+          novoUsuario.aprovacao === 'P'
+            ? 'Cadastro gravado! Sua conta aguarda a aprovação da administração.'
+            : 'Cadastro gravado na base de dados com sucesso!',
+        );
         navigate('/');
       }
 
@@ -193,6 +200,14 @@ export default function Account({ login = false }) {
             value={roleNames[profile]}
             onChange={handleProfileChange}
           />
+        )}
+
+        {!login && profile !== 'comprador' && (
+          <p className="auth-note approval-note">
+            Contas de {roleNames[profile].toLowerCase()} passam pela aprovação da administração.
+            Até lá, você pode completar o perfil
+            {profile === 'organizador' ? ' e preparar eventos como rascunho' : ''}.
+          </p>
         )}
 
         <form noValidate onSubmit={handleSubmit}>

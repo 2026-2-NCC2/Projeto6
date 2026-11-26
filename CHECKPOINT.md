@@ -1,5 +1,100 @@
 # Integração TrocaTicket
 
+## Integração com a TrocaTicket 2.0 — etapa 6: administração, aprovação de contas e cancelamento de evento (26/11/2026)
+
+Etapa iniciada com autorização do usuário ("Etapa 6") sobre o commit da etapa 5 (5c450b8). Houve uma interrupção por limite de uso no meio do trabalho; os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.
+
+**O que entrou**
+- `server/administracao.js` (novo), adaptado de app.js (contas e aprovação) e transacoes/carteira-portaria.js (cancelEvent) da 2.0:
+  - **Conta:** `GET /api/conta/aprovacao` mostra à própria conta a situação e a última decisão, com o motivo, mas sem o nome de quem decidiu.
+  - **Administração:** `GET /api/admin/resumo`, `GET /api/admin/contas` (filtros por situação, perfil e busca; o `%` da busca não vira curinga), `POST /api/admin/contas/:id/aprovacao`, `GET /api/admin/eventos` e `GET /api/admin/eventos/:id`.
+  - **Cancelamento:** `POST /api/eventos/:id/cancelar`, para o organizador dono ou a administração, com motivo de 5 a 500 caracteres e Idempotency-Key.
+- `server/MIGRACAO_ADMINISTRACAO.sql` (nova, incluída no preparador):
+  - tabela `aprovacao_conta` (histórico das decisões);
+  - colunas `cancelado_em`, `motivo_cancelamento` e `cancelado_por` em `evento`;
+  - na primeira aplicação, as contas pendentes que já existiam ficam aprovadas, com registro no histórico;
+  - pode ser reaplicada e termina com uma conferência que deve voltar vazia.
+- `server/scripts/criar-admin.js` (novo) e `npm run criar-admin` (na pasta do app e em `server/`). É o único caminho para criar conta de administração.
+  - Pergunta nome, e-mail e senha, e a senha não aparece no terminal; aceita `CRIAR_ADMIN_*` no ambiente.
+  - Exige senha de 10 caracteres ou mais, com letras e números, e recusa e-mail que já tem conta.
+  - Grava usuário, `administrador_detalhes` e histórico numa transação. Nenhuma senha vai para arquivo.
+- **Aprovação exigida:**
+  - `server/sessao.js`: `exigirAprovacao` e a situação `aprovacao` na sessão e no login.
+  - `server/pedidos.js`: `rotaComPerfis` recusa gravações de conta não aprovada (403, `APPROVAL_REQUIRED`), o que cobre pedidos, revenda, fila, transferência, portaria e atendimento.
+  - `server/server.js`: publicar evento, vincular fornecedor, decidir proposta, cadastrar produto e proposta e as gravações da conta de usuário exigem aprovação. Rascunho de evento, perfil do fornecedor e dados da própria conta continuam liberados.
+- **Correção de segurança:** o cadastro aceitava qualquer `tipo_perfil`, inclusive 4 (administração). Agora só aceita 1, 2 ou 3 (400 nos demais).
+- **Correção de estorno:** `atualizarSituacaoEstorno` contava estornos feitos a outro pedido do mesmo ingresso. Com o cancelamento de evento, o ingresso revendido é estornado a quem comprou na revenda; o pedido original passaria a aparecer como "estornado" sem ter recebido tudo. Agora conta só os estornos do próprio pedido. Até a etapa 5 todo estorno ia para o pedido original, então nada muda no que já existia.
+- `server/portaria.js`: a administração vê todos os atendimentos e responde como "administracao".
+- `server/server.js`: a situação "Cancelado" só vem pelo cancelamento (409 na criação e na edição comum), evento cancelado não pode ser editado e a lista do organizador traz `cancelReason`.
+- `server/pedidos.js`: o pedido informa `eventCancelled`, `cancelReason` e o total estornado ao próprio pedido.
+- **Site:**
+  - telas reais da administração com conta: Painel geral, Relatório do evento (com cancelamento), Aprovações e Atendimentos, além do menu próprio. No modo demo, as telas fictícias continuam iguais;
+  - aviso de conta pendente ou recusada no topo, com o motivo e o botão "Verificar situação";
+  - nota de aprovação no cadastro de organizador e fornecedor;
+  - cancelamento com motivo em Consolidar evento (eventos do banco);
+  - "Evento cancelado" com motivo e estorno em Meus pedidos;
+  - `src/utils/useGravacao.js` (Idempotency-Key compartilhado) e `src/admin.css`.
+- **Header:** o menu recolhe no botão ☰ quando os itens não cabem numa linha (detalhes em Testes).
+- **Testes:**
+  - `server/tests/administracao.test.js` (10 cenários);
+  - `tests/apoio.js` ganhou `aprovarConta`, usado pelos testes anteriores que criam organizador;
+  - `banco.test.js` confere a aprovação única das contas antigas;
+  - roteiro de navegador novo `scripts/e2e/administracao.py`, com `--fotos` e `--axe`;
+  - `navegador.py`, `portaria.py` e `repasse.py` aprovam o organizador de teste com a conta de `TT_ADMIN_EMAIL`/`TT_ADMIN_SENHA` (variáveis de ambiente, nunca em arquivo).
+
+**Decisões**
+- **Quem aprova:** contas de usuário nascem aprovadas; organizador e fornecedor aguardam, como na 2.0. Recusa exige motivo. A decisão pode ser revista (aprovar, recusar, voltar para análise). Ninguém muda a própria conta nem contas de administração.
+- **Conta recusada:** só consulta. A mensagem de recusa não manda abrir atendimento, porque conta recusada não grava, nem atendimento.
+- **Cancelamento:**
+  - estorna quem pagou por último: o comprador da revenda, se houve; senão, o da venda original, inclusive quando o ingresso foi dado de presente;
+  - ingresso já usado na portaria não é estornado (na 2.0, tudo era estornado);
+  - reservas, anúncios, fila, convites e trocas pendentes são encerrados;
+  - organizador de outro evento recebe 404; evento já cancelado, 409.
+- **Propostas de fornecedores** de evento cancelado não são encerradas automaticamente, como na 2.0.
+- **Painel:** "Ingressos vendidos" conta os ingressos válidos (ativos e utilizados). O cartão mostra a receita líquida de estornos; o relatório mostra a receita bruta e os estornos separados.
+
+**Testes executados (bancos e contas descartáveis)**
+- `npm test`: site 10/10; API 79/79 em MariaDB 10.11.14 e em MySQL 8.0.46 (69 anteriores e 10 novos), sem testes pulados.
+- Sabotagens propositais, todas acusadas pelos testes:
+  - aprovação ignorada nas rotas de pedidos e portaria;
+  - cadastro aceitando o tipo 4;
+  - administração mudando outra conta de administração;
+  - cancelamento estornando sempre a venda original;
+  - estorno contado no pedido errado;
+  - publicação sem aprovação.
+- Migração: num banco antigo, o organizador pendente foi aprovado uma vez, com histórico; reaplicar não aprova contas pendentes novas.
+- `criar-admin` testado:
+  - pelas variáveis de ambiente;
+  - com e-mail repetido, senha fraca, confirmação diferente e entrada interrompida (nada gravado);
+  - num pseudoterminal: a senha não apareceu na tela.
+  - Ali apareceu um defeito do próprio script: com respostas redirecionadas, ele perdia linhas e terminava com sucesso sem criar a conta. Foi corrigido antes do commit.
+- **Navegador** (Chromium 158 com Playwright, API e MariaDB reais). `administracao.py` passou com quatro contas:
+  - organizador cadastrado pelo site fica pendente: rascunho salvo, publicação recusada com aviso;
+  - administração vê o painel e recusa a conta com motivo; o organizador vê a recusa e o motivo; a administração aprova e o organizador publica;
+  - compra, relatório e cancelamento pela administração (2 estornos, R$ 120,00);
+  - "Evento cancelado" em Meus pedidos e "Cancelado" em Meus ingressos;
+  - atendimento respondido pela administração;
+  - cancelamento pelo organizador;
+  - conta de usuário recusada com aviso na homepage;
+  - 390 px sem rolagem lateral.
+- Regressão: `navegador.py` (`regressao`, `compra` e `recusado`), `repasse.py` e `portaria.py` passaram.
+- axe 4.14.1: zero violações em 40 combinações da etapa 6, 20 da etapa 4 e 12 da etapa 5.
+  - Três violações que eu tinha introduzido foram encontradas e corrigidas: nome acessível do botão "Voltar para análise", tabelas roláveis sem foco e regiões com nome repetido.
+- **Header:**
+  - A checagem da etapa 5 media só a rolagem lateral. Medindo o texto dos links, achei sobreposição entre 860 e 1330 px no menu do organizador (5 itens, desde a etapa 5) e em faixas menores nos outros perfis, inclusive no menu novo da administração.
+  - Corrigido: o menu recolhe no ☰ só quando não cabe. Recolhido, fica invisível e fora do Tab, mas continua medível. Com menu longo, o seletor da demo mostra só "DEMO", porque o perfil já aparece no cartão do usuário.
+  - Medido em 8 perfis (demo e conta), de 860 a 1460 px de 10 em 10, 1600 e 1920: nenhuma sobreposição.
+  - Ordem do Tab conferida; axe sem violações com o menu recolhido e aberto.
+- O build passou e não há arquivo novo fora do padrão do Prettier (os 51 antigos continuam iguais).
+
+**Pendências e riscos**
+- A aprovação não envia e-mail: a conta vê a decisão no aviso do topo do site.
+- Não há tela para gerenciar ou redefinir senha de contas de administração (só o script).
+- O painel lista até 500 eventos e a aprovação até 200 contas por consulta, sem paginação no servidor.
+- Propostas de fornecedores de evento cancelado continuam como estavam.
+- **Achado da etapa 4:** o histórico de trocas da main continua em aberto.
+- **Próximo passo:** aguardar a confirmação do usuário para publicar ou para começar a etapa 7 (idiomas).
+
 ## Integração com a TrocaTicket 2.0 — etapa 5: portaria e atendimento (26/11/2026)
 
 Etapa iniciada com autorização do usuário depois do ZIP da etapa 4 (base 753682b) e concluída; nada foi publicado e não houve merge.

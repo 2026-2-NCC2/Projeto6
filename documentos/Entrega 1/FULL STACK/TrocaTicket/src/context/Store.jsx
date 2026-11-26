@@ -140,6 +140,8 @@ export function StoreProvider({ children }) {
       return '';
     }
   });
+  // Situação da conta na aprovação da administração (etapa 6): A, P ou R. Vazio sem conta.
+  const [aprovacao, setAprovacao] = useState(() => sessionUser()?.aprovacao || '');
   const [toast, setToast] = useState('');
   const [storageError, setStorageError] = useState(false);
   useEffect(() => {
@@ -166,6 +168,7 @@ export function StoreProvider({ children }) {
     } catch {}
     if (!sessionUser()?.id) {
       setAccountId(null);
+      setAprovacao('');
       setData(readStorage(STORAGE_KEY));
     }
   }
@@ -181,6 +184,7 @@ export function StoreProvider({ children }) {
   function activateUser(user) {
     setRole(user.role || '');
     setAccountId(user.id || null);
+    setAprovacao(user.aprovacao || '');
     if (!user.id) {
       setData(readStorage(STORAGE_KEY));
       return;
@@ -191,10 +195,21 @@ export function StoreProvider({ children }) {
   // O servidor é quem sabe se a sessão vale. Ao abrir o site, confere o cookie de sessão:
   // restaura a conta numa aba nova, troca para a conta certa ou encerra a sessão local vencida.
   const navigate = useNavigate();
+  // Guarda a nova situação da conta também na aba (sessionStorage), para sobreviver ao recarregar.
+  const atualizarAprovacao = useCallback((valor) => {
+    setAprovacao(valor || '');
+    try {
+      const usuario = JSON.parse(sessionStorage.getItem('trocaticket-user') || 'null');
+      if (usuario?.id) {
+        sessionStorage.setItem('trocaticket-user', JSON.stringify({ ...usuario, aprovacao: valor }));
+      }
+    } catch {}
+  }, []);
   const encerrarLocalmente = useCallback((mensagem) => {
     limparSessaoLocal();
     setRole('');
     setAccountId(null);
+    setAprovacao('');
     setData(readStorage(STORAGE_KEY));
     if (mensagem) setToast(mensagem);
   }, []);
@@ -217,7 +232,12 @@ export function StoreProvider({ children }) {
           papelAtual = sessionStorage.getItem('trocaticket-role') || '';
         } catch {}
         const abaNova = !local?.id && !papelAtual;
-        if (Number(local?.id) === Number(user.id) || (!abaNova && !local?.id)) return;
+        if (Number(local?.id) === Number(user.id)) {
+          // Mesma conta: só atualiza a situação da aprovação, que a administração pode ter mudado.
+          if (user.aprovacao && local.aprovacao !== user.aprovacao) atualizarAprovacao(user.aprovacao);
+          return;
+        }
+        if (!abaNova && !local?.id) return;
         const usuario = {
           id: user.id,
           name: user.nome || 'Usuário',
@@ -225,6 +245,7 @@ export function StoreProvider({ children }) {
           photo: user.foto || '',
           role: user.role,
           tipo_perfil: user.tipo_perfil,
+          aprovacao: user.aprovacao || '',
         };
         try {
           sessionStorage.setItem('trocaticket-user', JSON.stringify(usuario));
@@ -293,6 +314,8 @@ export function StoreProvider({ children }) {
         update,
         role,
         isAuthenticated,
+        aprovacao: isAuthenticated ? aprovacao : '',
+        atualizarAprovacao,
         chooseRole,
         trocarPerfilDemo,
         activateUser,

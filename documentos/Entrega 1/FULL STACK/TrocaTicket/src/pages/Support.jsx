@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { Badge, Empty, PageTitle, Panel, money } from '../components/UI';
 import { useStore } from '../context/Store';
-import { criarChave, listarPedidos } from '../services/orders';
+import { listarPedidos } from '../services/orders';
+import useGravacao from '../utils/useGravacao';
 import {
   SITUACAO_ATENDIMENTO,
   abrirAtendimento,
@@ -12,31 +13,18 @@ import {
 } from '../services/portaria';
 
 // Atendimento (etapa 5): a conta de usuário abre solicitações ligadas a um pedido ou denuncia um
-// anúncio; a organização do evento responde e muda a situação. Sem chat em tempo real nem e-mail.
+// anúncio; a organização do evento responde e muda a situação. Desde a etapa 6, a administração
+// vê todas as solicitações e também responde. Sem chat em tempo real nem e-mail.
+// modo: 'usuario' (quem abre), 'organizador' (do evento) ou 'admin' (administração).
 
-// Grava com Idempotency-Key; a mesma chave é reusada se a API não respondeu (pode ter gravado).
-function useGravacao() {
-  const chaves = useRef(new Map());
-  const [ocupado, setOcupado] = useState('');
-  async function gravar(nome, acao) {
-    if (ocupado) return null;
-    if (!chaves.current.has(nome)) chaves.current.set(nome, criarChave());
-    setOcupado(nome);
-    try {
-      const resposta = await acao(chaves.current.get(nome));
-      chaves.current.delete(nome);
-      return { resposta };
-    } catch (error) {
-      if (!error.semResposta) chaves.current.delete(nome);
-      return { erro: error.message };
-    } finally {
-      setOcupado('');
-    }
-  }
-  return { gravar, ocupado };
+function autorDaMensagem(mensagem, equipe) {
+  if (mensagem.author === 'organizacao') return `Organização do evento (${mensagem.authorName})`;
+  if (mensagem.author === 'administracao') return `Administração (${mensagem.authorName})`;
+  return equipe ? mensagem.authorName : 'Você';
 }
 
-function Conversa({ item, organizador, gravacao, aoAtualizar }) {
+function Conversa({ item, modo, gravacao, aoAtualizar }) {
+  const equipe = modo !== 'usuario';
   const [texto, setTexto] = useState('');
   const [situacao, setSituacao] = useState(item.status);
   const [erro, setErro] = useState('');
@@ -69,18 +57,22 @@ function Conversa({ item, organizador, gravacao, aoAtualizar }) {
       <p className="muted">
         {item.eventTitle} ·{' '}
         {item.orderId ? `Pedido nº ${item.orderId}` : `Anúncio nº ${item.listingId}`}
-        {organizador && ` · aberto por ${item.requesterName}`}
+        {equipe && ` · aberto por ${item.requesterName}`}
       </p>
       <ol className="support-messages" aria-label={`Mensagens de "${item.subject}"`}>
         {item.messages.map((mensagem) => (
-          <li key={mensagem.id} className={mensagem.author === 'organizacao' ? 'from-team' : ''}>
+          <li
+            key={mensagem.id}
+            className={
+              mensagem.author === 'administracao'
+                ? 'from-team from-admin'
+                : mensagem.author === 'organizacao'
+                  ? 'from-team'
+                  : ''
+            }
+          >
             <small>
-              {mensagem.author === 'organizacao'
-                ? `Organização do evento (${mensagem.authorName})`
-                : organizador
-                  ? mensagem.authorName
-                  : 'Você'}{' '}
-              · {horaBrasilia(mensagem.createdAt)}
+              {autorDaMensagem(mensagem, equipe)} · {horaBrasilia(mensagem.createdAt)}
             </small>
             <p>{mensagem.message}</p>
           </li>
@@ -88,7 +80,13 @@ function Conversa({ item, organizador, gravacao, aoAtualizar }) {
       </ol>
       {item.canReply ? (
         <form className="support-reply" onSubmit={responder}>
-          <label htmlFor={idTexto}>{organizador ? 'Resposta da organização' : 'Responder'}</label>
+          <label htmlFor={idTexto}>
+            {modo === 'admin'
+              ? 'Resposta da administração'
+              : modo === 'organizador'
+                ? 'Resposta da organização'
+                : 'Responder'}
+          </label>
           <textarea
             id={idTexto}
             required
@@ -119,7 +117,7 @@ function Conversa({ item, organizador, gravacao, aoAtualizar }) {
             </p>
           )}
           <button type="submit" className="button primary" disabled={Boolean(gravacao.ocupado)}>
-            {organizador ? 'Enviar resposta' : 'Enviar mensagem'}
+            {equipe ? 'Enviar resposta' : 'Enviar mensagem'}
           </button>
         </form>
       ) : (
@@ -156,7 +154,9 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
     if (r?.resposta) {
       setMensagem('');
       setAssunto('');
-      setAviso('Solicitação registrada. A organização do evento responde por aqui.');
+      setAviso(
+        'Solicitação registrada. A organização do evento ou a administração responde por aqui.',
+      );
       aoCriar(r.resposta);
     }
   }
@@ -235,7 +235,8 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
   );
 }
 
-function Atendimentos({ organizador }) {
+function Atendimentos({ modo }) {
+  const equipe = modo !== 'usuario';
   const [itens, setItens] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [erro, setErro] = useState('');
@@ -247,7 +248,7 @@ function Atendimentos({ organizador }) {
     setErro('');
     Promise.all([
       listarAtendimentos(controller.signal),
-      organizador ? Promise.resolve([]) : listarPedidos(controller.signal),
+      equipe ? Promise.resolve([]) : listarPedidos(controller.signal),
     ])
       .then(([lista, meusPedidos]) => {
         setItens(lista);
@@ -257,19 +258,17 @@ function Atendimentos({ organizador }) {
         if (!controller.signal.aborted) setErro(error.message);
       });
     return () => controller.abort();
-  }, [organizador, tentativa]);
+  }, [equipe, tentativa]);
 
   const atualizarItem = useCallback((novo) => {
     setItens((lista) => [novo, ...(lista || []).filter((item) => item.id !== novo.id)]);
   }, []);
 
   return (
-    <div className={organizador ? '' : 'support-layout'}>
-      {!organizador && (
-        <NovaSolicitacao pedidos={pedidos} gravacao={gravacao} aoCriar={atualizarItem} />
-      )}
+    <div className={equipe ? '' : 'support-layout'}>
+      {!equipe && <NovaSolicitacao pedidos={pedidos} gravacao={gravacao} aoCriar={atualizarItem} />}
       <Panel
-        title={organizador ? 'Solicitações recebidas' : 'Suas solicitações'}
+        title={equipe ? 'Solicitações recebidas' : 'Suas solicitações'}
         action={
           <button
             type="button"
@@ -293,7 +292,7 @@ function Atendimentos({ organizador }) {
                 <Conversa
                   key={item.id}
                   item={item}
-                  organizador={organizador}
+                  modo={modo}
                   gravacao={gravacao}
                   aoAtualizar={atualizarItem}
                 />
@@ -301,9 +300,11 @@ function Atendimentos({ organizador }) {
             </ul>
           ) : (
             <p>
-              {organizador
-                ? 'Nenhuma solicitação sobre os seus eventos.'
-                : 'Você ainda não abriu nenhuma solicitação.'}
+              {modo === 'admin'
+                ? 'Nenhuma solicitação na plataforma.'
+                : modo === 'organizador'
+                  ? 'Nenhuma solicitação sobre os seus eventos.'
+                  : 'Você ainda não abriu nenhuma solicitação.'}
             </p>
           ))}
       </Panel>
@@ -313,19 +314,25 @@ function Atendimentos({ organizador }) {
 
 export default function Support() {
   const { role, isAuthenticated } = useStore();
-  const organizador = role === 'organizador';
-  const permitido = isAuthenticated && ['comprador', 'organizador'].includes(role);
+  const modo = role === 'admin' ? 'admin' : role === 'organizador' ? 'organizador' : 'usuario';
+  const permitido = isAuthenticated && ['comprador', 'organizador', 'admin'].includes(role);
   return (
     <div className="workspace">
       <PageTitle
-        title={organizador ? 'Atendimentos' : 'Atendimento'}
+        title={modo === 'usuario' ? 'Atendimento' : 'Atendimentos'}
         subtitle={
-          organizador
-            ? 'Solicitações e denúncias sobre os seus eventos. Responda e atualize a situação.'
-            : 'Fale com a organização do evento sobre um pedido ou denuncie um anúncio de revenda.'
+          modo === 'admin'
+            ? 'Todas as solicitações e denúncias da plataforma. A administração responde e muda a situação.'
+            : modo === 'organizador'
+              ? 'Solicitações e denúncias sobre os seus eventos. Responda e atualize a situação.'
+              : 'Fale com a organização do evento sobre um pedido ou denuncie um anúncio de revenda. A administração também acompanha.'
         }
       >
-        {organizador ? (
+        {modo === 'admin' ? (
+          <Link className="button outline" to="/admin">
+            Painel geral
+          </Link>
+        ) : modo === 'organizador' ? (
           <Link className="button outline" to="/organizador/portaria">
             Portaria
           </Link>
@@ -336,10 +343,10 @@ export default function Support() {
         )}
       </PageTitle>
       {permitido ? (
-        <Atendimentos organizador={organizador} />
+        <Atendimentos modo={modo} />
       ) : (
         <Empty
-          title="Entre com uma conta de usuário ou de organizador para usar o atendimento."
+          title="Entre com uma conta de usuário, de organizador ou de administração para usar o atendimento."
           heading="h2"
         >
           O atendimento guarda as mensagens no banco de dados; o modo demonstração não tem

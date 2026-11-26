@@ -14,6 +14,9 @@ import { Organizer, EventEditor, Consolidation, Suppliers } from './pages/Organi
 import Admin from './pages/Admin';
 import Moderation  from './pages/Moderation';
 import Report from './pages/Report';
+import PainelAdmin from './pages/admin/PainelAdmin';
+import AprovacoesAdmin from './pages/admin/AprovacoesAdmin';
+import RelatorioAdmin from './pages/admin/RelatorioAdmin';
 import { Catalog, EventDetails, Tickets, Community } from './pages/Participant';
 import Orders from './pages/Orders';
 import Gate from './pages/Gate';
@@ -48,15 +51,11 @@ function Info({ title, children, acao }) {
     </div>
   );
 }
-function DemoOnly({ children }) {
+// Administração (etapa 6): com conta, as telas usam o banco; no modo demonstração, os dados
+// fictícios de antes continuam disponíveis.
+function ContaOuDemo({ conta, demo }) {
   const { isAuthenticated } = useStore();
-  if (!isAuthenticated) return children;
-  return (
-    <Info title="Área ainda não conectada ao banco de dados">
-      Esta funcionalidade está disponível apenas na demonstração. Nenhum dado demonstrativo foi
-      carregado para sua conta.
-    </Info>
-  );
+  return isAuthenticated ? conta : demo;
 }
 export default function App() {
   const { isAuthenticated } = useStore();
@@ -133,9 +132,16 @@ export default function App() {
         <Route path="fornecedor/cotacao/:id" element={<QuoteRoute />} />
         <Route path="fornecedor/inventario" element={<SupplierInventory />} />
         <Route path="fornecedor/perfil" element={<SupplierProfile />} />
-        <Route path="admin" element={<DemoOnly><Admin /></DemoOnly>} />
-        <Route path="admin/relatorios/:id" element={<DemoOnly><Report /></DemoOnly>} />
-        <Route path="admin/moderacao" element={<DemoOnly><Moderation /></DemoOnly>} />
+        <Route path="admin" element={<ContaOuDemo conta={<PainelAdmin />} demo={<Admin />} />} />
+        <Route
+          path="admin/relatorios/:id"
+          element={<ContaOuDemo conta={<RelatorioAdmin />} demo={<Report />} />}
+        />
+        <Route
+          path="admin/moderacao"
+          element={<ContaOuDemo conta={<AprovacoesAdmin />} demo={<Moderation />} />}
+        />
+        <Route path="admin/atendimentos" element={<Support />} />
         <Route
           path="termos"
           element={

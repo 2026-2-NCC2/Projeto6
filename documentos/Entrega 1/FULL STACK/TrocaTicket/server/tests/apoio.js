@@ -126,10 +126,17 @@ class Cliente {
   }
 }
 
+// Desde a etapa 6, contas novas de organizador e fornecedor esperam a aprovação da administração.
+// Nos testes que não tratam disso, a aprovação é feita direto no banco temporário.
+async function aprovarConta(sql, usuarioId) {
+  await sql.execute("UPDATE usuario SET status_aprovacao = 'A' WHERE id = ?", [usuarioId]);
+}
+
 module.exports = {
   ORIGEM_SITE,
   SEM_MYSQL,
   Cliente,
+  aprovarConta,
   configMysql,
   conectar,
   criarBancoTemporario,

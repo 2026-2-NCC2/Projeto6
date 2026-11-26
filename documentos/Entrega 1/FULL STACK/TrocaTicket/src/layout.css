@@ -497,6 +497,49 @@ html[data-theme='dark'] .demo-switcher-foot button {
   }
 }
 
+/* ---------- Menu recolhido também acima de 850 px ----------
+   O Navbar aplica .is-compact quando os itens do perfil não cabem numa linha entre o
+   logotipo e as ferramentas. Fechado, o menu fica invisível (fora do fluxo, sem foco e
+   fora da leitura de tela), mas continua medível; aberto, vira a mesma lista das telas
+   estreitas. */
+.app-header.is-compact .app-navigation:not(.is-open) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.app-header.is-compact .app-navigation.is-open {
+  display: flex;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 20px;
+  border-radius: 15px;
+  background: #141414;
+  box-shadow: 0 10px 25px #0002;
+  font-size: 13px;
+}
+.app-header.is-compact .app-navigation.is-open a {
+  justify-content: flex-start;
+}
+.app-header.is-compact .app-navigation a.active::after {
+  right: 8px;
+  width: auto;
+}
+.app-header.is-compact .menu-toggle {
+  display: block;
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: white;
+  font-size: 23px;
+}
+
 /* ---------- Header em qualquer largura: tudo cabe numa linha ---------- */
 .header .public-navigation a,
 .header .app-navigation a {
@@ -515,6 +558,11 @@ html[data-theme='dark'] .demo-switcher-foot button {
   .demo-switcher-text b {
     display: none;
   }
+}
+/* Menu longo (organizador, 5 itens): o perfil já aparece no cartão do usuário, então o
+   seletor da demonstração mostra só "DEMO" e o menu continua cabendo em telas largas. */
+.app-header.menu-longo .demo-switcher-text b {
+  display: none;
 }
 .header .app-navigation .nav-mobile-only {
   display: none;

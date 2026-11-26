@@ -3,9 +3,13 @@
 Instale com python -m pip install playwright e python -m playwright install chromium.
 Com site e API já iniciados, execute python scripts/e2e/navegador.py --help.
 O roteiro cria contas e publica eventos exclusivos a cada execução.
+Desde a etapa 6, o organizador novo precisa da aprovação da administração: crie uma conta de
+administração no banco descartável (npm run criar-admin) e informe-a em TT_ADMIN_EMAIL e
+TT_ADMIN_SENHA no ambiente. A senha não fica em nenhum arquivo.
 """
 import argparse
 from datetime import date, timedelta
+import os
 import re
 import secrets
 from urllib.parse import urlsplit
@@ -19,6 +23,31 @@ def resposta(page, metodo, caminho):
     )
 
 
+def credenciais_admin():
+    email, senha = os.environ.get("TT_ADMIN_EMAIL"), os.environ.get("TT_ADMIN_SENHA")
+    if not email or not senha:
+        raise SystemExit(
+            "Defina TT_ADMIN_EMAIL e TT_ADMIN_SENHA com a conta criada por 'npm run criar-admin' "
+            "no banco descartável: desde a etapa 6, o organizador precisa ser aprovado para publicar.")
+    return email, senha
+
+
+def aprovar_conta(pw, site, api, usuario_id):
+    """Etapa 6: a administração aprova a conta nova de organizador ou fornecedor (pela API)."""
+    email, senha = credenciais_admin()
+    admin = pw.request.new_context(extra_http_headers={"Origin": site})
+    try:
+        login = admin.post(api + "/login", data={"email": email, "senha": senha})
+        assert login.status == 200, f"Login da administração: HTTP {login.status}"
+        decisao = admin.post(api + f"/admin/contas/{usuario_id}/aprovacao", headers={
+            "X-CSRF-Token": login.json()["csrfToken"], "Idempotency-Key": f"e2e-{secrets.token_hex(12)}",
+        }, data={"situacao": "A", "motivo": ""})
+        assert decisao.status == 200, f"Aprovação da conta: HTTP {decisao.status}"
+        admin.post(api + "/logout", headers={"X-CSRF-Token": login.json()["csrfToken"]})
+    finally:
+        admin.dispose()
+
+
 def eventos(pw, site, api, rodada):
     cliente = pw.request.new_context(extra_http_headers={"Origin": site})
     try:
@@ -29,6 +58,7 @@ def eventos(pw, site, api, rodada):
         })
         assert cadastro.status == 201, f"Cadastro de organizador: HTTP {cadastro.status}"
         organizador = cadastro.json()
+        aprovar_conta(pw, site, api, organizador["usuarioId"])
         ids = []
         for numero in (1, 2):
             dia = (date.today() + timedelta(days=20 + numero)).isoformat()

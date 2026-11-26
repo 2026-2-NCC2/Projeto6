@@ -132,9 +132,22 @@ export default function Orders() {
                       ? ` · ${FORMA_PAGAMENTO[pedido.paymentMethod] || pedido.paymentMethod}`
                       : ''}
                   </p>
-                  {pedido.reason && pedido.status !== 'pago' && (
-                    <p className="muted">{pedido.reason}</p>
+                  {/* Etapa 6: evento cancelado pela organização ou pela administração. */}
+                  {pedido.eventCancelled && (
+                    <p className="info-note event-cancelled-note">
+                      <strong>Evento cancelado.</strong>{' '}
+                      {pedido.cancelReason ? `Motivo: ${pedido.cancelReason}. ` : ''}
+                      {pedido.refundedAmount > 0
+                        ? 'O estorno simulado já foi registrado neste pedido.'
+                        : 'Não há valor a estornar neste pedido.'}
+                    </p>
                   )}
+                  {pedido.reason &&
+                    pedido.status !== 'pago' &&
+                    !(
+                      pedido.eventCancelled &&
+                      /^(Cancelamento do evento|Reserva cancelada: o evento)/.test(pedido.reason)
+                    ) && <p className="muted">{pedido.reason}</p>}
 
                   {pedido.canPay && (
                     <>

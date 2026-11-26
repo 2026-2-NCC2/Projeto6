@@ -1,0 +1,277 @@
+/* ==========================================================
+   Etapa 6 — administração ligada ao banco, aprovação de contas
+   e cancelamento de evento. Usa os tokens --tt-* do tema e os
+   componentes já existentes (rp-*, ah-*, mod-*).
+   ========================================================== */
+
+/* ---------- Aviso de conta pendente ou recusada (abaixo do header) ---------- */
+.approval-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1372px;
+  margin: 16px auto 0;
+  padding: 12px 16px;
+  border: 1px solid #f3c86b;
+  border-left-width: 5px;
+  border-radius: 12px;
+  background: #fff8e8;
+  color: #5c3b00;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.app-shell > .approval-strip {
+  width: calc(100% - 68px);
+}
+.approval-strip strong {
+  display: block;
+  font-size: 14px;
+}
+.approval-strip p {
+  margin: 2px 0 0;
+}
+.approval-strip .button {
+  flex-shrink: 0;
+  background: #fff;
+}
+.approval-strip.rejected {
+  border-color: #f2a1b2;
+  background: #fff1f3;
+  color: #7c1430;
+}
+html[data-theme='dark'] .approval-strip {
+  border-color: var(--tt-status-amber-border);
+  background: var(--tt-status-amber-bg);
+  color: var(--tt-status-amber-ink);
+}
+html[data-theme='dark'] .approval-strip.rejected {
+  border-color: var(--tt-status-red-border);
+  background: var(--tt-status-red-bg);
+  color: var(--tt-status-red-ink);
+}
+html[data-theme='dark'] .approval-strip .button {
+  background: #1b2636;
+}
+/* Homepage do Usuário: o hero começa atrás do header; o aviso fica sobre a imagem. */
+.hero-shell > .approval-strip {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--tt-header-offset) + 8px);
+  left: 34px;
+  right: 34px;
+  width: auto;
+  margin: 0;
+}
+@media (max-width: 620px) {
+  .app-shell > .approval-strip {
+    flex-direction: column;
+    align-items: flex-start;
+    width: calc(100% - 32px);
+  }
+  .hero-shell > .approval-strip {
+    left: 16px;
+    right: 16px;
+  }
+}
+
+.auth-note.approval-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #f3c86b;
+  border-radius: 10px;
+  background: #fff8e8;
+  color: #5c3b00;
+  text-align: left;
+}
+html[data-theme='dark'] .auth-note.approval-note {
+  border-color: var(--tt-status-amber-border);
+  background: var(--tt-status-amber-bg);
+  color: var(--tt-status-amber-ink);
+}
+
+/* ---------- Selos que faltavam (cancelado e encerrado) ---------- */
+.rp-status.red {
+  border-color: #ffd2dc;
+  background: #fff0f3;
+  color: #bc2044;
+}
+.rp-status.gray,
+.badge.gray {
+  border-color: #d5dce7;
+  background: #f1f4f8;
+  color: #4a5871;
+}
+html[data-theme='dark'] #root .rp-status.red {
+  border-color: var(--tt-status-red-border);
+  background: var(--tt-status-red-bg);
+  color: var(--tt-status-red-ink);
+}
+html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
+  border-color: var(--tt-status-gray-border);
+  background: var(--tt-status-gray-bg);
+  color: var(--tt-status-gray-ink);
+}
+
+/* ---------- Painel geral ---------- */
+.admin-live .admin-metrics .metric .text-link {
+  font-size: 12px;
+}
+.admin-live .ah-filters .button {
+  white-space: nowrap;
+}
+
+/* ---------- Relatório do evento ---------- */
+.admin-cancel-note {
+  margin: 0 0 18px;
+  border-left: 4px solid #bc2044;
+}
+.admin-report-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.admin-report-facts > div {
+  padding: 10px 12px;
+  border: 1px solid var(--tt-border);
+  border-radius: 10px;
+  background: var(--tt-surface-soft);
+}
+.admin-report-facts dt {
+  color: var(--tt-muted);
+  font-size: 12px;
+}
+.admin-report-facts dd {
+  margin: 2px 0 0;
+  color: var(--tt-ink);
+  font-size: 18px;
+  font-weight: 700;
+}
+.admin-report .table-wrap:focus-visible {
+  outline: 3px solid #b8c9ff;
+  outline-offset: 2px;
+}
+.admin-report .rp-table td small {
+  display: block;
+  color: var(--tt-muted);
+}
+
+/* ---------- Janela de cancelamento e de recusa ---------- */
+.cancel-event-form {
+  display: grid;
+  gap: 10px;
+  max-width: 560px;
+}
+.cancel-event-form p {
+  margin: 0;
+}
+.cancel-event-form label {
+  font-weight: 700;
+}
+.cancel-event-form .actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* ---------- Aprovação de contas ---------- */
+.admin-approvals .mod-search .button {
+  flex-shrink: 0;
+}
+.admin-profile-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tt-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.admin-profile-filter select {
+  padding: 8px 10px;
+  border: 1px solid var(--tt-border-strong);
+  border-radius: 10px;
+  background: var(--tt-surface);
+  color: var(--tt-ink);
+  font: inherit;
+}
+.approval-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.approval-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--tt-border);
+  border-radius: 14px;
+  background: var(--tt-surface-soft);
+}
+.approval-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.approval-card-head > div {
+  flex: 1;
+  min-width: 0;
+}
+.approval-card-head h3 {
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.approval-card-head p {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+.approval-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+.approval-facts dt {
+  color: var(--tt-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.approval-facts dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.mod-audit ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.mod-audit li + li {
+  margin-top: 6px;
+}
+@media (max-width: 620px) {
+  .approval-card-head {
+    flex-wrap: wrap;
+  }
+  .approval-actions .button {
+    flex: 1 1 140px;
+  }
+}
+
+/* ---------- Atendimento: mensagens da administração ---------- */
+.support-messages li.from-admin {
+  border-left-color: #0b8a65;
+}
+
+/* ---------- Pedidos de evento cancelado ---------- */
+.event-cancelled-note {
+  border-left: 4px solid #bc2044;
+}

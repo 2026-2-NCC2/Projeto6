@@ -2,7 +2,7 @@
 const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
-const { Cliente, SEM_MYSQL, conectar, configMysql, criarBancoTemporario, iniciarApi } = require('./apoio');
+const { Cliente, SEM_MYSQL, aprovarConta, conectar, configMysql, criarBancoTemporario, iniciarApi } = require('./apoio');
 
 const resumo = (valor) => crypto.createHash('sha256').update(valor).digest('hex');
 const senhaAleatoria = () => `Teste-${crypto.randomBytes(9).toString('base64url')}`;
@@ -33,6 +33,7 @@ describe('API com sessão (banco temporário)', { skip: !configMysql() && SEM_MY
       contas[chave] = { ...conta, id: resposta.json.usuarioId };
       clientes[chave] = cliente;
     }
+    for (const chave of ['org', 'forn']) await aprovarConta(sql, contas[chave].id);
     for (const [titulo, dias] of [['Festival Teste de Verão', 20], ['Show Teste Acústico', 45]]) {
       const resposta = await clientes.org.req('POST', '/eventos', {
         organizadorId: contas.org.id, title: titulo, category: 'Música', date: dataFutura(dias),
@@ -60,8 +61,10 @@ describe('API com sessão (banco temporário)', { skip: !configMysql() && SEM_MY
     const ana = new Cliente(api.url);
     const r = await ana.entrar(contas.ana.email, contas.ana.senha);
     assert.equal(r.status, 200);
-    assert.deepEqual(Object.keys(r.json.user).sort(), ['email', 'foto', 'id', 'nome', 'role', 'tipo_perfil']);
+    // Etapa 6: o login também informa a situação da conta na aprovação (A, P ou R).
+    assert.deepEqual(Object.keys(r.json.user).sort(), ['aprovacao', 'email', 'foto', 'id', 'nome', 'role', 'tipo_perfil']);
     assert.equal(r.json.user.role, 'comprador');
+    assert.equal(r.json.user.aprovacao, 'A', 'conta de usuário já nasce aprovada');
     assert.match(ana.setCookie, /HttpOnly/i);
     assert.match(ana.setCookie, /SameSite=Lax/i);
     assert.match(ana.setCookie, /Path=\/api/i);

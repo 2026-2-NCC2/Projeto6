@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { inicioDoPerfil, nomeDoPerfil, normalizarPerfil } from '../data/perfis';
@@ -38,6 +38,54 @@ export const menus = {
 // Aliases para garantir compatibilidade se a sessão usar 'participante'
 menus.participante = menus.comprador;
 
+// Conta de administração (etapa 6): telas ligadas ao banco. A demonstração usa menus.admin.
+export const menuAdminConta = [
+  ['Painel geral', '/admin'],
+  ['Aprovações', '/admin/moderacao'],
+  ['Atendimentos', '/admin/atendimentos'],
+  ['Eventos', '/eventos'],
+];
+
+// Distância mínima entre o texto do menu e o logotipo ou as ferramentas do header.
+const FOLGA_MENU = 12;
+
+// Recolhe o menu no botão ☰ quando os itens não cabem numa linha entre o logotipo e as
+// ferramentas (em qualquer largura acima de 850 px, para qualquer perfil e texto). Mede o
+// texto dos links: no modo recolhido o menu fica invisível, mas continua medível (CSS
+// .is-compact em layout.css), então a decisão vale também ao aumentar a janela.
+function useMenuCompacto(headerRef, navRef, ativo) {
+  const [compacto, setCompacto] = useState(false);
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    const nav = navRef.current;
+    if (!ativo || !header || !nav || typeof ResizeObserver === 'undefined') {
+      setCompacto(false);
+      return undefined;
+    }
+    const texto = (elemento) => {
+      const faixa = document.createRange();
+      faixa.selectNodeContents(elemento);
+      return faixa.getBoundingClientRect();
+    };
+    function medir() {
+      if (nav.classList.contains('is-open')) return; // aberto (em coluna): mantém a decisão
+      const links = [...nav.querySelectorAll('a')].filter((link) => link.offsetWidth > 0);
+      const marca = header.querySelector('.brand');
+      const ferramentas = header.querySelector('.header-tools');
+      if (!links.length || !marca || !ferramentas) return;
+      const largura = texto(links[links.length - 1]).right - texto(links[0]).left;
+      const espaco = ferramentas.getBoundingClientRect().left - marca.getBoundingClientRect().right;
+      setCompacto(largura + 2 * FOLGA_MENU > espaco);
+    }
+    const observador = new ResizeObserver(medir);
+    [header, nav, header.querySelector('.header-tools')].filter(Boolean).forEach((el) => observador.observe(el));
+    medir();
+    document.fonts?.ready.then(medir).catch(() => {});
+    return () => observador.disconnect();
+  }, [headerRef, navRef, ativo]);
+  return compacto;
+}
+
 /**
  * Componente Navbar unificado.
  * Altera dinamicamente as opções exibidas de acordo com o perfil de usuário armazenado na sessão.
@@ -48,6 +96,8 @@ export default function Navbar({ darkMode, toggleTheme }) {
   const { data, role, isAuthenticated, chooseRole, notify } = useStore();
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState(false);
+  const headerRef = useRef(null);
+  const navRef = useRef(null);
   async function handleLogout() {
     // Encerra a sessão no servidor (o cookie deixa de valer) e depois limpa o navegador.
     // No modo demonstração não há sessão no servidor, então nada é enviado à API.
@@ -117,8 +167,21 @@ export default function Navbar({ darkMode, toggleTheme }) {
     initialsOf(data?.profile?.name || 'CM')
   );
 
+  const itensMenu =
+    activeRole === 'admin' && isAuthenticated ? menuAdminConta : menus[activeRole] || menus.comprador;
+  const compacto = useMenuCompacto(
+    headerRef,
+    navRef,
+    isPublicView ? '' : itensMenu.map(([label]) => label).join('|'),
+  );
+
   return (
-    <header className={`header ${!isPublicView ? 'app-header' : ''}`}>
+    <header
+      ref={headerRef}
+      className={`header ${!isPublicView ? 'app-header' : ''} ${compacto ? 'is-compact' : ''} ${
+        itensMenu.length >= 5 ? 'menu-longo' : ''
+      }`}
+    >
       <Link
         className="brand"
         to={isPublicView ? '/' : inicioDoPerfil(activeRole)}
@@ -166,10 +229,11 @@ export default function Navbar({ darkMode, toggleTheme }) {
           </button>
 
           <nav
+            ref={navRef}
             className={`app-navigation ${menu ? 'is-open' : ''}`}
             aria-label="Navegação principal"
           >
-            {(menus[activeRole] || menus.comprador).map(([label, to]) => (
+            {itensMenu.map(([label, to]) => (
               <NavLink end key={to} to={to}>
                 {label}
               </NavLink>
