@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Link, Navigate } from 'react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -23,6 +23,8 @@ import Gate from './pages/Gate';
 import Support from './pages/Support';
 import Resale from './pages/Resale';
 import ForumPage from './pages/ForumPage';
+import PainelAcessibilidade from './components/acessibilidade/PainelAcessibilidade';
+import { definirTema, usePreferencias } from './acessibilidade';
 import { useStore } from './context/Store';
 import { inicioDoPerfil, normalizarPerfil } from './data/perfis';
 // Página inicial: visitante vê a homepage pública; o Usuário (conta ou demonstração)
@@ -64,23 +66,16 @@ export default function App() {
     // Título da aba no idioma escolhido, também no fórum público (fora do Layout).
     document.title = t('TrocaTicket — Eventos & ingressos');
   }, [idioma]);
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem('trocaticket-theme') === 'dark';
-    } catch {
-      return false;
-    }
-  });
+  // Tema claro, escuro ou do sistema vem das preferências de acessibilidade (etapa 8), que
+  // também aplicam o atributo data-theme e gravam a chave lida pelo fórum.
+  const { temaAtual } = usePreferencias();
+  const darkMode = temaAtual === 'dark';
 
   useEffect(() => {
-    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       'content',
       darkMode ? '#080c14' : '#f4f7fc',
     );
-    try {
-      localStorage.setItem('trocaticket-theme', darkMode ? 'dark' : 'light');
-    } catch {}
   }, [darkMode]);
 
   useEffect(() => {
@@ -88,7 +83,7 @@ export default function App() {
       const frame = document.querySelector('.forum-frame');
       if (frame && event.origin === window.location.origin && event.source === frame.contentWindow &&
           event.data?.type === 'TROCATICKET_THEME_CHANGED') {
-        setDarkMode(Boolean(event.data.dark));
+        definirTema(event.data.dark ? 'dark' : 'light');
       }
     };
     window.addEventListener('message', syncForumTheme);
@@ -97,7 +92,7 @@ export default function App() {
 
   function toggleTheme() {
     const next = !darkMode;
-    setDarkMode(next);
+    definirTema(next ? 'dark' : 'light');
     document
       .querySelector('.forum-frame')
       ?.contentWindow?.postMessage(
@@ -107,6 +102,7 @@ export default function App() {
   }
 
   return (
+    <>
     <Routes>
       <Route element={<Layout darkMode={darkMode} toggleTheme={toggleTheme} />}>
         <Route index element={<Inicio />} />
@@ -190,6 +186,8 @@ export default function App() {
       </Route>
       {!isAuthenticated && <Route path="comunidade/*" element={<ForumPage />} />}
     </Routes>
+    <PainelAcessibilidade />
+    </>
   );
 }
 import { useParams } from 'react-router';

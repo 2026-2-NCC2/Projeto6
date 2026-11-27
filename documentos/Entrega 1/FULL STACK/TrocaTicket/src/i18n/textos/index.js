@@ -12,6 +12,7 @@ import lote06 from './lote06.js';
 import lote07 from './lote07.js';
 import lote08 from './lote08.js';
 import lote09 from './lote09.js';
+import lote10 from './lote10.js';
 
 export default [
   ...reaproveitados,
@@ -24,4 +25,5 @@ export default [
   ...lote07,
   ...lote08,
   ...lote09,
+  ...lote10,
 ];

@@ -1,0 +1,867 @@
+/* Acessibilidade (etapa 8, adaptado de accessibility.css e appearance.css da TrocaTicket 2.0).
+   As preferências ficam em atributos do <html> (src/acessibilidade/preferencias.js):
+   data-fonte (100 a 200), data-letras e data-linhas (0 a 3), data-legivel, data-links e
+   data-contrast. O tamanho da letra muda o tamanho base da página; o CSS do site usa rem.
+   data-ampliado fica "true" quando a letra, os espaçamentos ou a fonte legível deixam o texto
+   maior: aí vale o layout que quebra linha (bloco "Texto ampliado", abaixo). */
+
+:root {
+  --acess-painel: #fff;
+  --acess-superficie: #f7f9fb;
+  --acess-texto: #121b30;
+  --acess-mudo: #536985;
+  --acess-borda: #dde5f0;
+  --acess-destaque: #5746ef;
+  --acess-suave: #f2efff;
+  --acess-acao: #5746ef;
+  --acess-sobre-acao: #fff;
+  --acess-foco: #7650e8;
+}
+html[data-theme='dark'] {
+  --acess-painel: #1d2637;
+  --acess-superficie: #212b3c;
+  --acess-texto: #f2f4fa;
+  --acess-mudo: #bdc9df;
+  --acess-borda: #53627c;
+  --acess-destaque: #c5b6ff;
+  --acess-suave: #2c2948;
+  --acess-acao: #c5b6ff;
+  --acess-sobre-acao: #14102b;
+  --acess-foco: #ffd965;
+}
+html[data-contrast='high'] {
+  --acess-painel: #000;
+  --acess-superficie: #000;
+  --acess-texto: #fff;
+  --acess-mudo: #eee;
+  --acess-borda: #fff;
+  --acess-destaque: #ffed4a;
+  --acess-suave: #171717;
+  --acess-acao: #ffed4a;
+  --acess-sobre-acao: #000;
+  --acess-foco: #ffed4a;
+}
+
+/* ---------- Botão flutuante e painel ---------- */
+.accessibility-launcher {
+  position: fixed;
+  z-index: 95;
+  right: 18px;
+  bottom: 22px;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid var(--acess-painel);
+  border-radius: 50%;
+  background: var(--acess-acao);
+  color: var(--acess-sobre-acao);
+  box-shadow: 0 4px 16px #19133040;
+  cursor: pointer;
+}
+.accessibility-launcher:hover {
+  filter: brightness(1.08);
+}
+.accessibility-launcher:focus-visible,
+.preference-dialog :focus-visible {
+  outline: 3px solid var(--acess-foco);
+  outline-offset: 3px;
+}
+.preference-dialog {
+  color: var(--acess-texto);
+  background: var(--acess-painel);
+  border: 1px solid var(--acess-borda);
+  box-shadow: 0 14px 35px #1a265924;
+  padding: 0;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 21px;
+  font-size: 0.875rem;
+}
+.preference-dialog::backdrop {
+  background: #121b304d;
+}
+.accessibility-dialog {
+  width: min(461px, calc(100vw - 24px));
+  margin: 16px 24px 16px auto;
+}
+.preference-dialog :is(h2, h3) {
+  color: var(--acess-texto);
+  letter-spacing: normal;
+}
+.accessibility-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: 45px minmax(0, 1fr) 32px;
+  gap: 12px;
+  align-items: start;
+  padding: 22px;
+  background: var(--acess-suave);
+}
+.accessibility-symbol {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--acess-acao);
+  color: var(--acess-sobre-acao);
+}
+.accessibility-heading h2 {
+  margin: 0 0 5px;
+  font-size: 1.4375rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.accessibility-heading > div {
+  min-width: 0;
+}
+.accessibility-heading p {
+  margin: 0;
+  color: var(--acess-mudo);
+  font-size: 0.8125rem;
+}
+.personalization-tag {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-top: 8px;
+  padding: 4px 16px;
+  border-radius: 20px;
+  background: var(--acess-painel);
+  color: var(--acess-destaque);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+.preferences-close {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--acess-mudo);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.accessibility-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 22px;
+}
+.accessibility-body h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.accessibility-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.accessibility-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  min-height: 108px;
+  padding: 12px 14px;
+  border: 1px solid var(--acess-borda);
+  border-radius: 14px;
+  background: var(--acess-painel);
+  color: var(--acess-texto);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.accessibility-option.font-option {
+  cursor: default;
+}
+.accessibility-option[aria-pressed='true'] {
+  padding: 11px 13px;
+  border: 2px solid var(--acess-destaque);
+  background: var(--acess-suave);
+}
+.option-symbol {
+  color: var(--acess-destaque);
+  font-size: 1.5625rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.accessibility-option small {
+  color: var(--acess-mudo);
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+.font-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+}
+.font-stepper button {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  border: 1px solid var(--acess-borda);
+  border-radius: 6px;
+  background: var(--acess-superficie);
+  color: var(--acess-texto);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.font-stepper button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.font-stepper output {
+  font-size: 0.75rem;
+}
+.appearance-options > p:not(.preferences-hint) {
+  margin: -7px 0 12px;
+  color: var(--acess-mudo);
+  font-size: 0.75rem;
+}
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+.theme-options button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 87px;
+  padding: 11px 12px;
+  border: 1px solid var(--acess-borda);
+  border-radius: 12px;
+  background: var(--acess-painel);
+  color: var(--acess-texto);
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.theme-options button > span {
+  font-size: 1.3125rem;
+}
+.theme-options button small {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.theme-options button[aria-pressed='true'] {
+  padding: 10px 11px;
+  border: 2px solid var(--acess-destaque);
+  background: var(--acess-suave);
+  color: var(--acess-destaque);
+}
+.preferences-hint {
+  margin: 12px 0 0;
+  color: var(--acess-mudo);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+}
+.libras-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  border: 1px solid var(--acess-borda);
+  border-radius: 13px;
+  background: var(--acess-superficie);
+}
+.libras-row > span {
+  color: var(--acess-destaque);
+  font-size: 1.625rem;
+}
+.libras-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.libras-row strong {
+  font-size: 0.875rem;
+}
+.libras-row p {
+  margin: 6px 0 0;
+  color: var(--acess-mudo);
+  font-size: 0.6875rem;
+}
+.assistive-options > .button {
+  width: 100%;
+  white-space: normal;
+}
+.assistive-options [role='status'] {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+}
+.preferences-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 10px;
+}
+.preferences-actions button {
+  min-width: 0;
+  min-height: 45px;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--acess-suave);
+  color: var(--acess-texto);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.preferences-actions .save-preferences {
+  background: var(--acess-acao);
+  color: var(--acess-sobre-acao);
+}
+.accessibility-body > .preferences-hint {
+  margin-top: -14px;
+  text-align: center;
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.accessibility-grid, .preferences-actions, .theme-options) {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (max-width: 600px) {
+  .accessibility-launcher {
+    right: 12px;
+    bottom: 14px;
+    width: 46px;
+    height: 46px;
+  }
+  .accessibility-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    margin: auto 0 0;
+    border-radius: 26px 26px 0 0;
+  }
+  .accessibility-heading {
+    grid-template-columns: 1fr 32px;
+    padding: 24px 22px 12px;
+    background: var(--acess-painel);
+  }
+  .accessibility-heading::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: calc(50% - 28px);
+    width: 56px;
+    height: 5px;
+    border-radius: 4px;
+    background: var(--acess-borda);
+  }
+  .accessibility-symbol,
+  .personalization-tag {
+    display: none;
+  }
+  .accessibility-body {
+    gap: 22px;
+    padding-top: 10px;
+  }
+  .appearance-options {
+    order: -1;
+  }
+}
+
+/* ---------- Espaçamentos, fonte legível e links ---------- */
+/* Nível 0 mantém o espaçamento original de cada componente. */
+html[data-letras]:not([data-letras='0']) :where(body, body *) {
+  letter-spacing: var(--leitura-espaco-letras) !important;
+}
+html[data-linhas]:not([data-linhas='0']) :where(body, body *) {
+  line-height: var(--leitura-altura-linhas) !important;
+}
+html[data-legivel='true']
+  :where(body, body *):not(
+    code,
+    kbd,
+    samp,
+    pre,
+    .mod-username span,
+    .mod-tag,
+    .mod-meta-box p,
+    .mod-queue-name small,
+    .gate-form input,
+    svg,
+    svg *
+  ) {
+  font-family: Verdana, Tahoma, Arial, sans-serif !important;
+}
+html[data-links='true'] a {
+  text-decoration-line: underline !important;
+  text-decoration-thickness: 0.13em !important;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: auto;
+}
+
+/* ---------- Alto contraste ----------
+   Preto, branco e amarelo em todo o site, independente do tema claro ou escuro. Imagens,
+   ícones, gráficos e o fórum (outra aplicação, num quadro) não mudam. */
+html[data-contrast='high'] {
+  color-scheme: dark;
+  background: #000;
+}
+/* :where() deixa a regra geral com pouco peso: links, botões e itens escolhidos (abaixo)
+   conseguem sobrepor. */
+html[data-contrast='high'] body,
+html[data-contrast='high']
+  body
+  :where(*:not(svg, svg *, img, picture, video, canvas, iframe, .rp-legend i)) {
+  background-color: #000 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html[data-contrast='high'] body *::before,
+html[data-contrast='high'] body *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html[data-contrast='high'] :is(a, a *) {
+  color: #ffed4a !important;
+}
+/* Contorno de 2 px desenhado por dentro (sombra interna): marca botões e campos sem mudar o
+   tamanho deles, então ligar o contraste não empurra nada para fora da tela. */
+html[data-contrast='high'] :is(button, .button, [role='button'], input, select, textarea) {
+  box-shadow: inset 0 0 0 2px #fff !important;
+}
+html[data-contrast='high'] :is(input, textarea)::placeholder {
+  color: #d9d9d9 !important;
+  opacity: 1;
+}
+/* O que está escolhido ou ativo aparece em amarelo, com texto preto. */
+html[data-contrast='high']
+  :is(
+    [aria-pressed='true'],
+    [aria-current='page'],
+    [aria-current='true'],
+    [aria-selected='true'],
+    .active,
+    .is-active
+  ) {
+  background-color: #ffed4a !important;
+  color: #000 !important;
+  border-color: #ffed4a !important;
+  box-shadow: inset 0 0 0 2px #ffed4a !important;
+}
+html[data-contrast='high']
+  :is(
+    [aria-pressed='true'],
+    [aria-current='page'],
+    [aria-current='true'],
+    [aria-selected='true'],
+    .active,
+    .is-active
+  )
+  * {
+  background-color: transparent !important;
+  color: #000 !important;
+}
+/* Bolinhas de status, separadores e a bolinha da demonstração não têm texto: com o fundo preto,
+   sumiriam. Ficam brancas, ou pretas no item escolhido (amarelo); as cores da legenda dos
+   gráficos continuam. */
+html[data-contrast='high'] :is(i[aria-hidden='true'], .hero-badge > span):empty:not(.rp-legend i) {
+  background-color: #fff !important;
+}
+html[data-contrast='high']
+  :is(
+    [aria-pressed='true'],
+    [aria-current='page'],
+    [aria-current='true'],
+    [aria-selected='true'],
+    .active,
+    .is-active
+  )
+  :is(i[aria-hidden='true'], .hero-badge > span):empty:not(.rp-legend i) {
+  background-color: #000 !important;
+}
+html[data-contrast='high'] .notification-button > i {
+  background-color: #ffed4a !important;
+}
+/* Barras de progresso e ocupação. */
+html[data-contrast='high'] :is([role='progressbar'] > span, .uh-pbar > i, .sp-cost-bar > i) {
+  background-color: #ffed4a !important;
+}
+html[data-contrast='high'] progress {
+  accent-color: #ffed4a;
+}
+html[data-contrast='high'] progress::-webkit-progress-bar {
+  background: #000;
+  border: 1px solid #fff;
+}
+html[data-contrast='high'] progress::-webkit-progress-value {
+  background: #ffed4a;
+}
+html[data-contrast='high'] progress::-moz-progress-bar {
+  background: #ffed4a;
+}
+html[data-contrast='high'] :is(button, .button, input, select, textarea):disabled {
+  opacity: 0.7;
+}
+html[data-contrast='high']
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #ffed4a !important;
+  outline-offset: 3px;
+}
+html[data-contrast='high'] .field-error,
+html[data-contrast='high'] [role='alert'] {
+  color: #ffb6cb !important;
+}
+
+/* ---------- Texto ampliado (data-ampliado) ----------
+   Letra de 125% a 200%, espaçamentos ou fonte legível: o que ficava lado a lado passa a
+   quebrar linha ou a ficar em coluna, para não cortar texto nem criar rolagem lateral. */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.hero-actions, .header-tools, .actions, .button-row, .filter-bar) {
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false']) :is(.badge, .button, .demo-strip button) {
+  white-space: normal;
+}
+/* Header: com o texto ampliado, a cápsula deixa de ser fixa e entra no fluxo da página, com altura
+   livre e itens que quebram linha (como na 2.0). Assim nada sai da tela nem se sobrepõe, e as
+   telas não precisam mais reservar a altura do header. */
+html[data-ampliado]:not([data-ampliado='false']) {
+  --tt-header-offset: 0px;
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.public-shell, .account-shell, .app-shell)
+  > .header {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: var(--tt-header-height) !important;
+  margin: var(--tt-header-top) 8px 0 !important;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  border-radius: 28px !important;
+}
+html[data-ampliado]:not([data-ampliado='false']) .header :is(.public-navigation, .header-tools) {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+html[data-ampliado]:not([data-ampliado='false']) .tabs {
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false']) .auth-symbol {
+  width: 1.75em;
+  height: 1.75em;
+}
+/* Na página inicial do usuário, a faixa da demonstração fica sobre a foto num espaço fixo;
+   com o texto ampliado ela ganha várias linhas, então passa a ocupar o próprio espaço. */
+html[data-ampliado]:not([data-ampliado='false']) .app-shell.hero-shell {
+  padding-top: var(--tt-header-offset);
+}
+html[data-ampliado]:not([data-ampliado='false']) .hero-shell > .demo-strip {
+  position: static;
+  padding: 12px 16px 0;
+}
+html[data-ampliado]:not([data-ampliado='false']) .user-home .hero {
+  padding-top: 2.5rem;
+}
+
+/* Componentes com medidas fixas em px, encontrados pela checagem de texto ampliado
+   (todas as telas, de 320 a 1920 px, de 100% a 200%, com e sem os espaçamentos). */
+html[data-ampliado]:not([data-ampliado='false'])
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    dt,
+    dd,
+    label,
+    legend,
+    a,
+    button,
+    strong,
+    small,
+    span,
+    b,
+    em,
+    div
+  ) {
+  /* anywhere deixa a palavra (ou o valor, como "R$ 145.500,00") quebrar quando não cabe, até
+     dentro de cartões estreitos. O menu, que encolheria até virar uma coluna de letras, fica
+     no botão ☰ e com os links sem quebra (regras abaixo). */
+  overflow-wrap: anywhere;
+}
+html[data-ampliado]:not([data-ampliado='false']) :where(select, input, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+/* Grades de cartões: a largura mínima acompanha a letra e nunca passa da tela. */
+html[data-ampliado]:not([data-ampliado='false']) .metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-strip {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-grid-cards {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18.75rem), 1fr));
+}
+/* Lado a lado vira coluna. */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.sp-proposals-layout, .sp-inventory-layout, .consolidation-event-list) {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* Em coluna única (supplier.css), "1fr" não deixa o cartão encolher abaixo do conteúdo. */
+@media (max-width: 1020px) {
+  html[data-ampliado]:not([data-ampliado='false']) .sp-grid-proposals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-form-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-form-grid > * {
+  grid-column: auto !important;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-info-row {
+  flex-direction: column;
+  gap: 2px;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-info-row :is(dt, dd) {
+  min-width: 0;
+  flex-shrink: 1;
+}
+html[data-ampliado]:not([data-ampliado='false']) .rp-legend li {
+  grid-template-columns: 14px minmax(0, 1fr);
+}
+html[data-ampliado]:not([data-ampliado='false']) .rp-legend li > :nth-child(n + 3) {
+  grid-column: 2;
+}
+/* Linhas com título e ação, filtros e etiquetas quebram linha. */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(
+    .panel-heading,
+    .section-row,
+    .page-title,
+    .ah-highlight,
+    .mod-triage,
+    .mod-chip,
+    .mod-row-extra,
+    .sp-values,
+    .sp-date-box,
+    .sp-filter-head,
+    .sp-preference,
+    .consolidation-partner,
+    .consolidation-section-heading,
+    .consolidation-event-option
+  ) {
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-values > * {
+  min-width: 0;
+}
+/* Selos ao lado do rótulo (verificado, bloqueado) passam para a linha de baixo. */
+html[data-ampliado]:not([data-ampliado='false']) .sp-field-aside {
+  position: static;
+  display: block;
+}
+/* Carrossel da página inicial: o título e o texto do slide entram no fluxo e a altura acompanha
+   o texto (a foto continua cobrindo o quadro inteiro, presa ao .uh-car). */
+html[data-ampliado]:not([data-ampliado='false']) .uh-car {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  height: auto;
+  min-height: 25.625rem;
+  padding: 14px 18px 24px;
+}
+@media (max-width: 900px) {
+  html[data-ampliado]:not([data-ampliado='false']) .uh-car {
+    min-height: 23.75rem;
+  }
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-car-top {
+  position: relative;
+  inset: auto;
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-slide {
+  position: static;
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-tx {
+  position: relative;
+  inset: auto;
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-tx .uh-price {
+  width: auto;
+  justify-self: start;
+}
+html[data-ampliado]:not([data-ampliado='false']) .uh-car-msg {
+  margin: auto;
+}
+/* Tabela do inventário: rola dentro do próprio quadro. */
+html[data-ampliado]:not([data-ampliado='false']) .sp-inventory-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-inventory-table table {
+  min-width: 42.5rem;
+}
+html[data-ampliado]:not([data-ampliado='false']) :is(.sp-select, .ah-filters label) {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+html[data-ampliado]:not([data-ampliado='false']) :is(.sp-select, .ah-filters) select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+html[data-ampliado]:not([data-ampliado='false']) .mod-row-text code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-quote-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.mod-triage > div, .sp-side-title, .sp-demand-head, .sp-demand-foot, .sp-organizer > div) {
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false']) .sp-quote-side > * {
+  min-width: 0;
+}
+html[data-ampliado]:not([data-ampliado='false']) .mod-chip {
+  max-width: 100%;
+  white-space: normal;
+}
+/* "1fr" não encolhe abaixo do conteúdo; com o texto ampliado, a coluna única pode encolher. */
+html[data-ampliado]:not([data-ampliado='false']) :is(.mod-layout, .dashboard-layout) {
+  grid-template-columns: minmax(0, 1fr);
+}
+html[data-ampliado]:not([data-ampliado='false']) :is(.mod-layout, .dashboard-layout) > * {
+  min-width: 0;
+}
+/* O tema escuro fixa a cor do botão "Criar conta" com !important; no alto contraste, o link
+   segue amarelo sobre preto (esta regra tem o mesmo peso e vem depois). */
+html[data-contrast='high'] .header a.header-cta,
+html[data-contrast='high'] .header a.header-cta * {
+  color: #ffed4a !important;
+}
+/* Links do menu não quebram por dentro: se não couberem, o menu recolhe no botão ☰. */
+html[data-ampliado]:not([data-ampliado='false'])
+  .header
+  :is(.app-navigation, .public-navigation)
+  a {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+/* Com o texto ampliado, o menu fica sempre no botão ☰ (Navbar.jsx). Fechado, ele sai do
+   layout: com o header no fluxo da página, um menu escondido mas posicionado alargaria a página. */
+html[data-ampliado]:not([data-ampliado='false'])
+  .app-header.is-compact
+  .app-navigation:not(.is-open) {
+  display: none;
+}
+/* Títulos e textos ao lado de ações podem encolher; a palavra longa quebra (break-word). */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.page-title, .section-row, .panel-heading)
+  > * {
+  min-width: 0;
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.sp-pill, .sp-protocol, .sp-tag, .badge, .mod-pill, .sp-callout-link) {
+  white-space: normal;
+}
+/* Botões e chips: o rótulo não quebra dentro da palavra (viraria uma coluna de letras); se não
+   couber, o botão inteiro passa para a linha de baixo. */
+html[data-ampliado]:not([data-ampliado='false']) :is(button, .button, .mod-chip, [role='button']),
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(button, .button, .mod-chip, [role='button'])
+  * {
+  overflow-wrap: normal;
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.demo-strip, .ah-date, .ah-rows > div, .consolidation-budget > div, .supplier-row-actions) {
+  flex-wrap: wrap;
+}
+/* Paginações: os botões e o "Página x de y" quebram linha. */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.pager, .pager-nav, .sp-pagination, .sp-pagination nav, .mod-pager) {
+  flex-wrap: wrap;
+}
+
+/* Tabelas rolam dentro do próprio quadro (.table-wrap): a palavra não quebra no meio, e cada
+   coluna fica pelo menos com a largura da maior palavra. */
+html[data-ampliado]:not([data-ampliado='false']) :is(td, th),
+html[data-ampliado]:not([data-ampliado='false']) :is(td, th) * {
+  overflow-wrap: normal;
+}
+/* Texto ao lado de ícone, preço ou botão: com pouco espaço, o texto ganha a linha inteira e o
+   resto passa para baixo (em vez de virar uma coluna de letras). */
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.consolidation-event-option, .sp-security-card, .rp-info-box) {
+  flex-wrap: wrap;
+}
+html[data-ampliado]:not([data-ampliado='false'])
+  :is(.consolidation-event-option > span:first-child, .sp-security-card > div, .rp-info-box > div) {
+  flex: 1 1 10rem;
+}
+/* Documentos da cotação, resumo da consolidação, dados e totais do relatório: menos colunas
+   quando o texto cresce. */
+html[data-ampliado]:not([data-ampliado='false']) .sp-docs {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .rp-info {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .rp-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .consolidation-status-summary {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+}
+html[data-ampliado]:not([data-ampliado='false']) .rp-occupancy {
+  white-space: normal;
+}
+/* Gráfico de rosca: o furo tem tamanho fixo, então o total sai dele e fica logo abaixo. */
+html[data-ampliado]:not([data-ampliado='false']) .donut-chart {
+  flex-shrink: 1;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+}
+html[data-ampliado]:not([data-ampliado='false']) .donut-chart-canvas {
+  width: 240px;
+  max-width: 100%;
+  height: 240px;
+}
+html[data-ampliado]:not([data-ampliado='false']) .donut-chart-center {
+  position: static;
+  margin-top: 8px;
+  text-align: center;
+}

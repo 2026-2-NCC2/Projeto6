@@ -67,6 +67,12 @@ function useMenuCompacto(headerRef, navRef, ativo) {
     }
     function medir() {
       if (nav.classList.contains('is-open')) return; // aberto (em coluna): mantém a decisão
+      // Letra maior, espaçamentos ou fonte legível (painel de acessibilidade, etapa 8): o header
+      // quebra linha e a medida abaixo deixa de valer; o menu fica no botão ☰.
+      if (document.documentElement.dataset.ampliado === 'true') {
+        setCompacto(true);
+        return;
+      }
       const links = [...nav.querySelectorAll('a')].filter((link) => link.offsetWidth > 0);
       const marca = header.querySelector('.brand');
       const ferramentas = header.querySelector('.header-tools');
@@ -78,9 +84,15 @@ function useMenuCompacto(headerRef, navRef, ativo) {
     }
     const observador = new ResizeObserver(medir);
     [header, nav, header.querySelector('.header-tools')].filter(Boolean).forEach((el) => observador.observe(el));
+    // Mede de novo quando as preferências de acessibilidade mudam o layout do header.
+    const preferencias = new MutationObserver(medir);
+    preferencias.observe(document.documentElement, { attributeFilter: ['data-ampliado'] });
     medir();
     document.fonts?.ready.then(medir).catch(() => {});
-    return () => observador.disconnect();
+    return () => {
+      observador.disconnect();
+      preferencias.disconnect();
+    };
   }, [headerRef, navRef, ativo]);
   return compacto;
 }

@@ -12,7 +12,7 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .rp-crumbs a {
@@ -69,7 +69,7 @@
   border-radius: 999px;
   background: #fef3c7;
   color: #7c3f00;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .rp-tag::before {
@@ -81,7 +81,7 @@
 }
 .rp-title {
   margin: 26px 0 8px;
-  font-size: clamp(32px, 4vw, 46px);
+  font-size: clamp(2rem, 4vw, 2.875rem);
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: -1.2px;
@@ -131,7 +131,7 @@
 }
 .rp-info-box small {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: light-dark(#687385, var(--tt-muted));
@@ -139,11 +139,11 @@
 .rp-info-box strong {
   display: block;
   margin: 2px 0;
-  font-size: 22px;
+  font-size: 1.375rem;
   overflow-wrap: anywhere;
 }
 .rp-info-box > div > span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .rp-stars {
@@ -168,14 +168,14 @@
   border-left: 1px solid var(--line);
 }
 .rp-facts dt {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: light-dark(#687385, var(--tt-muted));
 }
 .rp-facts dd {
   margin: 6px 0 0;
-  font-size: 19px;
+  font-size: 1.1875rem;
   font-weight: 800;
   overflow-wrap: anywhere;
 }
@@ -201,14 +201,14 @@
 }
 .rp-eyebrow {
   margin: 0 0 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 1px;
   color: light-dark(#687385, var(--tt-muted));
 }
 .rp-sales-head h2 {
   margin: 0;
-  font-size: clamp(22px, 2.4vw, 30px);
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
   font-weight: 900;
   letter-spacing: -1px;
 }
@@ -222,7 +222,7 @@
 .rp-occupancy small {
   display: block;
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .rp-pill {
@@ -232,7 +232,7 @@
   border-radius: 8px;
   background: light-dark(#ecfdf5, var(--tt-surface-soft));
   color: #006548;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 .rp-progress {
@@ -263,19 +263,19 @@
 }
 .rp-kpis small {
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .rp-kpis strong {
   display: block;
   margin: 4px 0;
-  font-size: clamp(20px, 2.4vw, 28px);
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
   font-weight: 800;
   overflow-wrap: anywhere;
 }
 .rp-kpis em,
 .rp-kpis span {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-style: normal;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
@@ -293,7 +293,7 @@
 }
 .rp-chart-head h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 800;
   letter-spacing: 0.5px;
 }
@@ -312,6 +312,11 @@
   width: 240px;
   height: 240px;
 }
+.donut-chart-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 .donut-chart-center {
   position: absolute;
   inset: 0;
@@ -322,11 +327,11 @@
   pointer-events: none;
 }
 .donut-chart-center small {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#687385, var(--tt-muted));
 }
 .donut-chart-center strong {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 900;
   letter-spacing: -0.5px;
 }
@@ -343,7 +348,7 @@
   align-items: center;
   gap: 10px;
   padding: 7px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .rp-legend i {
   width: 14px;
@@ -374,18 +379,18 @@
 }
 .rp-table-head h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .rp-table-head p {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .rp-rows {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .rp-rows select {
@@ -404,7 +409,7 @@
 .rp-table th {
   padding: 14px 24px;
   background: light-dark(#f8fafd, var(--tt-surface-soft));
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: light-dark(#506583, var(--tt-muted));
@@ -414,7 +419,7 @@
   padding: 16px 24px;
 }
 .rp-table td code {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #1e3a8a;
 }

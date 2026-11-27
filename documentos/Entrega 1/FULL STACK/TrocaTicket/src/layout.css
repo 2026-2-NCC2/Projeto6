@@ -168,7 +168,7 @@ html {
 
 /* ---------- Menu: hover, foco e página atual iguais no público e no interno ---------- */
 .header :is(.public-navigation, .app-navigation) {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.025em;
 }
@@ -270,7 +270,7 @@ html {
 .app-shell > .demo-strip {
   align-items: center;
   padding-top: 16px;
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .demo-strip span i {
   display: inline-block;
@@ -296,7 +296,7 @@ html {
   background: rgba(245, 158, 11, 0.1);
   color: #f7f9ff;
   font: inherit;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 650;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -330,7 +330,7 @@ html {
   text-transform: none;
 }
 .demo-caret {
-  font-size: 10px;
+  font-size: 0.625rem;
   opacity: 0.8;
 }
 .demo-switcher-panel {
@@ -351,14 +351,14 @@ html {
 .demo-switcher-title {
   margin: 0 0 10px;
   padding: 0 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .demo-switcher-title small {
   display: block;
   margin-top: 3px;
   color: var(--tt-muted, #5b6880);
-  font-size: 11.5px;
+  font-size: 0.71875rem;
   font-weight: 450;
 }
 .demo-switcher-panel ul {
@@ -379,7 +379,7 @@ html {
   background: transparent;
   color: inherit;
   font: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -397,7 +397,7 @@ html {
 .demo-option small {
   margin-left: auto;
   color: #6d5bd0;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
 }
 .demo-option-icon {
@@ -407,7 +407,7 @@ html {
   place-items: center;
   border-radius: 9px;
   color: #fff;
-  font-size: 14px;
+  font-size: 0.875rem;
   background: #2860ed;
 }
 .demo-option.organizador .demo-option-icon {
@@ -426,7 +426,7 @@ html {
   margin-top: 10px;
   padding: 10px 4px 0;
   border-top: 1px solid var(--tt-border, #e3e9f3);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .demo-switcher-foot a,
 .demo-switcher-foot button {
@@ -493,7 +493,7 @@ html[data-theme='dark'] .demo-switcher-foot button {
   background: rgba(255, 255, 255, 0.06);
   color: #f7f9ff;
   font: inherit;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -539,7 +539,7 @@ html[data-theme='dark'] .demo-switcher-foot button {
   border: 1px solid var(--tt-border, #e3e9f3);
   border-radius: 8px;
   background: var(--tt-surface-soft, #f3f6fb);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 html[data-theme='dark'] .language-panel {
@@ -606,7 +606,7 @@ html[data-theme='dark'] .language-code {
   border-radius: 15px;
   background: #141414;
   box-shadow: 0 10px 25px #0002;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .app-header.is-compact .app-navigation.is-open a {
   justify-content: flex-start;
@@ -621,7 +621,7 @@ html[data-theme='dark'] .language-code {
   border: 0;
   background: none;
   color: white;
-  font-size: 23px;
+  font-size: 1.4375rem;
 }
 
 /* ---------- Header em qualquer largura: tudo cabe numa linha ---------- */
@@ -667,7 +667,7 @@ html[data-theme='dark'] .language-code {
 @media (max-width: 620px) {
   .header .brand {
     gap: 8px;
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
   .header .brand img {
     width: 34px;
@@ -678,7 +678,7 @@ html[data-theme='dark'] .language-code {
   }
   .header .public-navigation {
     gap: 4px;
-    font-size: 10.5px;
+    font-size: 0.65625rem;
   }
   .header .public-navigation a:not(.header-cta) {
     padding: 8px 10px;

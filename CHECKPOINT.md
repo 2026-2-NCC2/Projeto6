@@ -1,5 +1,106 @@
 # Integração TrocaTicket
 
+## Integração com a TrocaTicket 2.0 — etapa 8: ferramentas de acessibilidade (27/11/2026)
+
+Etapa iniciada com autorização do usuário ("pode ir para a proxima etapa pf") sobre o commit da etapa 7 (43f7a9b). Sobre o VLibras, o usuário escolheu "Incluir, só ao clicar": o script do governo só é baixado quando a pessoa clica em "Ativar VLibras". Houve interrupções por limite de uso; os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.
+
+**O que entrou**
+- `src/acessibilidade/` (novo), adaptado de src/accessibility da 2.0:
+  - `preferencias.js` (de preferences.js): valida, lê e grava as preferências (`localStorage`, chave `trocaticket-acessibilidade`, com versão), resolve o tema do sistema e aplica tudo no `<html>`.
+    - Atributos: `data-theme`, `data-contrast`, `data-fonte`, `data-letras`, `data-linhas`, `data-legivel` e `data-links`.
+    - Também aplica o tamanho base da página e `data-ampliado`.
+    - Sem preferências salvas, o tema vem da escolha antiga do botão claro/escuro (`trocaticket-theme`).
+  - `index.js` (de PreferencesProvider.jsx): estado de módulo com `usePreferencias()`, como o idioma.
+    - Prévia que só vale depois de salvar; restaurar padrão.
+    - `definirTema` para o botão do header e para o fórum.
+    - Acompanha o tema do aparelho e o que outra aba salvou.
+    - Grava o tema já resolvido em `trocaticket-theme`, que o fórum Troca-Papo lê.
+  - `vlibras.js`: carrega `https://vlibras.gov.br/app/vlibras-plugin.js` só depois do clique, com limite de 15 segundos e aviso de falha.
+- `src/components/acessibilidade/` (novo):
+  - `PainelAcessibilidade.jsx` (de AccessibilityTools.jsx): botão flutuante em todas as páginas e o painel. O painel tem tamanho da letra (100% a 200%), alto contraste, espaço entre letras e entre linhas (níveis 0 a 3), fonte legível, destacar links, tema claro/escuro/sistema, VLibras, "Restaurar padrão" e "Salvar preferências".
+  - `JanelaPreferencias.jsx` (de PreferenceDialog.jsx): `<dialog>` com foco contido; Esc, × e clique fora fecham, e o foco volta ao botão.
+- `src/acessibilidade.css` (novo, de accessibility.css e appearance.css), com quatro blocos:
+  - **Painel:** estilos nos temas claro, escuro e alto contraste.
+  - **Leitura:** espaçamentos, fonte legível e links destacados.
+  - **Alto contraste** (preto, branco e amarelo):
+    - imagens, ícones, gráficos e o quadro do fórum não mudam;
+    - botões e campos ganham um contorno desenhado por dentro, que não muda o tamanho deles;
+    - itens escolhidos ficam amarelos com texto preto;
+    - bolinhas de status ficam brancas e a de notificação, amarela.
+  - **Texto ampliado:** quando a letra passa de 100% ou um espaçamento ou a fonte legível está ligado, o `<html>` recebe `data-ampliado="true"`. Então:
+    - o header entra no fluxo da página e o menu fica no ☰;
+    - linhas lado a lado quebram ou viram coluna;
+    - tabelas rolam dentro do próprio quadro;
+    - o carrossel da página inicial cresce com o texto;
+    - o total do gráfico de rosca sai do furo e fica abaixo dele.
+- **Letra grande de verdade:** 593 declarações de `font-size` e `line-height` em px passaram a rem, em 11 arquivos CSS (divisão exata por 16). O tamanho escolhido muda o tamanho base da página, e com a letra em 100% nada muda. Não sobrou tamanho de texto em px no CSS do site.
+- **Arquivos ajustados:**
+  - `src/App.jsx`: o tema vem das preferências; o botão claro/escuro e o fórum usam `definirTema`; o painel aparece em todas as rotas, inclusive no fórum público.
+  - `src/main.jsx`: importa `acessibilidade.css` por último.
+  - `src/components/Navbar.jsx`: com texto ampliado, o menu fica no ☰, e ele mede de novo quando `data-ampliado` muda.
+  - `src/components/DonutChart.jsx` e `report.css`: o canvas ganhou um quadro só dele (`.donut-chart-canvas`), porque o Chart.js mede esse quadro; com a letra em 100%, o gráfico fica igual.
+- Traduções: `src/i18n/textos/lote10.js`, com 38 linhas reaproveitadas de settingsMessages.js da 2.0.
+- Testes: `src/tests/acessibilidade.test.js` (6 testes) e o roteiro de navegador `scripts/e2e/acessibilidade.py`.
+
+**Defeitos antigos encontrados e corrigidos (axe, ordem dos títulos)**
+- Meus ingressos vazio pulava de h1 para h3; o título passou a h2. É a única mudança visível com tudo desligado: o parágrafo abaixo desceu 2 px, a mesma margem dos outros estados vazios com h2.
+- Cotação do fornecedor: "DEMANDA EM CONCORRÊNCIA" virou um título h2, com a mesma aparência de antes.
+- Moderação: os títulos dos quadros de dados passaram de h3 para h2, com a mesma aparência.
+
+**Defeitos que eu introduzi e corrigi antes do commit**
+- **Quebra de palavras:** a regra que deixa palavras quebrarem com a letra grande transformava links do menu e rótulos de botões em colunas de letras. Agora o menu fica no ☰ e botões e links do menu não quebram palavras.
+- **Peso dos seletores no alto contraste:**
+  - a regra geral pesava mais que as de links e itens escolhidos, que ficavam sem o amarelo (corrigido com `:where()`);
+  - o tema escuro fixava a cor do botão "Criar conta" com `!important` e ganhava do contraste (corrigido com uma regra de mesmo peso, depois).
+- **Bordas que empurravam o layout:** no alto contraste, a borda de 2 px dos botões empurrava o header e os filtros da moderação para fora da tela a 320 px. Virou contorno interno.
+- **Sumiços no fundo preto:** a bolinha da demonstração e a de notificação sumiam no alto contraste.
+- **Leitura em 100%:** com espaçamento ou fonte legível e a letra em 100%, o layout de letra grande não entrava (header fora da tela a 320 e 768 px, faixa da demonstração sobre o selo da página inicial). Resolvido com `data-ampliado`.
+- **Título da cotação:** o novo h2 ficou 11 px mais alto por uma regra `.workspace h2`; achado na comparação pixel a pixel e corrigido.
+- **Roteiro de navegador:**
+  - o filtro de pedidos externos confundia o módulo local `vlibras.js` com o site do governo;
+  - um rótulo em inglês estava errado no roteiro (o site estava certo).
+
+**Testes executados (bancos e contas descartáveis)**
+- `npm run test:front`: 25/25 (19 anteriores e 6 novos de acessibilidade). API 79/79 em MariaDB e em MySQL 8, sem testes pulados. O servidor não mudou nesta etapa.
+- **Comparação pixel a pixel com o commit da etapa 7**, com as preferências no padrão, por capturas de 27 telas em 1366 e 390 px, nos temas claro e escuro (108 capturas):
+  - iguais, salvo três diferenças, todas explicadas;
+  - Meus ingressos vazio: os 2 px acima;
+  - borda da pílula "Criar conta": ruído de renderização, que também aparece entre duas capturas do próprio commit anterior;
+  - Eventos do visitante: depende dos dados da API; com a API bloqueada nas duas versões, ficou igual.
+- **Checagem de layout** (rolagem lateral, textos sobrepostos, texto em coluna de letras e botões do header fora da tela), em 27 telas (visitante e os quatro perfis da demonstração) e 6 larguras (320 a 1920 px), com zero problemas em todos os modos:
+  - letra de 100% a 200%: 810 medições;
+  - leitura no máximo (letras e linhas no nível 3, fonte legível e links destacados) de 100% a 200%: 810 medições;
+  - alto contraste em 100% e 200%: 324 medições;
+  - leitura no máximo e alto contraste juntos, em 100% e 200%: 324 medições.
+- **axe 4.14.1:** zero violações em 216 auditorias (27 telas, 1366 e 390 px; alto contraste claro e escuro, letra 200% e leitura no máximo) e em 8 combinações com o painel aberto (claro, escuro, contraste e letra 200%, em 1366 e 390 px).
+- **Navegador** (Chromium com Playwright). `acessibilidade.py` passou:
+  - painel: foco contido, Esc, clique fora, botão em todas as áreas e nenhum acesso a vlibras.gov.br sem clique;
+  - prévia desfeita ao fechar; gravação mantida ao recarregar; restaurar padrão;
+  - tema do sistema acompanhando o aparelho; o botão do header fixa claro ou escuro;
+  - VLibras com rede bloqueada (aviso e nova tentativa), carregado (simulado) e em inglês (volta ao português);
+  - armazenamento bloqueado: aviso, e a escolha vale na visita;
+  - outra aba aplica o que foi salvo;
+  - texto ampliado: o contraste não muda tamanhos; o espaçamento em 100% quebra linha; o menu fica no ☰; sem rolagem lateral em 320 e 1366 px.
+- **VLibras real:** com `--vlibras-real`, o script oficial **não carregou neste ambiente** (sem acesso à rede do governo). O carregamento real não foi testado aqui.
+- **Regressão** (API e MariaDB reais): `navegador.py` (`regressao`, `compra` e `recusado`), `repasse.py`, `portaria.py`, `administracao.py` e `idiomas.py` passaram, com axe sem violações. `idiomas.py` fez 290 combinações e 960 medições do header.
+- **Build e conferências:**
+  - o build passou;
+  - Prettier: os mesmos 51 arquivos antigos fora do padrão; nenhum novo ou convertido entrou na lista;
+  - nenhum identificador sem declaração;
+  - dicionários: 2.101 linhas, 0 erros, as mesmas 25 chaves repetidas de antes;
+  - o único texto novo sem tradução é a mensagem interna de erro de `vlibras.js`, que não aparece na tela.
+
+**Pendências e riscos**
+- **VLibras:** testar num computador com internet. Clique em "Ativar VLibras" e confira se o botão do VLibras aparece no canto da tela.
+- **Fórum:** o Troca-Papo (outra aplicação, num quadro) acompanha só o tema; letra, espaçamentos e alto contraste não valem dentro do quadro.
+- **Alto contraste:** é um modo do próprio site. O modo de contraste do Windows continua sendo aplicado pelo navegador, por cima.
+- **Traduções:** as 38 linhas do painel vieram da 2.0 e não foram revisadas por falantes nativos.
+- **Achados de passagem, fora do escopo:**
+  - a tela de entrada mostra "Mostrar palavra-passe" e "Esqueceu-se da sua palavra-passe?" (português de Portugal), texto que já estava no código da equipe antes da integração;
+  - `InventoryTable.jsx` importa `kindOf` sem usar.
+- Pendências anteriores continuam (ver etapas 6 e 7).
+- **Próximo passo:** aguardar a confirmação do usuário para publicar ou para outra etapa.
+
 ## Integração com a TrocaTicket 2.0 — etapa 7: idiomas do site (27/11/2026)
 
 Etapa iniciada sobre o commit da etapa 6 (3ae77de). O usuário chegou a passar o trabalho para o ChatGPT, que perguntou como tratar as mensagens de erro da API; a resposta foi a opção A (o site traduz, a API continua em português). Depois o usuário pediu que eu fizesse a etapa ("esgotou, ent pode fazer voce mesmo"). Houve duas interrupções (limite de uso e reinício da máquina); os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.

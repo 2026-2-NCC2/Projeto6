@@ -21,12 +21,12 @@
   align-items: center;
   gap: 10px;
   margin: 0;
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 .fc-section-head p {
   margin: 6px 0 0;
   color: #4c5b72;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* Campos */
@@ -50,14 +50,14 @@
   margin-bottom: 8px;
 }
 .fc-label-row label {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
   color: #243148;
 }
 .fc-grid.three .fc-label-row label {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
@@ -67,7 +67,7 @@
   color: #e11d48;
 }
 .fc-aside {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #687385;
   white-space: nowrap;
 }
@@ -105,7 +105,7 @@
   background: none;
   outline: none;
   padding: 13px 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--ink);
 }
 .fc-control input::placeholder {
@@ -137,7 +137,7 @@
 .fc-error {
   display: block;
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .fc-hint {
   color: #687385;
@@ -161,10 +161,10 @@
 }
 .fc-subhead h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
 }
 .fc-subhead span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #4c5b72;
 }
 .fc-toggle {
@@ -200,17 +200,17 @@
   display: block;
 }
 .fc-toggle-text strong {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .fc-toggle-text small {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #4c5b72;
 }
 .fc-badge {
   padding: 4px 12px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .fc-badge.on {
@@ -268,7 +268,7 @@
   border-radius: 50%;
   background: linear-gradient(135deg, #2860ed, #4735d4);
   color: white;
-  font-size: 44px;
+  font-size: 2.75rem;
   font-weight: 700;
   box-shadow:
     0 0 0 4px white,
@@ -298,7 +298,7 @@
 }
 .fc-photo-body h2 {
   margin: 0 0 14px;
-  font-size: 24px;
+  font-size: 1.5rem;
   overflow-wrap: anywhere;
 }
 .fc-photo-actions {
@@ -316,7 +316,7 @@
   border: 0;
   background: none;
   color: #e11d48;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .fc-link-danger:disabled {
@@ -324,7 +324,7 @@
 }
 .fc-photo-body p {
   margin: 14px 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #687385;
 }
 .fc-card > .field-error {
@@ -348,7 +348,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #4c5b72;
 }
 .fc-sync svg {

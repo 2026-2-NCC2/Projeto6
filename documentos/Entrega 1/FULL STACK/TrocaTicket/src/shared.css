@@ -21,7 +21,7 @@
   background: none;
   outline: none;
   padding: 10px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ink);
 }
 .search-box.wide {
@@ -29,7 +29,7 @@
 }
 .search-box.wide input {
   padding: 13px 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .button.soft,
@@ -48,7 +48,7 @@
   background: #f1f4f8;
   color: #243148;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .button.soft:hover {
   background: #e7ecf4;
@@ -71,7 +71,7 @@
   border-radius: 999px;
   background: #ecfdf5;
   color: #006548;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -100,7 +100,7 @@
   gap: 12px;
   flex-wrap: wrap;
   padding: 16px 4px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #506583;
 }
 .pager-summary strong {
@@ -120,7 +120,7 @@
   border-radius: 6px;
   background: white;
   color: #243148;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .pager-nav button:hover:not(:disabled):not(.active) {
   background: #f1f4f8;

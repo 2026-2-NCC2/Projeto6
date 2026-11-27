@@ -948,7 +948,7 @@ export function Tickets() {
         ))}
       </div>
       {!data.tickets.length && (
-        <Empty title={t('Sua próxima experiência começa aqui')}>
+        <Empty heading="h2" title={t('Sua próxima experiência começa aqui')}>
           {t('Explore os eventos e simule uma reserva para vê-la nesta página.')}
         </Empty>
       )}

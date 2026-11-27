@@ -28,7 +28,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -44,7 +44,7 @@
   border-radius: 8px;
   background: light-dark(#f8fafd, var(--tt-surface-soft));
   color: var(--ink);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
@@ -73,7 +73,7 @@
   margin-top: 18px;
   padding-top: 18px;
   border-top: 1px solid #edf1f6;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .ah-summary strong {
@@ -101,14 +101,14 @@
 }
 .ah-heading h2 {
   margin: 0;
-  font-size: 26px;
+  font-size: 1.625rem;
 }
 .ah-count {
   padding: 3px 12px;
   border-radius: 999px;
   background: light-dark(#e9ecff, var(--tt-surface-soft));
   color: #3730a3;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 .ah-lead {
@@ -147,13 +147,13 @@
   border-radius: 6px;
   background: light-dark(#eef0ff, var(--tt-surface-soft));
   color: #4338ca;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 1px;
 }
 .ah-card h3 {
   margin: 20px 0 4px;
-  font-size: 28px;
+  font-size: 1.75rem;
   letter-spacing: -0.8px;
   overflow-wrap: anywhere;
 }
@@ -184,13 +184,13 @@
 }
 .ah-date small {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.4px;
   color: light-dark(#526077, var(--tt-muted));
 }
 .ah-date strong {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 .ah-chip {
   margin-left: auto;
@@ -198,7 +198,7 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   background: light-dark(white, var(--tt-surface));
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: light-dark(#506583, var(--tt-muted));
   text-align: right;
 }
@@ -213,7 +213,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 7px 0;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .ah-rows dt {
   color: light-dark(#4c5b72, var(--tt-muted));
@@ -243,7 +243,7 @@
   border-radius: 10px;
   background: light-dark(#f7f5ff, var(--tt-surface-soft));
   color: #5b21b6;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .ah-highlight svg {
   flex-shrink: 0;
@@ -260,7 +260,7 @@
   border-radius: 12px;
   background: #101010;
   color: white;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
 }
@@ -296,7 +296,7 @@
   gap: 8px;
 }
 .oh-stat span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -312,12 +312,12 @@
 .oh-stat strong {
   display: block;
   margin-top: 14px;
-  font-size: 38px;
+  font-size: 2.375rem;
   line-height: 1;
 }
 .oh-stat small {
   margin-left: 4px;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
 }
 .oh-stat .blue,
@@ -358,7 +358,7 @@
 }
 .oh-section-head h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 1.75rem;
 }
 .oh-badge {
   margin-left: 8px;
@@ -366,7 +366,7 @@
   border-radius: 999px;
   background: light-dark(#e8f0ff, var(--tt-surface-soft));
   color: #2357e5;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
   vertical-align: middle;
 }
@@ -443,7 +443,7 @@
   border-radius: 999px;
   background: #2563eb;
   color: white;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -492,7 +492,7 @@
   display: block;
   padding: 10px 12px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .oh-menu-list a:hover {
   background: light-dark(#f1f4f8, var(--tt-surface-soft));
@@ -502,7 +502,7 @@
 }
 .oh-category {
   margin: 0 0 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -519,7 +519,7 @@
 }
 .oh-event-body h3 {
   margin: 0 0 12px;
-  font-size: 21px;
+  font-size: 1.3125rem;
   letter-spacing: -0.3px;
 }
 .oh-meta {
@@ -527,7 +527,7 @@
   align-items: flex-start;
   gap: 8px;
   margin: 6px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .oh-meta svg {
@@ -543,7 +543,7 @@
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid #edf1f6;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .oh-event-body footer a {
@@ -571,7 +571,7 @@
 }
 .oh-month-head h2 {
   margin: 0;
-  font-size: 28px;
+  font-size: 1.75rem;
 }
 .oh-month-head p {
   margin: 8px 0 0;
@@ -617,7 +617,7 @@
   gap: 8px;
 }
 .oh-month-top time {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#687385, var(--tt-muted));
 }
 .oh-date {
@@ -625,7 +625,7 @@
   border-radius: 6px;
   background: light-dark(#e8f0ff, var(--tt-surface-soft));
   color: #2357e5;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: 0.6px;
 }
@@ -639,12 +639,12 @@
 }
 .oh-month-card h3 {
   margin: 14px 0 6px;
-  font-size: 19px;
+  font-size: 1.1875rem;
   letter-spacing: -0.2px;
 }
 .oh-month-card p {
   margin: 0 0 16px;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .oh-month-card footer {
@@ -656,7 +656,7 @@
   margin-top: auto;
   padding-top: 14px;
   border-top: 1px solid #edf1f6;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .oh-month-card footer span {
   color: light-dark(#687385, var(--tt-muted));
@@ -709,7 +709,7 @@
   display: block;
 }
 .oh-month-list span {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .oh-month-list a {
@@ -727,7 +727,7 @@
 .oh-cal-head {
   padding: 10px;
   background: light-dark(#f8fafd, var(--tt-surface-soft));
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-align: center;
   color: light-dark(#4c5b72, var(--tt-muted));
@@ -747,7 +747,7 @@
 .oh-cal-cell b {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .oh-cal-cell button {
@@ -759,7 +759,7 @@
   border-radius: 4px;
   background: light-dark(#e8f0ff, var(--tt-surface-soft));
   color: #2357e5;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   text-align: left;
   overflow: hidden;
@@ -782,11 +782,11 @@
 }
 .oh-suppliers h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .oh-suppliers header p {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#4c5b72, var(--tt-muted));
 }
 .oh-suppliers header .text-link {
@@ -824,15 +824,15 @@
   white-space: nowrap;
 }
 .oh-suppliers li strong {
-  font-size: 16px;
+  font-size: 1rem;
 }
 .oh-suppliers li span {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: light-dark(#506583, var(--tt-muted));
 }
 .oh-suppliers em {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
 }
 .oh-suppliers li > button,
@@ -864,7 +864,7 @@
   border-radius: 10px;
   background: light-dark(#f8fafd, var(--tt-surface-soft));
   color: light-dark(#243148, var(--tt-ink));
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 .oh-invite:hover {

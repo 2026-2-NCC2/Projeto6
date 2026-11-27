@@ -18,7 +18,7 @@
   border-radius: 12px;
   background: #fff8e8;
   color: #5c3b00;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.5;
 }
 .app-shell > .approval-strip {
@@ -26,7 +26,7 @@
 }
 .approval-strip strong {
   display: block;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .approval-strip p {
   margin: 2px 0 0;
@@ -115,7 +115,7 @@ html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
 
 /* ---------- Painel geral ---------- */
 .admin-live .admin-metrics .metric .text-link {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .admin-live .ah-filters .button {
   white-space: nowrap;
@@ -140,12 +140,12 @@ html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
 }
 .admin-report-facts dt {
   color: var(--tt-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .admin-report-facts dd {
   margin: 2px 0 0;
   color: var(--tt-ink);
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 .admin-report .table-wrap:focus-visible {
@@ -186,7 +186,7 @@ html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
   align-items: center;
   gap: 8px;
   color: var(--tt-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .admin-profile-filter select {
@@ -223,12 +223,12 @@ html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
 }
 .approval-card-head h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   overflow-wrap: anywhere;
 }
 .approval-card-head p {
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .approval-facts {
   display: grid;
@@ -238,7 +238,7 @@ html[data-theme='dark'] #root :is(.rp-status.gray, .badge.gray) {
 }
 .approval-facts dt {
   color: var(--tt-muted);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 .approval-facts dd {

@@ -65,7 +65,11 @@ export default function DonutChart({ items, unit = 'un.', ariaLabel, children })
 
   return (
     <div className="donut-chart">
-      <canvas ref={canvas} role="img" aria-label={ariaLabel} />
+      {/* O Chart.js mede o quadro do canvas, que fica só para ele (o total pode sair do furo
+          quando o texto está ampliado, ver acessibilidade.css). */}
+      <div className="donut-chart-canvas">
+        <canvas ref={canvas} role="img" aria-label={ariaLabel} />
+      </div>
       <div className="donut-chart-center">{children}</div>
     </div>
   );

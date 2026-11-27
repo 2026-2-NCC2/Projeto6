@@ -367,7 +367,7 @@ export default function Moderation() {
 
                   <div className="mod-meta">
                     <div className="mod-meta-box">
-                      <h3>{t('Metadados de Conexão')}</h3>
+                      <h2>{t('Metadados de Conexão')}</h2>
                       <p>
                         <span>{t('IP:')}</span> {person.ip} ({person.city})
                       </p>
@@ -377,7 +377,7 @@ export default function Moderation() {
                     </div>
                     <div className="mod-meta-box mod-proof">
                       <div>
-                        <h3>{t('Comprovante de Identidade')}</h3>
+                        <h2>{t('Comprovante de Identidade')}</h2>
                         <p>
                           {t('Documento anexado:')} <br />
                           {person.document}

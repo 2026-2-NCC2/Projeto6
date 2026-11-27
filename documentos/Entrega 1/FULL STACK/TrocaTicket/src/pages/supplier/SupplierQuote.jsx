@@ -267,7 +267,9 @@ export default function SupplierQuote() {
         <aside className="sp-quote-side">
           <OrganizerCard name={event.organizer} city={quote.organizer.city} reliability={quote.organizer.reliability} />
           <div className="sp-side-title">
-            <small>{t('DEMANDA EM CONCORRÊNCIA')}</small>
+            <h2 className="sp-side-heading">
+              <small>{t('DEMANDA EM CONCORRÊNCIA')}</small>
+            </h2>
             <span>{t('Total:')} {demands.length}</span>
           </div>
           {demands.map((demand) => (

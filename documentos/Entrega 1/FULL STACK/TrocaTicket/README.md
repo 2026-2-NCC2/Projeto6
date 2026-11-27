@@ -44,7 +44,7 @@ Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aprovei
 
 Rode `npm test` nesta pasta (ou dentro de `server/`). Os testes usam o testador do próprio Node.js, como na TrocaTicket 2.0:
 
-- **Unidade** (sempre rodam): regras de sessão, CSRF, origem, senha, limite de tentativas e preparo do banco. No site, `npm run test:front` confere perfis, painel do usuário e os idiomas: as seis colunas de cada linha dos dicionários, os mesmos `{marcadores}` em todos os idiomas, tradução para todo texto fixo passado a `t()`, troca e gravação do idioma, plurais, mensagens da API reconhecidas e formatos de número e moeda.
+- **Unidade** (sempre rodam): regras de sessão, CSRF, origem, senha, limite de tentativas e preparo do banco. No site, `npm run test:front` confere perfis, painel do usuário, os idiomas (as seis colunas de cada linha dos dicionários, os mesmos `{marcadores}` em todos os idiomas, tradução para todo texto fixo passado a `t()`, troca e gravação do idioma, plurais, mensagens da API reconhecidas e formatos de número e moeda) e as preferências de acessibilidade (valores aceitos, leitura e gravação no navegador, tema do sistema e atributos aplicados na página).
 - **Integração** (precisam de um MySQL local): API completa com sessão, tentativas de usar outra conta, CSRF, origem, senhas, limite de tentativas, troca de senha, logout, fluxos de participante, organizador e fornecedor, o preparo do banco e os pedidos (reserva, pagamento aprovado e recusado, repetição da mesma ação, cliques simultâneos, disputa pelos últimos lugares, prazo, lotação, limite por conta, cancelamento e estorno), a revenda, a portaria, o atendimento, a aprovação de contas, a administração e o cancelamento de evento com estorno. Cada arquivo cria um banco temporário `trocaticket_teste_…`, sobe a API nele e o apaga no fim. **O banco da equipe (`DB_NAME`) nunca é usado.** O usuário de `server/.env` (ou das variáveis `DB_USER`/`DB_PASSWORD`) precisa ter permissão para criar bancos. Sem MySQL configurado, esses testes aparecem como pulados.
 
 ## O que funciona
@@ -56,6 +56,7 @@ Rode `npm test` nesta pasta (ou dentro de `server/`). Os testes usam o testador 
 - **Perfil:** dados de demonstração, foto, preferências e cancelamento das alterações não salvas.
 - **Geral:** menu móvel, estados vazios, carregamento, falha com nova tentativa, formulários validados, modais com foco contido e fechamento por Escape, avisos de ação e página 404.
 - **Idiomas:** português do Brasil (padrão), inglês, espanhol, francês, alemão e italiano, escolhidos no botão de idioma do header (detalhes abaixo).
+- **Acessibilidade:** botão redondo no canto inferior direito de todas as páginas, com tamanho da letra, espaçamentos, alto contraste, fonte legível, destaque de links, tema claro, escuro ou do sistema e o tradutor VLibras (detalhes abaixo).
 
 ## Dados e limitações
 
@@ -123,6 +124,23 @@ O `SCRIPT_BANCO_V2.sql` versionado não contém todas as estruturas usadas pela 
 - **Datas, números e moeda:** seguem o idioma escolhido; os valores continuam em reais e aparecem sempre com "R$". Horários informados como "horário de Brasília" continuam no fuso de Brasília.
 - **Novo texto no site:** escreva o texto em português dentro de `t()` e acrescente a linha nas seis línguas em um arquivo de `src/i18n/textos/`. O teste do site acusa texto fixo sem tradução.
 
+**Ferramentas de acessibilidade (adaptado da TrocaTicket 2.0).** O botão com o símbolo de acessibilidade, no canto inferior direito de todas as páginas (inclusive a página do fórum), abre o painel.
+- **Opções:**
+  - tamanho da letra de 100% a 200%, de 25 em 25;
+  - espaço entre letras e espaço entre linhas, níveis 0 a 3 (o nível 0 mantém o espaçamento original);
+  - alto contraste: preto, branco e amarelo, independente do tema;
+  - fonte legível (Verdana);
+  - destacar links (sublinhado grosso);
+  - tema claro, escuro ou do sistema (acompanha o modo do aparelho);
+  - "Restaurar padrão".
+- **Prévia e gravação:** as escolhas aparecem na hora. Só ficam salvas neste navegador com **Salvar preferências** (`localStorage`, chave `trocaticket-acessibilidade`); fechar o painel sem salvar desfaz a prévia. Uma aba aplica o que outra salvou. Se o navegador não deixar salvar, o painel avisa e a escolha vale só nesta visita.
+- **Tema:** o botão claro/escuro do header continua funcionando e grava na hora. O tema já resolvido também fica em `trocaticket-theme`, que o fórum Troca-Papo lê.
+- **Painel:** abre como janela (`<dialog>`), com o foco preso dentro dele; Esc, o botão × e o clique fora fecham, e o foco volta ao botão. Os textos seguem o idioma escolhido.
+- **VLibras:** o tradutor de português para Libras do governo federal só é baixado quando a pessoa clica em **Ativar VLibras**; antes disso, o site não faz nenhum acesso a vlibras.gov.br. Precisa de internet; sem conexão, o painel avisa e oferece tentar de novo. Em outro idioma, o painel oferece voltar ao português, porque o VLibras traduz do português. O tradutor automático não substitui interpretação humana.
+- **Como funciona:** as preferências viram atributos do `<html>` (`data-fonte`, `data-letras`, `data-linhas`, `data-legivel`, `data-links`, `data-contrast` e `data-theme`), lidos por `src/acessibilidade.css`. O tamanho da letra muda o tamanho base da página, por isso os tamanhos de texto do CSS do site estão em `rem` (1 rem = 16 px com a letra em 100%; a conversão foi exata e, sozinha, não muda nenhuma tela em 100%).
+- **Texto ampliado:** com a letra acima de 100%, um espaçamento ligado ou a fonte legível, o `<html>` recebe `data-ampliado="true"`. Aí o header entra no fluxo da página, o menu fica no botão ☰, linhas lado a lado quebram ou viram coluna e tabelas rolam dentro do próprio quadro, para não cortar texto nem criar rolagem lateral. O alto contraste sozinho não muda o tamanho de nada: o contorno de botões e campos é desenhado por dentro.
+- **Novo componente:** use `rem` para tamanhos de texto e confira a tela com letra 200% e com os espaçamentos no máximo, de 320 px a 1920 px de largura, e com o alto contraste.
+
 Mensagens da comunidade na demonstração permanecem locais e separadas das contas. Ingressos comprados pela interface são registros simulados no banco, não são válidos para entrada e nenhum valor é cobrado. Dados locais da demonstração sem conta usam `trocaticket-v2`; o perfil escolhido fica no `sessionStorage`. Para os fluxos conectados, mantenha a API e o MySQL em execução conforme as instruções de instalação.
 
 **Login com sessão (adaptado da TrocaTicket 2.0).** Ao entrar ou se cadastrar, a API cria uma sessão: o navegador recebe um cookie `httpOnly` e `SameSite=Lax`, e o banco guarda só o resumo SHA-256 dele. As rotas que recebem o ID de uma conta só aceitam o ID da conta logada (401 sem sessão, 403 para outra conta). Toda gravação exige também o cabeçalho `X-CSRF-Token`, devolvido no login e em `GET /api/sessao`. A API recusa sites fora da lista de origens, limita a 10 as tentativas de login por e-mail e endereço a cada 15 minutos e encerra as outras sessões quando a senha muda. As sessões duram 8 horas (`SESSION_HOURS`). Senhas ficam em bcrypt; contas antigas com senha em texto puro ainda entram e são convertidas no primeiro login. Ainda é um projeto acadêmico: use somente dados fictícios e, fora do computador local, sirva a API com HTTPS e `COOKIE_SECURE=true`. Desde a etapa 6, as gravações exigem conta aprovada pela administração (ver abaixo). O limite de tentativas fica na memória do servidor e zera ao reiniciar. A opção 2FA é apenas uma preferência salva, não ativa segundo fator; e-mail não é verificado e o histórico de acesso é demonstrativo. Ingressos, trocas, revendas, transferências e entradas na portaria são registros acadêmicos simulados, sem pagamento, reembolso ou controle de acesso reais. OAuth, chat em tempo real e relatórios PDF não foram conectados; os fluxos correspondentes são demonstrações locais e/ou exportações CSV. O modo demo usa dados fictícios somente quando escolhido sem conta; contas autenticadas carregam registros da API, não exibem ações para entrar/sair do demo e não usam reservas ou mensagens demonstrativas.
@@ -138,6 +156,9 @@ As imagens não fornecem camadas, fontes ou regras de interação. O layout foi 
 | `src/components/UI.jsx`     | Campos, painéis, modais, badges e exportação CSV        |
 | `src/i18n/`                 | Idiomas: `t()`, `tn()`, formatos e dicionários (`textos/`) |
 | `src/components/SeletorIdioma.jsx` | Botão de idioma do header                     |
+| `src/acessibilidade/`       | Preferências de acessibilidade e carregamento do VLibras |
+| `src/components/acessibilidade/` | Botão e painel de acessibilidade                   |
+| `src/acessibilidade.css`    | Painel, alto contraste, espaçamentos e texto ampliado   |
 | `src/context/Store.jsx`     | Estado compartilhado e persistência local               |
 | `src/data/demo.js`          | Eventos, fornecedores, inventário e pessoas fictícias   |
 | `src/services/events.js`    | Eventos, favoritos, avaliações e propostas de organizador |
