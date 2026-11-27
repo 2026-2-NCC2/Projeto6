@@ -3,6 +3,7 @@ import { money } from '../UI';
 import { kindOf, marginOf, skuOf, statusView } from '../../utils/inventory';
 import Icon, { categoryIcon } from './Icon';
 import { StatusPill } from './common';
+import { t } from '../../i18n';
 
 const CATEGORY_TONES = {
   'Bebidas & Bar': 'blue',
@@ -24,12 +25,12 @@ export default function InventoryTable({ items, selectedId, onSelect, onEdit, on
       <table>
         <thead>
           <tr>
-            <th>Item & código SKU</th>
-            <th>Categoria & tipo</th>
-            <th>Unidade</th>
-            <th className="end">Valor referência</th>
-            <th>Status</th>
-            <th className="end">Ações</th>
+            <th>{t('Item & código SKU')}</th>
+            <th>{t('Categoria & tipo')}</th>
+            <th>{t('Unidade')}</th>
+            <th className="end">{t('Valor referência')}</th>
+            <th>{t('Status')}</th>
+            <th className="end">{t('Ações')}</th>
           </tr>
         </thead>
         <tbody>
@@ -61,25 +62,25 @@ export default function InventoryTable({ items, selectedId, onSelect, onEdit, on
                   </div>
                 </td>
                 <td>
-                  <strong>{item.category}</strong>
-                  <small>{item.type || 'Item de catálogo'}</small>
+                  <strong>{t(item.category)}</strong>
+                  <small>{t(item.type || 'Item de catálogo')}</small>
                 </td>
                 <td>
-                  <span className="sp-unit">{item.unit}</span>
+                  <span className="sp-unit">{t(item.unit)}</span>
                 </td>
                 <td className="end">
                   <strong>{money(item.price)}</strong>
-                  {margin !== null && <small className={margin >= 0 ? 'ok' : 'bad'}>Margem líq. {margin}%</small>}
+                  {margin !== null && <small className={margin >= 0 ? 'ok' : 'bad'}>{t('Margem líq.')} {margin}%</small>}
                 </td>
                 <td>
-                  <StatusPill tone={view.tone}>{view.label}</StatusPill>
+                  <StatusPill tone={view.tone}>{t(view.label)}</StatusPill>
                 </td>
                 <td>
                   <div className="sp-row-actions">
                     <button
                       type="button"
                       className={`sp-icon-button ${selected ? 'active' : ''}`}
-                      aria-label={`Ver detalhes de ${item.name}`}
+                      aria-label={t('Ver detalhes de {name}', { name: item.name })}
                       aria-pressed={selected}
                       onClick={(event) => {
                         event.stopPropagation();
@@ -91,7 +92,7 @@ export default function InventoryTable({ items, selectedId, onSelect, onEdit, on
                     <button
                       type="button"
                       className="sp-icon-button"
-                      aria-label={`Editar ${item.name}`}
+                      aria-label={t('Editar {name}', { name: item.name })}
                       onClick={(event) => {
                         event.stopPropagation();
                         onEdit(item);
@@ -102,7 +103,7 @@ export default function InventoryTable({ items, selectedId, onSelect, onEdit, on
                     <button
                       type="button"
                       className="sp-icon-button"
-                      aria-label={`Duplicar ${item.name}`}
+                      aria-label={t('Duplicar {name}', { name: item.name })}
                       onClick={(event) => {
                         event.stopPropagation();
                         onDuplicate(item);

@@ -3,11 +3,13 @@ import { Link } from 'react-router';
 import Events from '../components/Events';
 import Icon from '../components/Icon';
 import PapoBanner from '../components/PapoBanner';
+import { t } from '../i18n';
 const profiles = [
   {
     id: 'comprador',
     tag: 'Participante',
     name: 'Usuário',
+    cta: 'Seja um Usuário',
     icon: 'ticket',
     description: 'Compre, troque ou revenda ingressos sem risco de golpes.',
     features: [
@@ -20,6 +22,7 @@ const profiles = [
     id: 'organizador',
     tag: 'Produtores',
     name: 'Organizador',
+    cta: 'Seja um Organizador',
     icon: 'megaphone',
     description:
       'Organize seus eventos, anuncie e se conecte com fornecedores na nossa própria plataforma.',
@@ -33,6 +36,7 @@ const profiles = [
     id: 'fornecedor',
     tag: 'Fornecedores B2B',
     name: 'Fornecedor',
+    cta: 'Seja um Fornecedor',
     icon: 'box',
     description: 'Se conecte com organizadores de evento e ofereça serviços e insumos.',
     features: [
@@ -47,30 +51,30 @@ export default function Home() {
         <section className="hero hero-full">
         <div className="hero-content">
           <p className="hero-badge">
-            <span /> Troca e compra segura de ingressos
+            <span /> {t('Troca e compra segura de ingressos')}
           </p>
           <h1>
-            Compre e troque ingressos para
-            <br className="desktop-break" /> seus eventos <em>favoritos!</em>
+            {t('Compre e troque ingressos para')}
+            <br className="desktop-break" /> {t('seus eventos')} <em>{t('favoritos!')}</em>
           </h1>
           <p className="hero-description">
-            Compre e transfira seus ingressos em poucos cliques com qualquer pessoa.
+            {t('Compre e transfira seus ingressos em poucos cliques com qualquer pessoa.')}
           </p>
           <div className="hero-actions">
             <Link to="/cadastro" className="button primary">
-              Comece na TrocaTicket <Icon name="arrow" size={18} />
+              {t('Comece na TrocaTicket')} <Icon name="arrow" size={18} />
             </Link>
             <a className="button secondary" href="#profiles">
-              <Icon name="shield" size={18} /> Como funciona?
+              <Icon name="shield" size={18} /> {t('Como funciona?')}
             </a>
           </div>
         </div>
       </section>
       <section id="profiles" className="profiles section" aria-labelledby="profiles-title">
         <div className="section-heading">
-          <p className="eyebrow">Acesso multi-perfil</p>
-          <h2 id="profiles-title">Como você quer usar o Troca Ticket?</h2>
-          <p>Soluções desenhadas para usuários, organizadores e fornecedores.</p>
+          <p className="eyebrow">{t('Acesso multi-perfil')}</p>
+          <h2 id="profiles-title">{t('Como você quer usar o Troca Ticket?')}</h2>
+          <p>{t('Soluções desenhadas para usuários, organizadores e fornecedores.')}</p>
         </div>
         <div className="grid">
           {profiles.map((profile) => (
@@ -79,20 +83,20 @@ export default function Home() {
                 <span className="profile-icon" aria-hidden="true">
                   <Icon name={profile.icon} />
                 </span>
-                <span className="profile-tag">{profile.tag}</span>
+                <span className="profile-tag">{t(profile.tag)}</span>
               </div>
-              <h3>{profile.name}</h3>
-              <p>{profile.description}</p>
+              <h3>{t(profile.name)}</h3>
+              <p>{t(profile.description)}</p>
               <ul>
                 {profile.features.map((feature) => (
                   <li key={feature}>
                     <Icon name="check" size={15} />
-                    {feature}
+                    {t(feature)}
                   </li>
                 ))}
               </ul>
               <Link className="button dark" to={`/cadastro?perfil=${profile.id}`}>
-                Seja um {profile.name}
+                {t(profile.cta)}
               </Link>
             </article>
           ))}

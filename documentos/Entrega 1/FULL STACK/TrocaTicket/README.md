@@ -44,7 +44,7 @@ Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aprovei
 
 Rode `npm test` nesta pasta (ou dentro de `server/`). Os testes usam o testador do próprio Node.js, como na TrocaTicket 2.0:
 
-- **Unidade** (sempre rodam): regras de sessão, CSRF, origem, senha, limite de tentativas e preparo do banco.
+- **Unidade** (sempre rodam): regras de sessão, CSRF, origem, senha, limite de tentativas e preparo do banco. No site, `npm run test:front` confere perfis, painel do usuário e os idiomas: as seis colunas de cada linha dos dicionários, os mesmos `{marcadores}` em todos os idiomas, tradução para todo texto fixo passado a `t()`, troca e gravação do idioma, plurais, mensagens da API reconhecidas e formatos de número e moeda.
 - **Integração** (precisam de um MySQL local): API completa com sessão, tentativas de usar outra conta, CSRF, origem, senhas, limite de tentativas, troca de senha, logout, fluxos de participante, organizador e fornecedor, o preparo do banco e os pedidos (reserva, pagamento aprovado e recusado, repetição da mesma ação, cliques simultâneos, disputa pelos últimos lugares, prazo, lotação, limite por conta, cancelamento e estorno), a revenda, a portaria, o atendimento, a aprovação de contas, a administração e o cancelamento de evento com estorno. Cada arquivo cria um banco temporário `trocaticket_teste_…`, sobe a API nele e o apaga no fim. **O banco da equipe (`DB_NAME`) nunca é usado.** O usuário de `server/.env` (ou das variáveis `DB_USER`/`DB_PASSWORD`) precisa ter permissão para criar bancos. Sem MySQL configurado, esses testes aparecem como pulados.
 
 ## O que funciona
@@ -55,6 +55,7 @@ Rode `npm test` nesta pasta (ou dentro de `server/`). Os testes usam o testador 
 - **Administrador:** com conta de administração (criada por `npm run criar-admin`), o painel geral, os relatórios por evento, a aprovação de contas e os atendimentos usam o banco, e a administração pode cancelar eventos com estorno. No modo demo, as mesmas telas continuam com dados fictícios.
 - **Perfil:** dados de demonstração, foto, preferências e cancelamento das alterações não salvas.
 - **Geral:** menu móvel, estados vazios, carregamento, falha com nova tentativa, formulários validados, modais com foco contido e fechamento por Escape, avisos de ação e página 404.
+- **Idiomas:** português do Brasil (padrão), inglês, espanhol, francês, alemão e italiano, escolhidos no botão de idioma do header (detalhes abaixo).
 
 ## Dados e limitações
 
@@ -113,6 +114,15 @@ O `SCRIPT_BANCO_V2.sql` versionado não contém todas as estruturas usadas pela 
   - A situação "Cancelado" só vem por esta ação: a edição comum recusa, e evento cancelado não pode mais ser editado.
 - **Rotas novas:** `GET /api/conta/aprovacao`, `GET /api/admin/resumo`, `GET /api/admin/contas`, `POST /api/admin/contas/:id/aprovacao`, `GET /api/admin/eventos`, `GET /api/admin/eventos/:id` e `POST /api/eventos/:id/cancelar`.
 
+**Idiomas do site (adaptado da TrocaTicket 2.0).** O botão de idioma do header (PT, EN, ES, FR, DE, IT) troca o site entre português do Brasil, inglês, espanhol, francês, alemão e italiano.
+- **Escolha:** fica salva neste navegador (`localStorage`, chave `trocaticket-idioma`) e vale para todas as telas, inclusive o modo demo. Sem escolha salva, o site abre em português. O atributo `lang` da página e o título da aba acompanham o idioma.
+- **Como funciona:** o texto em português é a própria chave. `t('Meus pedidos')` devolve a tradução do idioma escolhido ou, se ela não existir, o português; nenhum texto some por falta de tradução. Textos com valores usam marcadores: `t('Restam {quantidade} lugares', { quantidade: 3 })`. Plurais usam `tn(quantidade, '{n} evento', '{n} eventos')`.
+- **Dicionários:** `src/i18n/textos/`, uma linha por texto com as seis versões `[português, inglês, espanhol, francês, alemão, italiano]`. `reaproveitados.js` traz as traduções que já existiam na 2.0; os arquivos `lote01.js` a `lote09.js`, as deste site. Linhas posteriores substituem as anteriores. As tabelas ficam fora do Prettier (`.prettierignore`) para continuar uma linha por texto.
+- **Mensagens da API:** a API continua respondendo em português, com os mesmos códigos HTTP; nada mudou no servidor. O site reconhece a mensagem pelo texto exato ou por um modelo com marcadores (por exemplo, `Este ingresso já foi utilizado (entrada em {quando}, horário de Brasília).`) e mostra a tradução. Mensagem desconhecida aparece em português.
+- **O que não é traduzido:** dados do banco e da demonstração, como nomes de eventos, locais, nomes de pessoas, descrições, motivos de recusa ou cancelamento e mensagens escritas pelas pessoas. O fórum Troca-Papo (aplicação separada, em `forum/`) continua em português.
+- **Datas, números e moeda:** seguem o idioma escolhido; os valores continuam em reais e aparecem sempre com "R$". Horários informados como "horário de Brasília" continuam no fuso de Brasília.
+- **Novo texto no site:** escreva o texto em português dentro de `t()` e acrescente a linha nas seis línguas em um arquivo de `src/i18n/textos/`. O teste do site acusa texto fixo sem tradução.
+
 Mensagens da comunidade na demonstração permanecem locais e separadas das contas. Ingressos comprados pela interface são registros simulados no banco, não são válidos para entrada e nenhum valor é cobrado. Dados locais da demonstração sem conta usam `trocaticket-v2`; o perfil escolhido fica no `sessionStorage`. Para os fluxos conectados, mantenha a API e o MySQL em execução conforme as instruções de instalação.
 
 **Login com sessão (adaptado da TrocaTicket 2.0).** Ao entrar ou se cadastrar, a API cria uma sessão: o navegador recebe um cookie `httpOnly` e `SameSite=Lax`, e o banco guarda só o resumo SHA-256 dele. As rotas que recebem o ID de uma conta só aceitam o ID da conta logada (401 sem sessão, 403 para outra conta). Toda gravação exige também o cabeçalho `X-CSRF-Token`, devolvido no login e em `GET /api/sessao`. A API recusa sites fora da lista de origens, limita a 10 as tentativas de login por e-mail e endereço a cada 15 minutos e encerra as outras sessões quando a senha muda. As sessões duram 8 horas (`SESSION_HOURS`). Senhas ficam em bcrypt; contas antigas com senha em texto puro ainda entram e são convertidas no primeiro login. Ainda é um projeto acadêmico: use somente dados fictícios e, fora do computador local, sirva a API com HTTPS e `COOKIE_SECURE=true`. Desde a etapa 6, as gravações exigem conta aprovada pela administração (ver abaixo). O limite de tentativas fica na memória do servidor e zera ao reiniciar. A opção 2FA é apenas uma preferência salva, não ativa segundo fator; e-mail não é verificado e o histórico de acesso é demonstrativo. Ingressos, trocas, revendas, transferências e entradas na portaria são registros acadêmicos simulados, sem pagamento, reembolso ou controle de acesso reais. OAuth, chat em tempo real e relatórios PDF não foram conectados; os fluxos correspondentes são demonstrações locais e/ou exportações CSV. O modo demo usa dados fictícios somente quando escolhido sem conta; contas autenticadas carregam registros da API, não exibem ações para entrar/sair do demo e não usam reservas ou mensagens demonstrativas.
@@ -126,6 +136,8 @@ As imagens não fornecem camadas, fontes ou regras de interação. O layout foi 
 | `src/App.jsx`               | Rotas e páginas institucionais                          |
 | `src/components/Layout.jsx` | Cabeçalho, navegação por perfil, rodapé                 |
 | `src/components/UI.jsx`     | Campos, painéis, modais, badges e exportação CSV        |
+| `src/i18n/`                 | Idiomas: `t()`, `tn()`, formatos e dicionários (`textos/`) |
+| `src/components/SeletorIdioma.jsx` | Botão de idioma do header                     |
 | `src/context/Store.jsx`     | Estado compartilhado e persistência local               |
 | `src/data/demo.js`          | Eventos, fornecedores, inventário e pessoas fictícias   |
 | `src/services/events.js`    | Eventos, favoritos, avaliações e propostas de organizador |

@@ -1,5 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { formatarNumero, t } from '../i18n';
+import { dateLabel, money } from './UI';
+
+// Data ISO (AAAA-MM-DD) aparece no formato do idioma; rótulos prontos da vitrine passam por t().
+const dataDoEvento = (valor) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(String(valor || '')) ? dateLabel(valor) : t(valor);
 
 /**
  * Componente unificado de Card de Evento para toda a plataforma.
@@ -19,8 +25,7 @@ export default function EventCard({
   actions,
   metrics,
 }) {
-  const formatCurrency = (value) =>
-    Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatCurrency = (value) => money(value || 0);
 
   // Mapeia as classes originais do CSS para manter as regras de Grid, Flexbox e sombras intactas
   const getArticleClasses = () => {
@@ -40,7 +45,7 @@ export default function EventCard({
             {metrics?.status && (
               <span className={`rp-status ${metrics.statusTone || 'blue'}`}>
                 <i aria-hidden="true" />
-                {metrics.status}
+                {t(metrics.status)}
               </span>
             )}
           </div>
@@ -49,7 +54,7 @@ export default function EventCard({
           
           <div className="ah-date">
             <div>
-              <small>DATA DO EVENTO</small>
+              <small>{t('DATA DO EVENTO')}</small>
               <strong>{event.date}</strong>
             </div>
             {metrics?.city && <span className="ah-chip">{metrics.city}</span>}
@@ -59,7 +64,7 @@ export default function EventCard({
             <dl className="ah-rows">
               {metrics.rows.map((row, idx) => (
                 <div key={idx}>
-                  <dt>{row.label}:</dt>
+                  <dt>{t(row.label)}:</dt>
                   <dd className={row.tone || ''}>{row.value}</dd>
                 </div>
               ))}
@@ -73,7 +78,7 @@ export default function EventCard({
           <div style={{ marginTop: '16px' }}>
             {actions || (
               <Link className="ah-cta" to={`/admin/relatorios/${event.id}`}>
-                Visão e Relatórios ↗
+                {t('Visão e Relatórios ↗')}
               </Link>
             )}
           </div>
@@ -84,27 +89,27 @@ export default function EventCard({
       {variant === 'organizer' && (
         <>
           <div className="oh-event-image managed-image">
-            <img src={event.image} alt={event.imageAlt || event.title} loading="lazy" />
+            <img src={event.image} alt={event.imageAlt ? t(event.imageAlt) : event.title} loading="lazy" />
             {event.status && (
               <span className={`oh-status ${event.statusTone || 'blue'}`}>
-                {event.status}
+                {t(event.status)}
               </span>
             )}
             {actions && <div className="oh-menu">{actions}</div>}
           </div>
           <div className="oh-event-body managed-body">
-            {event.category && <p className="oh-category eyebrow purple">{event.category}</p>}
+            {event.category && <p className="oh-category eyebrow purple">{t(event.category)}</p>}
             <h3>{event.title}</h3>
-            <p className="oh-meta">📅 {event.date} {event.time ? `• ${event.time}` : ''}</p>
+            <p className="oh-meta">📅 {dataDoEvento(event.date)} {event.time ? `• ${event.time}` : ''}</p>
             <p className="oh-meta">📍 {event.location}</p>
             <footer>
               {event.capacity ? (
                 <span>
-                  Capacidade: <strong>{typeof event.capacity === 'number' ? event.capacity.toLocaleString('pt-BR') : event.capacity}</strong>
+                  {t('Capacidade:')} <strong>{typeof event.capacity === 'number' ? formatarNumero(event.capacity) : event.capacity}</strong>
                 </span>
               ) : <span />}
               <Link className="text-link" to={`/organizador/eventos/${event.id}/consolidar`}>
-                Detalhes →
+                {t('Detalhes →')}
               </Link>
             </footer>
           </div>
@@ -115,13 +120,13 @@ export default function EventCard({
       {(variant === 'public' || variant === 'participant') && (
         <>
           <div className="event-image">
-            <img loading="lazy" src={event.image} alt={event.imageAlt || event.title} />
-            <span className="event-tag">{event.tag}</span>
+            <img loading="lazy" src={event.image} alt={event.imageAlt ? t(event.imageAlt) : event.title} />
+            <span className="event-tag">{t(event.tag)}</span>
             {onToggleFavorite && (
               <button
                 type="button"
                 className={`favorite ${isFavorite ? 'saved' : ''}`}
-                aria-label={`${isFavorite ? 'Remover dos' : 'Adicionar aos'} favoritos: ${event.title}`}
+                aria-label={isFavorite ? t('Remover dos favoritos: {title}', { title: event.title }) : t('Adicionar aos favoritos: {title}', { title: event.title })}
                 aria-pressed={isFavorite}
                 onClick={() => onToggleFavorite(event.id)}
               >
@@ -131,20 +136,20 @@ export default function EventCard({
           </div>
           <div className="event-info">
             <h3>{event.title}</h3>
-            {event.date && <p className="event-meta">📅 {event.date}</p>}
+            {event.date && <p className="event-meta">📅 {dataDoEvento(event.date)}</p>}
             {event.location && <p className="event-meta">📍 {event.location}</p>}
             <div className="event-bottom">
               <div>
-                <small>A partir de</small>
+                <small>{t('A partir de')}</small>
                 <strong>{formatCurrency(event.price)}</strong>
               </div>
               {actions || (
                 <Link
                   to={`/eventos/${event.id}`}
                   className="ticket-link"
-                  aria-label={`Ver opções: ${event.title}`}
+                  aria-label={t('Ver opções: {title}', { title: event.title })}
                 >
-                  Ver opções →
+                  {t('Ver opções →')}
                 </Link>
               )}
             </div>

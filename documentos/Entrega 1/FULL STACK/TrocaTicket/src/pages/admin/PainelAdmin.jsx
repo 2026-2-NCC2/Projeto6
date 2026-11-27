@@ -5,6 +5,7 @@ import Pagination from '../../components/Pagination';
 import { Icon } from '../../components/Icons';
 import { DownloadButton, Empty, PageTitle, dateLabel, money } from '../../components/UI';
 import { listarEventosAdmin, resumoAdmin, situacaoEvento } from '../../services/admin';
+import { formatarNumero, localeAtual, t } from '../../i18n';
 
 // Painel geral da administração com os dados do banco (etapa 6). A versão de demonstração,
 // com dados fictícios, continua em pages/Admin.jsx para quem explora sem conta.
@@ -19,11 +20,11 @@ const ORDENS = {
   vendas: ['Mais vendidos', (a, b) => b.tickets.sold - a.tickets.sold || a.id - b.id],
   receita: ['Maior receita', (a, b) => b.grossRevenue - a.grossRevenue || a.id - b.id],
 };
-const numero = (valor) => Number(valor || 0).toLocaleString('pt-BR');
+const numero = (valor) => formatarNumero(valor);
 // Receita da venda original menos os estornos dessa venda (simulação).
 const liquida = (e) => Math.round((e.grossRevenue - e.refunds.sales) * 100) / 100;
 const percentual = (valor) =>
-  valor === null || valor === undefined ? 'Sem capacidade' : `${String(valor).replace('.', ',')}%`;
+  valor === null || valor === undefined ? t('Sem capacidade') : `${formatarNumero(valor)}%`;
 
 export default function PainelAdmin() {
   const [resumo, setResumo] = useState(null);
@@ -44,7 +45,7 @@ export default function PainelAdmin() {
         setResumo(numeros);
         setEventos(lista);
         setAtualizadoEm(
-          new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          new Date().toLocaleTimeString(localeAtual(), { hour: '2-digit', minute: '2-digit' }),
         );
       })
       .catch((error) => {
@@ -121,28 +122,29 @@ export default function PainelAdmin() {
   return (
     <div className="workspace admin-home admin-live">
       <PageTitle
-        title="Painel Geral"
-        subtitle="Eventos, contas e atendimentos com os dados do banco."
+        title={t('Painel Geral')}
+        subtitle={t('Eventos, contas e atendimentos com os dados do banco.')}
       >
         <Link className="button primary" to="/admin/moderacao">
-          Aprovar contas{resumo?.pendingAccounts ? ` (${resumo.pendingAccounts})` : ''}{' '}
+          {t('Aprovar contas')}
+          {resumo?.pendingAccounts ? ` (${resumo.pendingAccounts})` : ''}{' '}
           <span aria-hidden="true">→</span>
         </Link>
       </PageTitle>
 
       {erro && (
         <div className="api-error" role="alert">
-          <span>{erro}</span>
+          <span>{t(erro)}</span>
           <button
             type="button"
             className="button outline tiny"
             onClick={() => setTentativa((n) => n + 1)}
           >
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       )}
-      {!erro && !eventos && <p role="status">Carregando o painel…</p>}
+      {!erro && !eventos && <p role="status">{t('Carregando o painel…')}</p>}
 
       {resumo && (
         <div className="metrics admin-metrics">
@@ -153,14 +155,14 @@ export default function PainelAdmin() {
             ['Atendimentos abertos', resumo.openSupport, 'Ver atendimentos', '/admin/atendimentos'],
           ].map(([rotulo, valor, nota, destino]) => (
             <div className="metric" key={rotulo}>
-              <span>{rotulo}</span>
+              <span>{t(rotulo)}</span>
               <strong>{numero(valor)}</strong>
               {destino ? (
                 <Link className="text-link" to={destino}>
-                  {nota} →
+                  {t(nota)} →
                 </Link>
               ) : (
-                <small>{nota}</small>
+                <small>{t(nota)}</small>
               )}
             </div>
           ))}
@@ -169,13 +171,13 @@ export default function PainelAdmin() {
 
       {eventos && (
         <>
-          <section className="ah-search" aria-label="Pesquisa de eventos">
+          <section className="ah-search" aria-label={t('Pesquisa de eventos')}>
             <div className="ah-search-row">
               <label className="search-box wide">
                 <Icon name="search" size={18} />
                 <input
-                  aria-label="Buscar eventos"
-                  placeholder="Buscar por evento, organização, local ou número..."
+                  aria-label={t('Buscar eventos')}
+                  placeholder={t('Buscar por evento, organização, local ou número...')}
                   value={busca}
                   onChange={(e) => {
                     setBusca(e.target.value);
@@ -185,7 +187,7 @@ export default function PainelAdmin() {
               </label>
               <div className="ah-filters">
                 <label>
-                  Situação:
+                  {t('Situação:')}
                   <select
                     value={situacao}
                     onChange={(e) => {
@@ -193,20 +195,22 @@ export default function PainelAdmin() {
                       setPagina(1);
                     }}
                   >
-                    <option value="Todos">Todos os eventos ({comSituacao.length})</option>
+                    <option value="Todos">
+                      {t('Todos os eventos')} ({comSituacao.length})
+                    </option>
                     {situacoes.map((nome) => (
                       <option key={nome} value={nome}>
-                        {nome} ({comSituacao.filter((e) => e.situacao[0] === nome).length})
+                        {t(nome)} ({comSituacao.filter((e) => e.situacao[0] === nome).length})
                       </option>
                     ))}
                   </select>
                 </label>
                 <label>
-                  Ordenar:
+                  {t('Ordenar:')}
                   <select value={ordem} onChange={(e) => setOrdem(e.target.value)}>
                     {Object.entries(ORDENS).map(([valor, [nome]]) => (
                       <option key={valor} value={valor}>
-                        {nome}
+                        {t(nome)}
                       </option>
                     ))}
                   </select>
@@ -216,34 +220,36 @@ export default function PainelAdmin() {
             </div>
             <div className="ah-summary">
               <span>
-                Eventos cancelados: <strong>{numero(resumo?.cancelledEvents)}</strong>
+                {t('Eventos cancelados:')} <strong>{numero(resumo?.cancelledEvents)}</strong>
               </span>
               <i aria-hidden="true" />
               <span>
-                Contas recusadas:{' '}
+                {t('Contas recusadas:')}{' '}
                 <strong className="amber">{numero(resumo?.rejectedAccounts)}</strong>
               </span>
               <span className="ah-updated">
-                Atualizado às {atualizadoEm} ·{' '}
+                {t('Atualizado às')} {atualizadoEm} ·{' '}
                 <button
                   type="button"
                   className="text-link plain-button"
                   onClick={() => setTentativa((n) => n + 1)}
                 >
-                  Atualizar
+                  {t('Atualizar')}
                 </button>
               </span>
             </div>
           </section>
 
           <div className="ah-heading">
-            <h2>Grade de Eventos</h2>
+            <h2>{t('Grade de Eventos')}</h2>
             <span className="ah-count">
-              {filtrados.length} {filtrados.length === 1 ? 'Evento' : 'Eventos'}
+              {filtrados.length} {filtrados.length === 1 ? t('Evento') : t('Eventos')}
             </span>
           </div>
           <p className="ah-lead">
-            Abra um evento para ver o relatório completo e, se preciso, cancelá-lo com estorno.
+            {t(
+              'Abra um evento para ver o relatório completo e, se preciso, cancelá-lo com estorno.',
+            )}
           </p>
 
           <div className="ah-grid">
@@ -253,12 +259,14 @@ export default function PainelAdmin() {
                 event={{
                   id: e.id,
                   title: e.title,
-                  subtitle: e.cancelReason ? `Cancelado: ${e.cancelReason}` : e.location,
+                  subtitle: e.cancelReason
+                    ? t('Cancelado: {motivo}', { motivo: e.cancelReason })
+                    : e.location,
                   date: dateLabel(e.startDate),
                 }}
                 variant="admin"
                 metrics={{
-                  tag: `EVENTO Nº ${e.id}`,
+                  tag: t('EVENTO Nº {id}', { id: e.id }),
                   status: e.situacao[0],
                   statusTone: e.situacao[1],
                   rows: [
@@ -271,15 +279,19 @@ export default function PainelAdmin() {
                     <>
                       <Icon name="chart" size={18} />
                       <span>
-                        {numero(e.resales.count)} revendas · {numero(e.transfers)} transferências ·{' '}
-                        {numero(e.exchanges)} trocas
+                        {numero(e.resales.count)} {t('revendas ·')} {numero(e.transfers)}{' '}
+                        {t('transferências ·')} {numero(e.exchanges)} {t('trocas')}
                       </span>
                     </>
                   ),
                 }}
                 actions={
                   <Link className="ah-cta" to={`/admin/relatorios/${e.id}`}>
-                    Visão e Relatórios<span className="sr-only"> de {e.title}</span>{' '}
+                    {t('Visão e Relatórios')}
+                    <span className="sr-only">
+                      {' '}
+                      {t('de')} {e.title}
+                    </span>{' '}
                     <span aria-hidden="true">↗</span>
                   </Link>
                 }
@@ -289,12 +301,14 @@ export default function PainelAdmin() {
           {!filtrados.length && (
             <Empty
               title={
-                comSituacao.length ? 'Nenhum resultado encontrado' : 'Nenhum evento cadastrado'
+                comSituacao.length
+                  ? t('Nenhum resultado encontrado')
+                  : t('Nenhum evento cadastrado')
               }
             >
               {comSituacao.length
-                ? 'Nenhum evento corresponde aos filtros selecionados.'
-                : 'Os eventos aparecem aqui assim que os organizadores os cadastram.'}
+                ? t('Nenhum evento corresponde aos filtros selecionados.')
+                : t('Os eventos aparecem aqui assim que os organizadores os cadastram.')}
             </Empty>
           )}
           {filtrados.length > POR_PAGINA && (

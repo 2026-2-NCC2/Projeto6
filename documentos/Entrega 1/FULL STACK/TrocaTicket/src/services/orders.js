@@ -1,6 +1,7 @@
 // Pedidos, pagamento simulado, cancelamento e estorno (etapa 3 da integração com a TrocaTicket 2.0).
 // Toda gravação leva o cabeçalho Idempotency-Key: repetir a mesma ação não compra em dobro.
 import { API_URL, apiFetch } from './api';
+import { localeAtual } from '../i18n';
 
 export function criarChave() {
   if (globalThis.crypto?.randomUUID) return `pedido-${globalThis.crypto.randomUUID()}`;
@@ -99,7 +100,7 @@ export const FORMA_PAGAMENTO = {
 
 // Horário local até quando a reserva vale, a partir dos segundos informados pela API.
 export const horaLimite = (segundos) =>
-  new Date(Date.now() + segundos * 1000).toLocaleTimeString('pt-BR', {
+  new Date(Date.now() + segundos * 1000).toLocaleTimeString(localeAtual(), {
     hour: '2-digit',
     minute: '2-digit',
   });

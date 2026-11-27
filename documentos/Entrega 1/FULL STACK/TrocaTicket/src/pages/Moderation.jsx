@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../context/Store';
 import { Empty, Modal, PageTitle } from '../components/UI';
+import { t } from '../i18n';
 
 const PAGE_SIZE = 5;
 const OPEN_STATUSES = ['Pendente', 'Em revisão'];
@@ -190,15 +191,17 @@ export default function Moderation() {
   return (
     <div className="workspace moderation">
       <PageTitle
-        title="Moderação de Cadastros"
-        subtitle="Fila de validação com pessoas fictícias. Nenhuma consulta externa é realizada."
+        title={t('Moderação de Cadastros')}
+        subtitle={t(
+          'Fila de validação com pessoas fictícias. Nenhuma consulta externa é realizada.',
+        )}
       />
       <div className="mod-toolbar">
         <label className="mod-search">
           <SearchIcon />
           <input
-            aria-label="Buscar cadastro"
-            placeholder="Buscar por nome…"
+            aria-label={t('Buscar cadastro')}
+            placeholder={t('Buscar por nome…')}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -206,7 +209,7 @@ export default function Moderation() {
             }}
           />
         </label>
-        <div className="mod-chips" role="group" aria-label="Filtrar por situação">
+        <div className="mod-chips" role="group" aria-label={t('Filtrar por situação')}>
           {Object.entries(STATUS).map(([key, item]) => (
             <button
               type="button"
@@ -219,7 +222,7 @@ export default function Moderation() {
               }}
             >
               <i aria-hidden="true" />
-              {item.tab}
+              {t(item.tab)}
               <b>{counts[key]}</b>
             </button>
           ))}
@@ -229,15 +232,19 @@ export default function Moderation() {
         <div>
           <div className="mod-triage">
             <span>
-              <strong>Fila de Triagem:</strong>{' '}
+              <strong>{t('Fila de Triagem:')}</strong>{' '}
               {person
-                ? `Cadastro ${index + 1} de ${people.length} ${STATUS[status].plural}`
-                : 'Nenhum cadastro nesta seleção'}
+                ? t('Cadastro {v1} de {length} {plural}', {
+                    v1: index + 1,
+                    length: people.length,
+                    plural: t(STATUS[status].plural),
+                  })
+                : t('Nenhum cadastro nesta seleção')}
             </span>
             <div>
               <button
                 type="button"
-                aria-label="Cadastro anterior"
+                aria-label={t('Cadastro anterior')}
                 disabled={index <= 0}
                 onClick={() => select(people[index - 1].id)}
               >
@@ -245,7 +252,7 @@ export default function Moderation() {
               </button>
               <button
                 type="button"
-                aria-label="Próximo cadastro"
+                aria-label={t('Próximo cadastro')}
                 disabled={index < 0 || index >= people.length - 1}
                 onClick={() => select(people[index + 1].id)}
               >
@@ -254,15 +261,19 @@ export default function Moderation() {
             </div>
           </div>
           {person ? (
-            <section className="mod-card" aria-label={`Cadastro de ${person.name}`}>
+            <section
+              className="mod-card"
+              aria-label={t('Cadastro de {name}', { name: person.name })}
+            >
               <div className="mod-banner">
                 <span>
-                  MÓDULO DE VALIDAÇÃO<i aria-hidden="true">|</i>
+                  {t('MÓDULO DE VALIDAÇÃO')}
+                  <i aria-hidden="true">|</i>
                   <code>ID: #{person.id}</code>
                 </span>
                 <span className={`mod-status ${current.tone}`}>
                   <i aria-hidden="true" />
-                  {current.badge}
+                  {t(current.badge)}
                 </span>
               </div>
               <div className="mod-body">
@@ -273,20 +284,21 @@ export default function Moderation() {
                         <circle cx="32" cy="24" r="11" fill="currentColor" />
                         <path d="M10 60c1-14 10-22 22-22s21 8 22 22z" fill="currentColor" />
                       </svg>
-                      {isOpen && <em title="Aguardando decisão" />}
+                      {isOpen && <em title={t('Aguardando decisão')} />}
                     </span>
                     <div>
                       <p className="mod-name">
-                        <small>NOME:</small>
+                        <small>{t('NOME:')}</small>
                         <strong>{person.name}</strong>
                       </p>
                       <p className="mod-username">
-                        <small>USERNAME:</small>
+                        <small>{t('USERNAME:')}</small>
                         <code>{person.username}</code>
                         <span>#{person.id}</span>
                       </p>
                       <p className="mod-registered">
-                        <CalendarIcon /> Cadastrado hoje às {person.time} (Horário de Brasília)
+                        <CalendarIcon /> {t('Cadastrado hoje às')} {person.time}{' '}
+                        {t('(Horário de Brasília)')}
                       </p>
                     </div>
                   </div>
@@ -296,12 +308,12 @@ export default function Moderation() {
                       <MailIcon />
                     </span>
                     <div className="mod-row-text">
-                      <small>EMAIL:</small>
+                      <small>{t('EMAIL:')}</small>
                       <code>{revealed ? person.email : maskEmail(person.email)}</code>
                     </div>
                     <div className="mod-row-extra">
                       {person.emailVerified && (
-                        <span className="mod-pill green">✓ E-mail verificado via OTP</span>
+                        <span className="mod-pill green">{t('✓ E-mail verificado via OTP')}</span>
                       )}
                       <button
                         type="button"
@@ -309,7 +321,7 @@ export default function Moderation() {
                         aria-pressed={revealed}
                         onClick={() => setRevealed(!revealed)}
                       >
-                        {revealed ? 'Ocultar' : 'Revelar'}
+                        {revealed ? t('Ocultar') : t('Revelar')}
                       </button>
                     </div>
                   </div>
@@ -318,13 +330,13 @@ export default function Moderation() {
                       <LockIcon />
                     </span>
                     <div className="mod-row-text">
-                      <small>SENHA:</small>
-                      <code className="mod-dots" aria-label="Senha oculta">
+                      <small>{t('SENHA:')}</small>
+                      <code className="mod-dots" aria-label={t('Senha oculta')}>
                         ••••••••••
                       </code>
                     </div>
                     <div className="mod-row-extra">
-                      <span className="mod-tag">Criptografia Argon2id / Hash Seguro</span>
+                      <span className="mod-tag">{t('Criptografia Argon2id / Hash Seguro')}</span>
                     </div>
                   </div>
                   <div className="mod-row">
@@ -332,11 +344,13 @@ export default function Moderation() {
                       <IdIcon />
                     </span>
                     <div className="mod-row-text">
-                      <small>CPF:</small>
+                      <small>{t('CPF:')}</small>
                       <code>***.***.***-XX</code>
                     </div>
                     <div className="mod-row-extra">
-                      <span className="mod-pill amber">Receita Federal: {person.cpfStatus}</span>
+                      <span className="mod-pill amber">
+                        {t('Receita Federal:')} {person.cpfStatus}
+                      </span>
                       <button
                         type="button"
                         className="mod-link"
@@ -346,26 +360,26 @@ export default function Moderation() {
                           )
                         }
                       >
-                        Consultar Base
+                        {t('Consultar Base')}
                       </button>
                     </div>
                   </div>
 
                   <div className="mod-meta">
                     <div className="mod-meta-box">
-                      <h3>Metadados de Conexão</h3>
+                      <h3>{t('Metadados de Conexão')}</h3>
                       <p>
-                        <span>IP:</span> {person.ip} ({person.city})
+                        <span>{t('IP:')}</span> {person.ip} ({person.city})
                       </p>
                       <p>
-                        <span>Dispositivo:</span> {person.device}
+                        <span>{t('Dispositivo:')}</span> {person.device}
                       </p>
                     </div>
                     <div className="mod-meta-box mod-proof">
                       <div>
-                        <h3>Comprovante de Identidade</h3>
+                        <h3>{t('Comprovante de Identidade')}</h3>
                         <p>
-                          Documento anexado: <br />
+                          {t('Documento anexado:')} <br />
                           {person.document}
                         </p>
                       </div>
@@ -374,17 +388,18 @@ export default function Moderation() {
                         className="button outline"
                         onClick={() => setPreview(true)}
                       >
-                        Visualizar
+                        {t('Visualizar')}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="mod-decision">
-                  <h2>{isOpen ? 'Deseja aceitar?' : 'Decisão registrada'}</h2>
+                  <h2>{isOpen ? t('Deseja aceitar?') : t('Decisão registrada')}</h2>
                   <p className="mod-lead">
-                    Avaliação decisória do moderador para permissão de compras e trocas na
-                    plataforma Troca Ticket.
+                    {t(
+                      'Avaliação decisória do moderador para permissão de compras e trocas na plataforma Troca Ticket.',
+                    )}
                   </p>
                   {isOpen ? (
                     <>
@@ -400,26 +415,26 @@ export default function Moderation() {
                                 )
                               }
                             />
-                            {label}
+                            {t(label)}
                           </label>
                         ))}
                       </div>
                       <label className="mod-notes" htmlFor="moderation-note">
-                        Notas do moderador:
+                        {t('Notas do moderador:')}
                       </label>
                       <textarea
                         id="moderation-note"
                         rows={3}
-                        placeholder="Insira o motivo caso vá recusar…"
+                        placeholder={t('Insira o motivo caso vá recusar…')}
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                       />
                       {error && (
                         <p role="alert" className="field-error">
-                          {error}
+                          {t(error)}
                         </p>
                       )}
-                      <p className="mod-action-label">AÇÃO IMEDIATA</p>
+                      <p className="mod-action-label">{t('AÇÃO IMEDIATA')}</p>
                       <div className="mod-actions">
                         <button
                           type="button"
@@ -429,9 +444,9 @@ export default function Moderation() {
                         >
                           <CheckIcon />
                           <span>
-                            Aprovar
+                            {t('Aprovar')}
                             <br />
-                            (V)
+                            {t('(V)')}
                           </span>
                         </button>
                         <button
@@ -442,9 +457,9 @@ export default function Moderation() {
                         >
                           <CrossIcon />
                           <span>
-                            Recusar
+                            {t('Recusar')}
                             <br />
-                            (X)
+                            {t('(X)')}
                           </span>
                         </button>
                       </div>
@@ -453,9 +468,9 @@ export default function Moderation() {
                     <>
                       <span className={`mod-status ${current.tone}`}>
                         <i aria-hidden="true" />
-                        {current.badge}
+                        {t(current.badge)}
                       </span>
-                      <p>{person.note || 'Sem observações.'}</p>
+                      <p>{person.note || t('Sem observações.')}</p>
                       <button
                         type="button"
                         className="button outline"
@@ -467,7 +482,7 @@ export default function Moderation() {
                           select(person.id);
                         }}
                       >
-                        Reabrir análise
+                        {t('Reabrir análise')}
                       </button>
                     </>
                   )}
@@ -476,22 +491,22 @@ export default function Moderation() {
             </section>
           ) : (
             <section className="panel">
-              <Empty title="Fila concluída">
-                Nenhum cadastro corresponde aos filtros selecionados.
+              <Empty title={t('Fila concluída')}>
+                {t('Nenhum cadastro corresponde aos filtros selecionados.')}
               </Empty>
             </section>
           )}
         </div>
 
         <aside>
-          <section className="mod-queue" aria-label="Fila de espera">
+          <section className="mod-queue" aria-label={t('Fila de espera')}>
             <div className="mod-queue-head">
               <div>
-                <h2>Fila de Espera</h2>
-                <p>Cadastros por ordem cronológica</p>
+                <h2>{t('Fila de Espera')}</h2>
+                <p>{t('Cadastros por ordem cronológica')}</p>
               </div>
               <span className="mod-count">
-                {visible.length} de {people.length}
+                {visible.length} {t('de')} {people.length}
               </span>
             </div>
             {visible.length ? (
@@ -510,7 +525,7 @@ export default function Moderation() {
                         <small>@{p.username}</small>
                       </span>
                       {person?.id === p.id ? (
-                        <span className="mod-focus">Em Foco</span>
+                        <span className="mod-focus">{t('Em Foco')}</span>
                       ) : (
                         <time>{p.time}</time>
                       )}
@@ -519,11 +534,11 @@ export default function Moderation() {
                 ))}
               </ul>
             ) : (
-              <p className="mod-queue-empty">Nenhum cadastro nesta seleção.</p>
+              <p className="mod-queue-empty">{t('Nenhum cadastro nesta seleção.')}</p>
             )}
             <div className="mod-pager">
               <span>
-                Página <strong>{currentPage + 1}</strong> de {pages}
+                {t('Página')} <strong>{currentPage + 1}</strong> {t('de')} {pages}
               </span>
               <div>
                 <button
@@ -531,42 +546,43 @@ export default function Moderation() {
                   disabled={currentPage === 0}
                   onClick={() => setQueuePage(currentPage - 1)}
                 >
-                  Anterior
+                  {t('Anterior')}
                 </button>
                 <button
                   type="button"
                   disabled={currentPage >= pages - 1}
                   onClick={() => setQueuePage(currentPage + 1)}
                 >
-                  Próximo
+                  {t('Próximo')}
                 </button>
               </div>
             </div>
           </section>
           <div className="mod-audit">
             <h3>
-              <InfoIcon /> Regras de Auditoria Troca Ticket
+              <InfoIcon /> {t('Regras de Auditoria Troca Ticket')}
             </h3>
             <p>
-              Cadastros aprovados têm liberação imediata para anunciar ingressos nominais.
-              Certifique-se da consistência entre nome registrado e documento oficial. As decisões
-              ficam salvas apenas neste navegador.
+              {t(
+                'Cadastros aprovados têm liberação imediata para anunciar ingressos nominais. Certifique-se da consistência entre nome registrado e documento oficial. As decisões ficam salvas apenas neste navegador.',
+              )}
             </p>
           </div>
         </aside>
       </div>
 
       {preview && person && (
-        <Modal title="Comprovante de Identidade" onClose={() => setPreview(false)}>
+        <Modal title={t('Comprovante de Identidade')} onClose={() => setPreview(false)}>
           <p>
             <strong>{person.document}</strong>
           </p>
           <p className="muted">
-            Pré-visualização indisponível na demonstração: nenhum documento real é enviado ou
-            armazenado.
+            {t(
+              'Pré-visualização indisponível na demonstração: nenhum documento real é enviado ou armazenado.',
+            )}
           </p>
           <button type="button" className="button outline" onClick={() => setPreview(false)}>
-            Fechar
+            {t('Fechar')}
           </button>
         </Modal>
       )}

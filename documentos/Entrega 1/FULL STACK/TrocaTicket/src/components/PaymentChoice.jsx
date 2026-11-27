@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../i18n';
 
 const OPCOES = [
   ['pix', 'Pix (simulado)'],
@@ -9,7 +10,7 @@ const OPCOES = [
 export default function PaymentChoice({ value, onChange, name }) {
   return (
     <fieldset className="sp-radio-cards payment-choice">
-      <legend>Forma de pagamento (simulada)</legend>
+      <legend>{t('Forma de pagamento (simulada)')}</legend>
       {OPCOES.map(([id, rotulo]) => (
         <label key={id} className={value === id ? 'checked' : ''}>
           <input
@@ -19,11 +20,11 @@ export default function PaymentChoice({ value, onChange, name }) {
             checked={value === id}
             onChange={() => onChange(id)}
           />
-          {rotulo}
+          {t(rotulo)}
         </label>
       ))}
       <small className="muted">
-        Nenhum dado de pagamento é pedido; o resultado é uma simulação.
+        {t('Nenhum dado de pagamento é pedido; o resultado é uma simulação.')}
       </small>
     </fieldset>
   );

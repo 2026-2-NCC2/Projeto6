@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { t } from '../i18n';
 
 // Faixa de convite para o Troca-Papo. A homepage do Usuário usa os textos da referência 01.
 export default function PapoBanner({
@@ -12,12 +13,12 @@ export default function PapoBanner({
     <section className="uh-papo-wrap section">
       <div className="uh-papo">
         <div>
-          <p className="eyebrow">{eyebrow}</p>
-          <h2>{title}</h2>
-          <p>{text}</p>
+          <p className="eyebrow">{t(eyebrow)}</p>
+          <h2>{t(title)}</h2>
+          <p>{t(text)}</p>
         </div>
         <Link to={to} className="button">
-          Entrar no Troca-Papo <span aria-hidden="true">→</span>
+          {t('Entrar no Troca-Papo')} <span aria-hidden="true">→</span>
         </Link>
       </div>
     </section>

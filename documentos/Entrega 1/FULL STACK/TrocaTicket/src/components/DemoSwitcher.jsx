@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { PERFIS, inicioDoPerfil, nomeDoPerfil, roleNames } from '../data/perfis';
+import { t } from '../i18n';
 
 const ICONES = {
   comprador: '♧',
@@ -60,7 +61,7 @@ export default function DemoSwitcher({ perfilAtual }) {
     navigate('/');
   }
 
-  const nomeAtual = nomeDoPerfil(perfilAtual);
+  const nomeAtual = t(nomeDoPerfil(perfilAtual));
 
   return (
     <div className="demo-switcher" ref={caixa}>
@@ -70,13 +71,14 @@ export default function DemoSwitcher({ perfilAtual }) {
         className="demo-switcher-toggle"
         aria-expanded={aberto}
         aria-controls={idPainel}
-        aria-label={`Demo ${nomeAtual}, trocar perfil da demonstração`}
-        title="Trocar perfil da demonstração"
+        aria-label={t('Demo {nomeAtual}, trocar perfil da demonstração', { nomeAtual: nomeAtual })}
+        title={t('Trocar perfil da demonstração')}
         onClick={() => setAberto((valor) => !valor)}
       >
         <i className="demo-dot" aria-hidden="true" />
         <span className="demo-switcher-text" aria-hidden="true">
-          Demo<b>{nomeAtual}</b>
+          {t('Demo')}
+          <b>{nomeAtual}</b>
         </span>
         <span className="demo-caret" aria-hidden="true">
           ▾
@@ -86,10 +88,10 @@ export default function DemoSwitcher({ perfilAtual }) {
       {aberto && (
         <div className="demo-switcher-panel" id={idPainel}>
           <p className="demo-switcher-title">
-            Modo demonstração
-            <small>Dados fictícios, salvos só neste navegador.</small>
+            {t('Modo demonstração')}
+            <small>{t('Dados fictícios, salvos só neste navegador.')}</small>
           </p>
-          <ul aria-label="Perfis da demonstração">
+          <ul aria-label={t('Perfis da demonstração')}>
             {PERFIS.map((perfil) => {
               const atual = perfil === perfilAtual;
               return (
@@ -103,8 +105,8 @@ export default function DemoSwitcher({ perfilAtual }) {
                     <span className="demo-option-icon" aria-hidden="true">
                       {ICONES[perfil]}
                     </span>
-                    <span>{roleNames[perfil]}</span>
-                    {atual && <small>atual</small>}
+                    <span>{t(roleNames[perfil])}</span>
+                    {atual && <small>{t('atual')}</small>}
                   </button>
                 </li>
               );
@@ -112,10 +114,10 @@ export default function DemoSwitcher({ perfilAtual }) {
           </ul>
           <div className="demo-switcher-foot">
             <Link to="/perfis" onClick={() => setAberto(false)}>
-              Ver perfis
+              {t('Ver perfis')}
             </Link>
             <button type="button" onClick={sairDaDemonstracao}>
-              Sair da demonstração
+              {t('Sair da demonstração')}
             </button>
           </div>
         </div>

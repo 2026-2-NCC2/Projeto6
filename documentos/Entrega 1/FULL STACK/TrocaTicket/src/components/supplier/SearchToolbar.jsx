@@ -1,6 +1,7 @@
 import React, { useId, useState } from 'react';
 import Icon from './Icon';
 import { LabeledSelect, SearchInput } from './common';
+import { t } from '../../i18n';
 
 /*
  * Barra de pesquisa + filtros, reutilizável em qualquer listagem.
@@ -39,7 +40,7 @@ export default function SearchToolbar({
               aria-controls={panelId}
               onClick={() => setOpen((value) => !value)}
             >
-              <Icon name="filter" size={14} /> Mais filtros
+              <Icon name="filter" size={14} /> {t('Mais filtros')}
               {advancedCount > 0 && <span className="sp-count">{advancedCount}</span>}
             </button>
           )}

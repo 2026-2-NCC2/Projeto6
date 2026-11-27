@@ -19,6 +19,7 @@ import {
   limparSessaoLocal,
   podeTerSessao,
 } from '../services/api';
+import { t, useIdioma } from '../i18n';
 const Context = createContext(null);
 const STORAGE_KEY = 'trocaticket-v2';
 const defaults = {
@@ -128,6 +129,7 @@ function accountData(saved, user) {
   };
 }
 export function StoreProvider({ children }) {
+  useIdioma(); // o aviso e a faixa de armazenamento acompanham o idioma
   const [data, setData] = useState(() => {
     return read();
   });
@@ -325,15 +327,14 @@ export function StoreProvider({ children }) {
       {children}
       {storageError && (
         <div className="storage-warning" role="alert">
-          Não foi possível salvar no navegador. As alterações desta sessão podem se perder ao
-          recarregar.
+          {t('Não foi possível salvar no navegador. As alterações desta sessão podem se perder ao recarregar.')}
         </div>
       )}
       {toast && (
         <div className="toast" role="status">
           <span>✓</span>
-          {toast}
-          <button aria-label="Fechar aviso" onClick={() => setToast('')}>
+          {t(toast)}
+          <button aria-label={t('Fechar aviso')} onClick={() => setToast('')}>
             ×
           </button>
         </div>

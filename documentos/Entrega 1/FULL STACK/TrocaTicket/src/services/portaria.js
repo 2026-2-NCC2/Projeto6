@@ -1,6 +1,7 @@
 // Portaria e atendimento (etapa 5 da integração com a TrocaTicket 2.0).
 // As gravações levam Idempotency-Key: repetir a mesma ação devolve a mesma resposta.
 import { request } from './orders';
+import { localeAtual } from '../i18n';
 
 const gravar = (path, body, chave, fallback) =>
   request(
@@ -43,7 +44,7 @@ export const SITUACAO_ATENDIMENTO = {
 
 export const horaBrasilia = (iso) =>
   iso
-    ? new Date(iso).toLocaleString('pt-BR', {
+    ? new Date(iso).toLocaleString(localeAtual(), {
         timeZone: 'America/Sao_Paulo',
         day: '2-digit',
         month: '2-digit',

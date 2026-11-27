@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './UI';
 import { cancelarEvento } from '../services/admin';
 import useGravacao from '../utils/useGravacao';
+import { t } from '../i18n';
 
 // Cancelamento de evento do banco (etapa 6), usado pela administração e pelo organizador dono.
 // O motivo é obrigatório e aparece para quem comprou; quem pagou recebe o estorno simulado.
@@ -27,19 +28,18 @@ export default function CancelarEvento({ evento, aoConcluir, aoFechar }) {
   }
 
   return (
-    <Modal title="Cancelar este evento?" onClose={() => !ocupado && aoFechar()}>
+    <Modal title={t('Cancelar este evento?')} onClose={() => !ocupado && aoFechar()}>
       <form className="cancel-event-form" onSubmit={confirmar} noValidate>
         <p>
           <strong>{evento.title}</strong>
         </p>
         <p>
-          Os ingressos ativos serão cancelados e quem pagou recebe o estorno simulado: quem comprou
-          na revenda recebe o valor da revenda; os demais, o valor da compra. Reservas em aberto,
-          anúncios, fila de espera, convites e trocas pendentes são encerrados. Ingressos já
-          utilizados na portaria não são estornados. Não é possível desfazer.
+          {t(
+            'Os ingressos ativos serão cancelados e quem pagou recebe o estorno simulado: quem comprou na revenda recebe o valor da revenda; os demais, o valor da compra. Reservas em aberto, anúncios, fila de espera, convites e trocas pendentes são encerrados. Ingressos já utilizados na portaria não são estornados. Não é possível desfazer.',
+          )}
         </p>
         <label htmlFor="motivo-cancelamento">
-          Motivo do cancelamento (aparece para quem comprou)
+          {t('Motivo do cancelamento (aparece para quem comprou)')}
         </label>
         <textarea
           id="motivo-cancelamento"
@@ -53,15 +53,15 @@ export default function CancelarEvento({ evento, aoConcluir, aoFechar }) {
         />
         {erro && (
           <p id="motivo-cancelamento-erro" role="alert" className="field-error">
-            {erro}
+            {t(erro)}
           </p>
         )}
         <div className="actions">
           <button type="button" className="button outline" onClick={aoFechar} disabled={ocupado}>
-            Voltar
+            {t('Voltar')}
           </button>
           <button type="submit" className="button danger" disabled={ocupado}>
-            {ocupado ? 'Cancelando…' : 'Confirmar cancelamento'}
+            {ocupado ? t('Cancelando…') : t('Confirmar cancelamento')}
           </button>
         </div>
       </form>

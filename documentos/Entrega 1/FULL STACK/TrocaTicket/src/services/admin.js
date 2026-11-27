@@ -1,6 +1,7 @@
 // Administração ligada ao banco, aprovação de contas e cancelamento de evento
 // (etapa 6 da integração com a TrocaTicket 2.0). Gravações levam Idempotency-Key.
 import { request } from './orders';
+import { localeAtual } from '../i18n';
 
 const gravar = (path, body, chave, fallback) =>
   request(
@@ -103,7 +104,7 @@ export function documentoFormatado(documento) {
 // "26/11/2026, 14:30" no horário de Brasília.
 export const dataHoraBrasilia = (iso) =>
   iso
-    ? new Date(iso).toLocaleString('pt-BR', {
+    ? new Date(iso).toLocaleString(localeAtual(), {
         timeZone: 'America/Sao_Paulo',
         day: '2-digit',
         month: '2-digit',
@@ -116,9 +117,10 @@ export const dataHoraBrasilia = (iso) =>
 // Aviso depois do cancelamento: quantos estornos simulados e o total.
 export function mensagemCancelamento({ refunds, refundedAmount }) {
   if (!refunds) return 'Evento cancelado. Não havia valor a estornar.';
-  const total = Number(refundedAmount).toLocaleString('pt-BR', {
+  const total = Number(refundedAmount).toLocaleString(localeAtual(), {
     style: 'currency',
     currency: 'BRL',
+    currencyDisplay: 'narrowSymbol',
   });
   return `Evento cancelado. ${refunds} ${refunds === 1 ? 'estorno simulado' : 'estornos simulados'}, total de ${total}.`;
 }

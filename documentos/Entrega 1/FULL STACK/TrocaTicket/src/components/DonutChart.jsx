@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, ArcElement, DoughnutController, Tooltip } from 'chart.js';
+import { localeAtual } from '../i18n';
 
 Chart.register(ArcElement, DoughnutController, Tooltip);
 
@@ -41,7 +42,7 @@ export default function DonutChart({ items, unit = 'un.', ariaLabel, children })
               label: (ctx) => {
                 const value = ctx.parsed;
                 const share = total ? Math.round((value / total) * 100) : 0;
-                return ` ${ctx.label}: ${value.toLocaleString('pt-BR')} ${unit} (${share}%)`;
+                return ` ${ctx.label}: ${value.toLocaleString(localeAtual())} ${unit} (${share}%)`;
               },
             },
           },

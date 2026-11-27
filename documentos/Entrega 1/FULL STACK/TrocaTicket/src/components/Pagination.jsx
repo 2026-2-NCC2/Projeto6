@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../i18n';
 
 // 1 2 3 … 10: sempre mostra as pontas e a página atual com vizinhas.
 function pageList(page, pages) {
@@ -25,14 +26,14 @@ export default function Pagination({ page, pageSize, total, onPage, summary }) {
           summary(from, to, total)
         ) : (
           <>
-            Mostrando <strong>{from}</strong> a <strong>{to}</strong> de <strong>{total}</strong>{' '}
-            resultados
+            {t('Mostrando')} <strong>{from}</strong> {t('a')} <strong>{to}</strong> {t('de')}{' '}
+            <strong>{total}</strong> {t('resultados')}
           </>
         )}
       </span>
-      <nav className="pager-nav" aria-label="Paginação">
+      <nav className="pager-nav" aria-label={t('Paginação')}>
         <button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)}>
-          Anterior
+          {t('Anterior')}
         </button>
         {pageList(page, pages).map((item) =>
           typeof item === 'string' ? (
@@ -52,7 +53,7 @@ export default function Pagination({ page, pageSize, total, onPage, summary }) {
           ),
         )}
         <button type="button" disabled={page >= pages} onClick={() => onPage(page + 1)}>
-          Próximo
+          {t('Próximo')}
         </button>
       </nav>
     </div>

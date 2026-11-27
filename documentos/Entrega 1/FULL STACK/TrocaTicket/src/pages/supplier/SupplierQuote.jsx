@@ -8,6 +8,7 @@ import { BriefingPanel, DemandCard, OrganizerCard, QuoteFooter, QuoteItemsTable 
 import { Callout, Chip, LabeledSelect, SearchInput, Tag } from '../../components/supplier/common';
 import Icon from '../../components/supplier/Icon';
 import { getSupplierInventory, getSupplierOpportunities, getSupplierProposals, saveSupplierProposal } from '../../services/supplier';
+import { localeAtual, t } from '../../i18n';
 
 const PAYMENTS = ['50% sinal + 50% D+10', 'Faturamento 28 DDL'];
 const CRITERIA = [
@@ -28,7 +29,7 @@ function databaseOpportunity(event) {
       code: event.proposal?.protocol || `EV-${event.id}`,
       lot: event.category,
       venue: event.location,
-      audience: event.capacity ? `${event.capacity.toLocaleString('pt-BR')} pessoas` : 'Não informado',
+      audience: event.capacity ? `${event.capacity.toLocaleString(localeAtual())} pessoas` : 'Não informado',
       window: {
         state: submitted ? 'submitted' : 'open',
         pill: submitted ? 'Proposta enviada' : 'Evento publicado',
@@ -143,21 +144,21 @@ export default function SupplierQuote() {
   }, [connectedSupplier, draftSignature, event?.id, itemSignature]);
 
   if (connectedSupplier && !loaded && !loadError) {
-    return <div className="workspace sp-page"><p role="status">Carregando cotação do banco de dados…</p></div>;
+    return <div className="workspace sp-page"><p role="status">{t('Carregando cotação do banco de dados…')}</p></div>;
   }
   if (loadError) {
     return (
       <div className="workspace sp-page">
         <div className="api-error" role="alert">
-          <span>Não foi possível carregar a cotação: {loadError}</span>
+          <span>{t('Não foi possível carregar a cotação:')} {t(loadError)}</span>
           <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       </div>
     );
   }
-  if (!event) return <NotFound title="Cotação não encontrada" />;
+  if (!event) return <NotFound title={t('Cotação não encontrada')} />;
 
   const { quote } = event;
   const locked = quote.window.state === 'submitted';
@@ -251,28 +252,28 @@ export default function SupplierQuote() {
       <PageTitle
         title={
           <span className="sp-title-with-chip">
-            Eventos
-            <Chip tone="blue">{openCount} abertos para cotação</Chip>
-            {closingCount > 0 && <Chip tone="amber">{closingCount} próximo do prazo</Chip>}
+            {t('Eventos')}
+            <Chip tone="blue">{openCount} {t('abertos para cotação')}</Chip>
+            {closingCount > 0 && <Chip tone="amber">{closingCount} {t('próximo do prazo')}</Chip>}
           </span>
         }
-        subtitle="Selecione uma demanda no menu lateral para visualizar os editais e submeter sua proposta técnica e comercial."
+        subtitle={t('Selecione uma demanda no menu lateral para visualizar os editais e submeter sua proposta técnica e comercial.')}
       >
-        <SearchInput value={query} onChange={setQuery} placeholder="Buscar evento ou organizadora…" label="Buscar evento ou organizadora" />
-        <LabeledSelect label="Categoria:" value={category} onChange={setCategory} options={categories} />
+        <SearchInput value={query} onChange={setQuery} placeholder={t('Buscar evento ou organizadora…')} label={t('Buscar evento ou organizadora')} />
+        <LabeledSelect label={t('Categoria:')} value={category} onChange={setCategory} options={categories} />
       </PageTitle>
 
       <div className="sp-quote-layout">
         <aside className="sp-quote-side">
           <OrganizerCard name={event.organizer} city={quote.organizer.city} reliability={quote.organizer.reliability} />
           <div className="sp-side-title">
-            <small>DEMANDA EM CONCORRÊNCIA</small>
-            <span>Total: {demands.length}</span>
+            <small>{t('DEMANDA EM CONCORRÊNCIA')}</small>
+            <span>{t('Total:')} {demands.length}</span>
           </div>
           {demands.map((demand) => (
             <DemandCard key={demand.id} event={demand} active={demand.id === id} />
           ))}
-          {!demands.length && <p className="muted sp-side-empty">Nenhuma demanda com esses filtros.</p>}
+          {!demands.length && <p className="muted sp-side-empty">{t('Nenhuma demanda com esses filtros.')}</p>}
           <BriefingPanel docs={quote.docs} onOpen={openDoc} />
         </aside>
 
@@ -280,50 +281,50 @@ export default function SupplierQuote() {
           <div className="sp-quote-top">
             <div>
               <div className="sp-quote-tags">
-                <Tag tone="blue">COTAÇÃO ATIVA Nº {quote.code}</Tag>
-                <span>Lote: {quote.lot}</span>
+                <Tag tone="blue">{t('COTAÇÃO ATIVA Nº')} {quote.code}</Tag>
+                <span>{t('Lote:')} {t(quote.lot)}</span>
               </div>
               <h1>
-                {event.title} — {event.subtitle}
+                {event.title} — {t(event.subtitle)}
               </h1>
               <p className="sp-quote-meta">
                 <span>
                   <Icon name="pin" size={14} /> {quote.venue} · {event.location}
                 </span>
                 <span>
-                  <Icon name="user" size={14} /> Público estimado: {quote.audience}
+                  <Icon name="user" size={14} /> {t('Público estimado:')} {t(quote.audience)}
                 </span>
               </p>
             </div>
             <div className={`sp-deadline ${quote.window.state}`}>
-              <small>RECEBIMENTO DE PROPOSTAS</small>
-              <strong>{quote.closesIn}</strong>
-              <span>{quote.closesAt}</span>
+              <small>{t('RECEBIMENTO DE PROPOSTAS')}</small>
+              <strong>{t(quote.closesIn)}</strong>
+              <span>{t(quote.closesAt)}</span>
             </div>
           </div>
 
           <p className="sp-scope-text">
-            <strong>Escopo resumido:</strong> {quote.scope}
+            <strong>{t('Escopo resumido:')}</strong> {t(quote.scope)}
           </p>
 
           {locked && (
             <Callout
               tone="blue"
               icon="check"
-              title={`Proposta enviada em ${event.proposal.sentAt}`}
-              action={<span className="sp-protocol">Protocolo {event.proposal.protocol}</span>}
+              title={t('Proposta enviada em {sentAt}', { sentAt: event.proposal.sentAt })}
+              action={<span className="sp-protocol">{t('Protocolo')} {event.proposal.protocol}</span>}
             >
-              Os valores abaixo estão bloqueados enquanto a proposta é analisada.
+              {t('Os valores abaixo estão bloqueados enquanto a proposta é analisada.')}
             </Callout>
           )}
 
           <div className="sp-section-head">
             <h2>
-              {connectedSupplier ? 'Itens ofertados do seu inventário' : 'Itens requisitados para cotação'}{' '}
-              <Chip>{items.length} itens</Chip>
+              {connectedSupplier ? t('Itens ofertados do seu inventário') : t('Itens requisitados para cotação')}{' '}
+              <Chip>{items.length} {t('itens')}</Chip>
             </h2>
             <button type="button" className="sp-link-button" onClick={() => setModal('criteria')}>
-              Revisar critérios técnicos de homologação <Icon name="arrow-right" size={13} />
+              {t('Revisar critérios técnicos de homologação')} <Icon name="arrow-right" size={13} />
             </button>
           </div>
 
@@ -337,34 +338,34 @@ export default function SupplierQuote() {
             onQuantity={(i, value) => setQuantities((old) => old.map((v, j) => (j === i ? value : v)))}
             editableQuantity={connectedSupplier}
           />
-          {apiError && <p role="alert" className="field-error">{apiError}</p>}
+          {apiError && <p role="alert" className="field-error">{t(apiError)}</p>}
           {connectedSupplier && !items.length && (
             <p className="muted">
-              Seu inventário não tem itens ativos.{' '}
-              <Link className="text-link" to="/fornecedor/inventario">Cadastre produtos ou serviços</Link>
-              {' '}para montar a proposta.
+              {t('Seu inventário não tem itens ativos.')}{' '}
+              <Link className="text-link" to="/fornecedor/inventario">{t('Cadastre produtos ou serviços')}</Link>
+              {' '}{t('para montar a proposta.')}
             </p>
           )}
           {invalid.length > 0 && (
             <p role="alert" className="field-error">
-              Informe um valor maior que zero para todos os itens.
+              {t('Informe um valor maior que zero para todos os itens.')}
             </p>
           )}
 
           <div className="sp-quote-extras">
             <FormTextArea
-              label="Observações & diferenciais da fornecedora"
+              label={t('Observações & diferenciais da fornecedora')}
               name="quote-note"
               rows={4}
               disabled={locked}
-              placeholder="Ex.: informar tempo de montagem, frota própria de caminhões refrigerados, certificados ISO…"
+              placeholder={t('Ex.: informar tempo de montagem, frota própria de caminhões refrigerados, certificados ISO…')}
               value={note}
               onChange={setNote}
             />
             <div>
-              <RadioCards legend="Condição de faturamento proposta" name="payment" options={PAYMENTS} value={payment} onChange={locked ? () => {} : setPayment} />
+              <RadioCards legend={t('Condição de faturamento proposta')} name="payment" options={PAYMENTS} value={payment} onChange={locked ? () => {} : setPayment} />
               <small className="sp-hint">
-                A condição de pagamento será registrada na proposta; pagamentos dependem de contrato formal.
+                {t('A condição de pagamento será registrada na proposta; pagamentos dependem de contrato formal.')}
               </small>
             </div>
           </div>
@@ -372,15 +373,15 @@ export default function SupplierQuote() {
           <QuoteFooter total={total} withinCeiling={ceiling === null ? null : total <= ceiling}>
             {locked ? (
               <Link className="button blue-button" to="/fornecedor/propostas">
-                Acompanhar proposta <Icon name="arrow-right" size={14} />
+                {t('Acompanhar proposta')} <Icon name="arrow-right" size={14} />
               </Link>
             ) : (
               <>
                 <button type="button" className="button sp-ghost-light" onClick={() => submit('Rascunho')}>
-                  Salvar rascunho
+                  {t('Salvar rascunho')}
                 </button>
                 <button type="button" className="button blue-button" onClick={() => submit('Em análise')}>
-                  Enviar proposta comercial <Icon name="arrow-right" size={14} />
+                  {t('Enviar proposta comercial')} <Icon name="arrow-right" size={14} />
                 </button>
               </>
             )}
@@ -389,7 +390,7 @@ export default function SupplierQuote() {
       </div>
 
       {modal === 'criteria' && (
-        <Modal title="Critérios técnicos de homologação" onClose={() => setModal(null)}>
+        <Modal title={t('Critérios técnicos de homologação')} onClose={() => setModal(null)}>
           <ul className="sp-criteria">
             {CRITERIA.map((item) => (
               <li key={item}>
@@ -397,12 +398,12 @@ export default function SupplierQuote() {
               </li>
             ))}
           </ul>
-          <p className="muted">Critérios de demonstração. Os critérios reais virão do edital de cada evento.</p>
+          <p className="muted">{t('Critérios de demonstração. Os critérios reais virão do edital de cada evento.')}</p>
         </Modal>
       )}
       {modal === 'docs' && (
-        <Modal title="Briefing do evento" onClose={() => setModal(null)}>
-          <p>{quote.scope}</p>
+        <Modal title={t('Briefing do evento')} onClose={() => setModal(null)}>
+          <p>{t(quote.scope)}</p>
           <button
             className="button outline"
             onClick={() =>
@@ -413,10 +414,10 @@ export default function SupplierQuote() {
               ])
             }
           >
-            ↓ Baixar briefing (CSV)
+            {t('↓ Baixar briefing (CSV)')}
           </button>
           <p className="muted">
-            Teto sugerido da cotação: <strong>{money(ceiling)}</strong> · evento em {dateLabel(event.date)}
+            {t('Teto sugerido da cotação:')} <strong>{money(ceiling)}</strong> {t('· evento em')} {dateLabel(event.date)}
           </p>
         </Modal>
       )}

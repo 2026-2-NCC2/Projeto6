@@ -39,12 +39,12 @@ function Info({ title, children, acao }) {
   return (
     <div className="workspace narrow">
       <section className="panel">
-        <h1>{title}</h1>
+        <h1>{t(title)}</h1>
         <p>{children}</p>
         {isAuthenticated && acao}
         {!isAuthenticated && (
           <Link className="button primary" to="/perfis">
-            Explorar os perfis
+            {t('Explorar os perfis')}
           </Link>
         )}
       </section>
@@ -59,6 +59,11 @@ function ContaOuDemo({ conta, demo }) {
 }
 export default function App() {
   const { isAuthenticated } = useStore();
+  const { idioma } = useIdioma(); // trocar o idioma redesenha as telas com os textos traduzidos
+  useEffect(() => {
+    // Título da aba no idioma escolhido, também no fórum público (fora do Layout).
+    document.title = t('TrocaTicket — Eventos & ingressos');
+  }, [idioma]);
   const [darkMode, setDarkMode] = useState(() => {
     try {
       return localStorage.getItem('trocaticket-theme') === 'dark';
@@ -145,10 +150,8 @@ export default function App() {
         <Route
           path="termos"
           element={
-            <Info title="Termos da demonstração">
-              Este é um protótipo acadêmico. Eventos, empresas, propostas, moderação e reservas são
-              demonstrativos. Nenhuma compra, autenticação ou contratação real é realizada. As
-              informações podem ser alteradas localmente para testar os fluxos.
+            <Info title={t('Termos da demonstração')}>
+              {t('Este é um protótipo acadêmico. Eventos, empresas, propostas, moderação e reservas são demonstrativos. Nenhuma compra, autenticação ou contratação real é realizada. As informações podem ser alteradas localmente para testar os fluxos.')}
             </Info>
           }
         />
@@ -156,11 +159,8 @@ export default function App() {
         <Route
           path="privacidade"
           element={
-            <Info title="Privacidade nesta demonstração">
-              As alterações em eventos, propostas, inventário, perfil e preferências ficam no
-              armazenamento local deste navegador. Use apenas dados fictícios. Senhas e documentos
-              dos formulários de acesso não são salvos nem enviados. Limpar os dados do site no
-              navegador remove as alterações.
+            <Info title={t('Privacidade nesta demonstração')}>
+              {t('As alterações em eventos, propostas, inventário, perfil e preferências ficam no armazenamento local deste navegador. Use apenas dados fictícios. Senhas e documentos dos formulários de acesso não são salvos nem enviados. Limpar os dados do site no navegador remove as alterações.')}
             </Info>
           }
         />
@@ -168,25 +168,22 @@ export default function App() {
           path="ajuda"
           element={
             <Info
-              title="Ajuda & Suporte"
+              title={t('Ajuda & Suporte')}
               acao={
                 <Link className="button primary" to="/atendimento">
-                  Abrir atendimento
+                  {t('Abrir atendimento')}
                 </Link>
               }
             >
-              Use “Explorar demo” ou “Trocar perfil” para acessar cada área. O organizador cria e
-              publica eventos; o fornecedor prepara cotações e gerencia itens; o usuário salva
-              favoritos e simula reservas; o administrador consulta relatórios e modera cadastros
-              fictícios. A integração com serviços reais ainda não faz parte deste front-end.
+              {t('Use “Explorar demo” ou “Trocar perfil” para acessar cada área. O organizador cria e publica eventos; o fornecedor prepara cotações e gerencia itens; o usuário salva favoritos e simula reservas; o administrador consulta relatórios e modera cadastros fictícios. A integração com serviços reais ainda não faz parte deste front-end.')}
             </Info>
           }
         />
         <Route
           path="*"
           element={
-            <Info title="404 — Página não encontrada">
-              O endereço acessado não existe. Escolha uma área para continuar.
+            <Info title={t('404 — Página não encontrada')}>
+              {t('O endereço acessado não existe. Escolha uma área para continuar.')}
             </Info>
           }
         />
@@ -196,6 +193,7 @@ export default function App() {
   );
 }
 import { useParams } from 'react-router';
+import { t, useIdioma } from './i18n';
 function EventEditorRoute() {
   const { id } = useParams();
   return <EventEditor key={id} />;

@@ -1,11 +1,17 @@
 import React, { useEffect, useRef, useId } from 'react';
 import { Link } from 'react-router';
+import { localeAtual, t } from '../i18n';
 
+// Valores em reais e datas no formato do idioma escolhido (etapa 7).
 export const money = (value) =>
-  Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  Number(value).toLocaleString(localeAtual(), {
+    style: 'currency',
+    currency: 'BRL',
+    currencyDisplay: 'narrowSymbol',
+  });
 
 export const dateLabel = (date) =>
-  date ? new Date(`${date}T12:00:00`).toLocaleDateString('pt-BR') : 'A definir';
+  date ? new Date(`${date}T12:00:00`).toLocaleDateString(localeAtual()) : t('A definir');
 
 export function Badge({ children, tone }) {
   const text = String(children).toLowerCase();
@@ -18,16 +24,17 @@ export function Badge({ children, tone }) {
         : /recus|cancel|selecionada/.test(text)
           ? 'red'
           : 'blue');
-  return <span className={`badge ${color}`}>{children}</span>;
+  // A cor vem do texto original; a situação aparece no idioma escolhido.
+  return <span className={`badge ${color}`}>{typeof children === 'string' ? t(children) : children}</span>;
 }
 
 export function PageTitle({ title, subtitle, children, eyebrow, heading: Heading = 'h1' }) {
   return (
     <div className="page-title">
       <div>
-        {eyebrow && <p className="eyebrow purple">{eyebrow}</p>}
-        <Heading>{title}</Heading>
-        {subtitle && <p>{subtitle}</p>}
+        {eyebrow && <p className="eyebrow purple">{t(eyebrow)}</p>}
+        <Heading>{t(title)}</Heading>
+        {subtitle && <p>{t(subtitle)}</p>}
       </div>
       <div className="actions">{children}</div>
     </div>
@@ -40,8 +47,8 @@ export function Panel({ title, subtitle, children, className = '', action }) {
       {title && (
         <div className="panel-heading">
           <div>
-            <h2>{title}</h2>
-            {subtitle && <p>{subtitle}</p>}
+            <h2>{t(title)}</h2>
+            {subtitle && <p>{t(subtitle)}</p>}
           </div>
           {action}
         </div>
@@ -55,15 +62,15 @@ export function Empty({ title = 'Nenhum resultado encontrado', children, heading
   return (
     <div className="empty-state">
       <span aria-hidden="true">◇</span>
-      <Heading>{title}</Heading>
-      <p>{children || 'Tente ajustar os filtros para encontrar o que procura.'}</p>
+      <Heading>{t(title)}</Heading>
+      <p>{typeof children === 'string' ? t(children) : children || t('Tente ajustar os filtros para encontrar o que procura.')}</p>
     </div>
   );
 }
 
 export function Tabs({ options, value, onChange, label = 'Filtrar resultados' }) {
   return (
-    <div className="tabs" role="group" aria-label={label}>
+    <div className="tabs" role="group" aria-label={t(label)}>
       {options.map((option) => (
         <button
           type="button"
@@ -72,7 +79,7 @@ export function Tabs({ options, value, onChange, label = 'Filtrar resultados' })
           aria-pressed={value === option}
           onClick={() => onChange(option)}
         >
-          {option}
+          {t(option)}
         </button>
       ))}
     </div>
@@ -121,9 +128,9 @@ export function Field({ label, name, id, error, mask, onChange, children, ...pro
 
   return (
     <div className={`field ${error ? 'has-error' : ''}`}>
-      <label htmlFor={fieldId}>{label}</label>
+      <label htmlFor={fieldId}>{t(label)}</label>
       {control}
-      {error && <span id={errorId} className="field-error" role="alert">{error}</span>}
+      {error && <span id={errorId} className="field-error" role="alert">{t(error)}</span>}
     </div>
   );
 }
@@ -151,8 +158,8 @@ export function Modal({ title, children, onClose }) {
       }}
     >
       <div className="panel-heading">
-        <h2 id={titleId}>{title}</h2>
-        <button className="icon-button" aria-label="Fechar janela" onClick={onClose}>
+        <h2 id={titleId}>{t(title)}</h2>
+        <button className="icon-button" aria-label={t('Fechar janela')} onClick={onClose}>
           ×
         </button>
       </div>
@@ -163,7 +170,7 @@ export function Modal({ title, children, onClose }) {
 export function DownloadButton({ name, rows, children = '↓ Exportar CSV' }) {
   return (
     <button className="button outline" onClick={() => downloadCSV(name, rows)}>
-      {children}
+      {typeof children === 'string' ? t(children) : children}
     </button>
   );
 }
@@ -186,9 +193,9 @@ export function downloadCSV(name, rows) {
 export function NotFound({ title = 'Página não encontrada' }) {
   return (
     <div className="workspace">
-      <Empty title={title}>O endereço solicitado não está disponível.</Empty>
+      <Empty title={title}>{t('O endereço solicitado não está disponível.')}</Empty>
       <Link className="button primary" to="/perfis">
-        Escolher uma área
+        {t('Escolher uma área')}
       </Link>
     </div>
   );

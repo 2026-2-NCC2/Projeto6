@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../i18n';
 
 /*
  * Faixa de resumo logo abaixo da busca.
@@ -11,7 +12,7 @@ export default function SummaryBar({ items, trailing }) {
       <div>
         {items.map((item) => (
           <p key={item.label}>
-            {item.label}: <strong className={item.tone || ''}>{item.value}</strong>
+            {t(item.label)}: <strong className={item.tone || ''}>{item.value}</strong>
           </p>
         ))}
       </div>

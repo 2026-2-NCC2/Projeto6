@@ -13,6 +13,7 @@ import {
   listarContas,
   resumoAdmin,
 } from '../../services/admin';
+import { t } from '../../i18n';
 
 // Aprovação de contas com os dados do banco (etapa 6). A moderação de demonstração continua em
 // pages/Moderation.jsx. Organizador e fornecedor só publicam e negociam depois da aprovação;
@@ -124,8 +125,10 @@ export default function AprovacoesAdmin() {
   return (
     <div className="workspace admin-approvals">
       <PageTitle
-        title="Aprovação de contas"
-        subtitle="O cadastro público nunca cria administradores. Organizadores e fornecedores publicam e negociam só depois da aprovação."
+        title={t('Aprovação de contas')}
+        subtitle={t(
+          'O cadastro público nunca cria administradores. Organizadores e fornecedores publicam e negociam só depois da aprovação.',
+        )}
       />
 
       <div className="mod-toolbar">
@@ -138,16 +141,16 @@ export default function AprovacoesAdmin() {
           }}
         >
           <input
-            aria-label="Buscar por nome, e-mail ou organização"
-            placeholder="Buscar por nome, e-mail ou organização…"
+            aria-label={t('Buscar por nome, e-mail ou organização')}
+            placeholder={t('Buscar por nome, e-mail ou organização…')}
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
           <button type="submit" className="button outline tiny">
-            Buscar
+            {t('Buscar')}
           </button>
         </form>
-        <div className="mod-chips" role="group" aria-label="Filtrar por situação">
+        <div className="mod-chips" role="group" aria-label={t('Filtrar por situação')}>
           {FILTROS.map(([valor, nome]) => (
             <button
               type="button"
@@ -159,17 +162,17 @@ export default function AprovacoesAdmin() {
               onClick={() => setSituacao(valor)}
             >
               <i aria-hidden="true" />
-              {nome}
+              {t(nome)}
               {contagem[valor] !== undefined && <b>{contagem[valor]}</b>}
             </button>
           ))}
         </div>
         <label className="admin-profile-filter">
-          Perfil:
+          {t('Perfil:')}
           <select value={perfil} onChange={(e) => setPerfil(e.target.value)}>
             {PERFIS.map(([valor, nome]) => (
               <option key={nome} value={valor}>
-                {nome}
+                {t(nome)}
               </option>
             ))}
           </select>
@@ -180,9 +183,9 @@ export default function AprovacoesAdmin() {
         <section className="panel" aria-labelledby="contas-titulo">
           <div className="panel-heading">
             <div>
-              <h2 id="contas-titulo">Contas</h2>
+              <h2 id="contas-titulo">{t('Contas')}</h2>
               <p>
-                {termo ? `Busca: “${termo}” · ` : ''}
+                {termo ? t('Busca: “{termo}” · ', { termo: termo }) : ''}
                 {contas ? `${contas.length} ${contas.length === 1 ? 'conta' : 'contas'}` : ''}
               </p>
             </div>
@@ -191,15 +194,15 @@ export default function AprovacoesAdmin() {
               className="button outline tiny"
               onClick={() => setTentativa((n) => n + 1)}
             >
-              Atualizar
+              {t('Atualizar')}
             </button>
           </div>
           {erro && (
             <p role="alert" className="api-error">
-              {erro}
+              {t(erro)}
             </p>
           )}
-          {!contas && !erro && <p role="status">Carregando contas…</p>}
+          {!contas && !erro && <p role="status">{t('Carregando contas…')}</p>}
           {contas &&
             (contas.length ? (
               <ul className="approval-list">
@@ -216,28 +219,30 @@ export default function AprovacoesAdmin() {
                         <div>
                           <h3>{conta.name}</h3>
                           <p className="muted">
-                            {PERFIL_CONTA[conta.profile] || conta.profile} · conta nº {conta.id} ·
-                            cadastro em {dataHoraBrasilia(conta.createdAt)}
+                            {t(PERFIL_CONTA[conta.profile] || conta.profile)} {t('· conta nº')}{' '}
+                            {conta.id} {t('· cadastro em')} {dataHoraBrasilia(conta.createdAt)}
                           </p>
                         </div>
-                        <Badge tone={tom}>{rotulo}</Badge>
+                        <Badge tone={tom}>{t(rotulo)}</Badge>
                       </div>
                       <dl className="approval-facts">
                         <div>
-                          <dt>E-mail</dt>
+                          <dt>{t('E-mail')}</dt>
                           <dd>{conta.email}</dd>
                         </div>
                         {empresa && (
                           <div>
                             <dt>
-                              {conta.profile === 'fornecedor' ? 'Nome fantasia' : 'Organização'}
+                              {conta.profile === 'fornecedor'
+                                ? t('Nome fantasia')
+                                : t('Organização')}
                             </dt>
-                            <dd>{conta.organization || 'Não informado'}</dd>
+                            <dd>{conta.organization || t('Não informado')}</dd>
                           </div>
                         )}
                         {empresa && (
                           <div>
-                            <dt>CPF / CNPJ</dt>
+                            <dt>{t('CPF / CNPJ')}</dt>
                             <dd>
                               <code>
                                 {visivel
@@ -249,12 +254,16 @@ export default function AprovacoesAdmin() {
                                   type="button"
                                   className="mod-link"
                                   aria-pressed={visivel}
-                                  aria-label={`${visivel ? 'Ocultar' : 'Mostrar'} o documento de ${conta.name}`}
+                                  aria-label={
+                                    visivel
+                                      ? t('Ocultar o documento de {name}', { name: conta.name })
+                                      : t('Mostrar o documento de {name}', { name: conta.name })
+                                  }
                                   onClick={() =>
                                     setDocumentos((atual) => ({ ...atual, [conta.id]: !visivel }))
                                   }
                                 >
-                                  {visivel ? 'Ocultar' : 'Mostrar'}
+                                  {visivel ? t('Ocultar') : t('Mostrar')}
                                 </button>
                               )}
                             </dd>
@@ -262,11 +271,13 @@ export default function AprovacoesAdmin() {
                         )}
                         {conta.lastDecision && (
                           <div>
-                            <dt>Última decisão</dt>
+                            <dt>{t('Última decisão')}</dt>
                             <dd>
-                              {(SITUACAO_CONTA[conta.lastDecision.approval] || [''])[0]} em{' '}
+                              {(SITUACAO_CONTA[conta.lastDecision.approval] || [''])[0]} {t('em')}{' '}
                               {dataHoraBrasilia(conta.lastDecision.at)}
-                              {conta.lastDecision.by ? ` por ${conta.lastDecision.by}` : ''}
+                              {conta.lastDecision.by
+                                ? t(' por {by}', { by: conta.lastDecision.by })
+                                : ''}
                               {conta.lastDecision.reason ? ` · ${conta.lastDecision.reason}` : ''}
                             </dd>
                           </div>
@@ -279,10 +290,10 @@ export default function AprovacoesAdmin() {
                               type="button"
                               className="button primary"
                               disabled={ocupado}
-                              aria-label={`Aprovar a conta de ${conta.name}`}
+                              aria-label={t('Aprovar a conta de {name}', { name: conta.name })}
                               onClick={() => decidir(conta, 'A')}
                             >
-                              Aprovar
+                              {t('Aprovar')}
                             </button>
                           )}
                           {conta.approval !== 'R' && (
@@ -290,14 +301,14 @@ export default function AprovacoesAdmin() {
                               type="button"
                               className="button danger-outline"
                               disabled={ocupado}
-                              aria-label={`Recusar a conta de ${conta.name}`}
+                              aria-label={t('Recusar a conta de {name}', { name: conta.name })}
                               onClick={() => {
                                 setErroDecisao('');
                                 setMotivo('');
                                 setRecusando(conta);
                               }}
                             >
-                              Recusar
+                              {t('Recusar')}
                             </button>
                           )}
                           {conta.approval !== 'P' && (
@@ -305,18 +316,22 @@ export default function AprovacoesAdmin() {
                               type="button"
                               className="button outline"
                               disabled={ocupado}
-                              aria-label={`Voltar para análise: conta de ${conta.name}`}
+                              aria-label={t('Voltar para análise: conta de {name}', {
+                                name: conta.name,
+                              })}
                               onClick={() => decidir(conta, 'P')}
                             >
-                              Voltar para análise
+                              {t('Voltar para análise')}
                             </button>
                           )}
                         </div>
                       ) : (
                         <p className="muted">
                           {conta.id === meuId
-                            ? 'Esta é a sua conta: a situação dela não muda por aqui.'
-                            : 'Contas de administração são criadas e mantidas pelo script do servidor.'}
+                            ? t('Esta é a sua conta: a situação dela não muda por aqui.')
+                            : t(
+                                'Contas de administração são criadas e mantidas pelo script do servidor.',
+                              )}
                         </p>
                       )}
                     </li>
@@ -324,25 +339,33 @@ export default function AprovacoesAdmin() {
                 })}
               </ul>
             ) : (
-              <Empty title="Nenhuma conta nesta seleção" heading="h3">
+              <Empty title={t('Nenhuma conta nesta seleção')} heading="h3">
                 {situacao === 'P'
-                  ? 'Nenhuma conta aguardando aprovação no momento.'
-                  : 'Ajuste os filtros ou a busca para encontrar outras contas.'}
+                  ? t('Nenhuma conta aguardando aprovação no momento.')
+                  : t('Ajuste os filtros ou a busca para encontrar outras contas.')}
               </Empty>
             ))}
         </section>
 
         <aside>
           <div className="mod-audit">
-            <h3>Regras da aprovação</h3>
+            <h3>{t('Regras da aprovação')}</h3>
             <ul>
-              <li>Contas de usuário já nascem aprovadas; organizador e fornecedor aguardam.</li>
               <li>
-                Enquanto aguarda, a conta consulta os dados, edita o perfil e prepara rascunhos.
+                {t('Contas de usuário já nascem aprovadas; organizador e fornecedor aguardam.')}
               </li>
-              <li>Recusar exige motivo: ele fica no histórico e aparece para a conta.</li>
-              <li>Conta recusada só consulta; nada é apagado e a decisão pode ser revista.</li>
-              <li>Administração não muda a própria conta nem outras contas de administração.</li>
+              <li>
+                {t(
+                  'Enquanto aguarda, a conta consulta os dados, edita o perfil e prepara rascunhos.',
+                )}
+              </li>
+              <li>{t('Recusar exige motivo: ele fica no histórico e aparece para a conta.')}</li>
+              <li>
+                {t('Conta recusada só consulta; nada é apagado e a decisão pode ser revista.')}
+              </li>
+              <li>
+                {t('Administração não muda a própria conta nem outras contas de administração.')}
+              </li>
             </ul>
           </div>
         </aside>
@@ -350,15 +373,16 @@ export default function AprovacoesAdmin() {
 
       {recusando && (
         <Modal
-          title={`Recusar a conta de ${recusando.name}?`}
+          title={t('Recusar a conta de {name}?', { name: recusando.name })}
           onClose={() => !ocupado && setRecusando(null)}
         >
           <form className="cancel-event-form" onSubmit={confirmarRecusa} noValidate>
             <p>
-              A conta continua existindo, mas não grava nada até uma nova decisão. O motivo aparece
-              para a própria conta.
+              {t(
+                'A conta continua existindo, mas não grava nada até uma nova decisão. O motivo aparece para a própria conta.',
+              )}
             </p>
-            <label htmlFor="motivo-recusa">Motivo da recusa</label>
+            <label htmlFor="motivo-recusa">{t('Motivo da recusa')}</label>
             <textarea
               id="motivo-recusa"
               required
@@ -371,7 +395,7 @@ export default function AprovacoesAdmin() {
             />
             {erroDecisao && (
               <p id="motivo-recusa-erro" role="alert" className="field-error">
-                {erroDecisao}
+                {t(erroDecisao)}
               </p>
             )}
             <div className="actions">
@@ -381,10 +405,10 @@ export default function AprovacoesAdmin() {
                 disabled={ocupado}
                 onClick={() => setRecusando(null)}
               >
-                Voltar
+                {t('Voltar')}
               </button>
               <button type="submit" className="button danger" disabled={ocupado}>
-                {ocupado ? 'Registrando…' : 'Recusar conta'}
+                {ocupado ? t('Registrando…') : t('Recusar conta')}
               </button>
             </div>
           </form>

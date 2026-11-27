@@ -3,6 +3,7 @@ import { Modal } from '../UI';
 import { inventoryStatuses, inventoryTypes, supplierCategories } from '../../data/supplier';
 import { specsToText, textToSpecs } from '../../utils/inventory';
 import { FormInput, FormSelect, FormTextArea } from './FormControls';
+import { t } from '../../i18n';
 
 /* Formulário (modal) para criar ou editar um item do catálogo. onSave recebe o item já normalizado. */
 export default function ItemFormModal({ item, onSave, onClose }) {
@@ -52,17 +53,17 @@ export default function ItemFormModal({ item, onSave, onClose }) {
   }
 
   return (
-    <Modal title={item.id ? 'Editar item' : 'Novo item do catálogo'} onClose={onClose}>
+    <Modal title={item.id ? t('Editar item') : t('Novo item do catálogo')} onClose={onClose}>
       <form noValidate onSubmit={submit} className="sp-form">
-        <FormInput label="Nome do item" name="item-name" required value={form.name} error={errors['item-name']} onChange={set('name')} />
-        <FormInput label="Versão / variação" name="item-version" value={form.version} onChange={set('version')} />
+        <FormInput label={t('Nome do item')} name="item-name" required value={form.name} error={errors['item-name']} onChange={set('name')} />
+        <FormInput label={t('Versão / variação')} name="item-version" value={form.version} onChange={set('version')} />
         <div className="sp-form-grid">
-          <FormSelect label="Categoria" name="item-category" options={supplierCategories} value={form.category} onChange={set('category')} />
-          <FormSelect label="Tipo" name="item-kind" options={inventoryTypes} value={form.kind} onChange={set('kind')} />
-          <FormInput label="Subtipo" name="item-subtype" placeholder="Ex.: Estrutura, Mão de obra" value={form.subtype} onChange={set('subtype')} />
-          <FormInput label="Unidade" name="item-unit" required value={form.unit} error={errors['item-unit']} onChange={set('unit')} />
+          <FormSelect label={t('Categoria')} name="item-category" options={supplierCategories} value={form.category} onChange={set('category')} />
+          <FormSelect label={t('Tipo')} name="item-kind" options={inventoryTypes} value={form.kind} onChange={set('kind')} />
+          <FormInput label={t('Subtipo')} name="item-subtype" placeholder={t('Ex.: Estrutura, Mão de obra')} value={form.subtype} onChange={set('subtype')} />
+          <FormInput label={t('Unidade')} name="item-unit" required value={form.unit} error={errors['item-unit']} onChange={set('unit')} />
           <FormInput
-            label="Valor de referência (R$)"
+            label={t('Valor de referência (R$)')}
             name="item-price"
             type="number"
             min="0.01"
@@ -73,28 +74,28 @@ export default function ItemFormModal({ item, onSave, onClose }) {
             onChange={set('price')}
           />
           <FormInput
-            label="Custo direto (R$)"
+            label={t('Custo direto (R$)')}
             name="item-cost"
             type="number"
             min="0"
             step="0.01"
-            hint="Usado para calcular a margem líquida."
+            hint={t('Usado para calcular a margem líquida.')}
             value={form.cost}
             error={errors['item-cost']}
             onChange={set('cost')}
           />
-          <FormSelect label="Status" name="item-status" options={inventoryStatuses} value={form.status} onChange={set('status')} />
+          <FormSelect label={t('Status')} name="item-status" options={inventoryStatuses} value={form.status} onChange={set('status')} />
         </div>
-        <FormTextArea label="Descrição técnica" name="item-description" rows={3} value={form.description} onChange={set('description')} />
+        <FormTextArea label={t('Descrição técnica')} name="item-description" rows={3} value={form.description} onChange={set('description')} />
         <FormTextArea
-          label="Especificações (uma por linha)"
+          label={t('Especificações (uma por linha)')}
           name="item-specs"
           rows={4}
-          hint="Formato: Rótulo: valor — ex.: Dimensões: 4,00 m x 2,20 m"
+          hint={t('Formato: Rótulo: valor — ex.: Dimensões: 4,00 m x 2,20 m')}
           value={form.specsText}
           onChange={set('specsText')}
         />
-        <button className="button blue-button full">Salvar item</button>
+        <button className="button blue-button full">{t('Salvar item')}</button>
       </form>
     </Modal>
   );

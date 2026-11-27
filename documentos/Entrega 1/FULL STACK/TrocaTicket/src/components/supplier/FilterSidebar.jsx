@@ -1,6 +1,7 @@
 import React from 'react';
 import Icon from './Icon';
 import { LabeledSelect } from './common';
+import { t } from '../../i18n';
 
 /*
  * Barra lateral de filtros.
@@ -10,16 +11,16 @@ import { LabeledSelect } from './common';
  */
 export default function FilterSidebar({ title = 'Filtros por status', statuses, status, onStatus, selects = [], onClear }) {
   return (
-    <aside className="sp-filter-sidebar" aria-label={title}>
+    <aside className="sp-filter-sidebar" aria-label={t(title)}>
       <div className="sp-filter-head">
         <h2>
-          <Icon name="filter" size={14} /> {title}
+          <Icon name="filter" size={14} /> {t(title)}
         </h2>
         <button type="button" className="sp-link-button" onClick={onClear}>
-          Limpar
+          {t('Limpar')}
         </button>
       </div>
-      <div className="sp-filter-list" role="group" aria-label={title}>
+      <div className="sp-filter-list" role="group" aria-label={t(title)}>
         {statuses.map((item) => (
           <button
             type="button"
@@ -29,7 +30,7 @@ export default function FilterSidebar({ title = 'Filtros por status', statuses, 
             onClick={() => onStatus(item.value)}
           >
             <i className={item.tone || 'blue'} aria-hidden="true" />
-            <span>{item.label}</span>
+            <span>{t(item.label)}</span>
             <b>{item.count}</b>
           </button>
         ))}

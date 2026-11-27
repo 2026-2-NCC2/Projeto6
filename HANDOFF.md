@@ -1,16 +1,18 @@
 # Continuidade da integração
 
-## Situação em 26/11/2026 — etapa 6 concluída
+## Situação em 27/11/2026 — etapa 7 concluída
 
-Branch integracao-site-2.0, a partir de b477108. As etapas 4 (revenda, fila de espera e transferência com aceite), 5 (portaria e atendimento) e 6 (administração ligada ao banco, aprovação de contas e cancelamento de evento com estorno) da 2.0 estão concluídas e testadas. Detalhes, decisões e resultados estão nas primeiras seções de CHECKPOINT.md. Nada foi publicado e não houve merge.
+Branch integracao-site-2.0, a partir de b477108. As etapas 4 (revenda, fila de espera e transferência com aceite), 5 (portaria e atendimento), 6 (administração ligada ao banco, aprovação de contas e cancelamento de evento com estorno) e 7 (idiomas do site: português do Brasil, inglês, espanhol, francês, alemão e italiano) da 2.0 estão concluídas e testadas. Detalhes, decisões e resultados estão nas primeiras seções de CHECKPOINT.md. Nada foi publicado e não houve merge.
 
 Para retomar:
 1. Restaure o bundle mais recente conforme o LEIA-PRIMEIRO.txt do ZIP e confira o commit esperado.
-2. Em um MySQL ou MariaDB local que possa criar bancos, rode `npm test` na pasta do app (os testes criam e apagam bancos `trocaticket_teste_*`).
+2. Em um MySQL ou MariaDB local que possa criar bancos, rode `npm test` na pasta do app (os testes criam e apagam bancos `trocaticket_teste_*`). `npm run test:front` roda só os testes do site, inclusive os dos idiomas.
 3. Com API e site iniciados num banco descartável, crie uma conta de administração nele com `npm run criar-admin`. Desde a etapa 6, organizador novo só publica depois de aprovado. Informe essa conta aos roteiros em `TT_ADMIN_EMAIL` e `TT_ADMIN_SENHA`, só no ambiente, nunca em arquivo. Os roteiros de navegador ficam em `scripts/e2e/`:
    - `navegador.py --fluxo regressao|compra|recusado` (o fluxo `recusado` exige a API com `PAGAMENTO_SIMULADO=recusado`);
-   - `repasse.py`, `portaria.py` e `administracao.py`, todos com `[--axe caminho/axe.min.js] [--fotos pasta]`.
-4. Aguarde a orientação do usuário para publicar ou avançar à etapa 7 (idiomas). O header recolhe o menu sozinho quando os textos não cabem, o que ajuda com traduções mais longas. Não salve credenciais.
+   - `repasse.py`, `portaria.py`, `administracao.py` e `idiomas.py`, todos com `[--axe caminho/axe.min.js] [--fotos pasta]`.
+   - Não edite arquivos de `src/` com um roteiro rodando: o Vite recarrega a página a cada alteração e o resultado fica inválido.
+4. Idiomas: o texto em português é a chave de `t()`; um texto novo precisa de uma linha nas seis línguas em `src/i18n/textos/` (o teste do site acusa a falta). A API continua em português e o site traduz as mensagens dela. Dados do banco e da demonstração não são traduzidos.
+5. Aguarde a orientação do usuário para publicar ou para a próxima etapa. Não salve credenciais.
 
 Objetivo do usuário: integrar na Entrega 1 o servidor, banco, autenticação, modelos, APIs e regras da main ao visual de alteraçõesMiguel. Trabalhar em branch nova e incrementalmente. Antes de editar, comparar todos os arquivos, decidir quais copiar, adaptar ou dispensar e conferir imports, assets, rotas e dependências. Substituir o tema por tokens, classes, toggle e persistência da referência e verificar legibilidade em todas as páginas nos dois temas. Integrar homes pública e autenticada com fundo estendido, elementos centralizados, banner Troca-Papo no fim e demais elementos da referência. Na home autenticada incluir cards personalizados, card interativo temporal e “Bem-vindo de volta, (nome do usuário)” usando sessão real. Preservar contratos e pedir orientação sobre ambiguidades ou riscos. Rodar build, iniciar, testar login, logout, temas, homes, rotas principais e chamadas reais à API, corrigir erros e reportar os resultados. Ao terminar a etapa 4, parar e aguardar confirmação.
 
@@ -18,7 +20,7 @@ Ler CHECKPOINT.md e DIAGNOSTICO.md. Conferir git status, branch, commits e diff 
 
 A aplicação integrada está em documentos/Entrega 1/FULL STACK/TrocaTicket. O esquema-base da Entrega 2 e as migrações da Entrega 1 são usados em bancos de teste.
 
-Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapas 4, 5 e 6 concluídas.
+Migração oficial ausente em todo o repositório; complementar criada com autorização e validada em bancos descartáveis. Etapas 4, 5, 6 e 7 concluídas.
 Branch integracao-main-miguel publicada por um colega (b477108). O usuário pediu para trazer a TrocaTicket 2.0 para a Entrega 1 por etapas, mantendo a Entrega 1 como base. Cada etapa termina com testes e parada para confirmação. O usuário prefere publicar só quando todas as etapas terminarem.
 
 ## Histórico até a compra simulada

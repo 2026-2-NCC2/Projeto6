@@ -7,6 +7,7 @@ import Icon from '../../components/supplier/Icon';
 import OpportunityCard from '../../components/supplier/OpportunityCard';
 import { useStore } from '../../context/Store';
 import { getSupplierOpportunities } from '../../services/supplier';
+import { t } from '../../i18n';
 
 const STATUSES = ['Cotação aberta', 'Em análise', 'Alta prioridade'];
 const SORTS = [
@@ -88,38 +89,38 @@ export default function SupplierHome() {
   return (
     <div className="workspace sp-page sp-home">
       <PageTitle
-        title="Painel do Fornecedor"
+        title={t('Painel do Fornecedor')}
         subtitle={data.supplierProfile?.tradeName || data.supplierProfile?.name}
       >
         <Link className="button outline" to="/fornecedor/inventario">
-          <Icon name="box" /> Inventário
+          <Icon name="box" /> {t('Inventário')}
         </Link>
         <Link className="button primary" to="/fornecedor/propostas">
-          <Icon name="file" /> Minhas propostas
+          <Icon name="file" /> {t('Minhas propostas')}
         </Link>
       </PageTitle>
 
-      <dl className="sp-home-counts" aria-label="Resumo das oportunidades">
+      <dl className="sp-home-counts" aria-label={t('Resumo das oportunidades')}>
         <div>
-          <dt><Icon name="calendar" /> Eventos disponíveis</dt>
+          <dt><Icon name="calendar" /> {t('Eventos disponíveis')}</dt>
           <dd>{countsReady ? list.length : '—'}</dd>
         </div>
         <div>
-          <dt><Icon name="clock" /> Sem proposta enviada</dt>
+          <dt><Icon name="clock" /> {t('Sem proposta enviada')}</dt>
           <dd>{countsReady ? pending : '—'}</dd>
         </div>
         <div>
-          <dt><Icon name="check" /> Com proposta enviada</dt>
+          <dt><Icon name="check" /> {t('Com proposta enviada')}</dt>
           <dd>{countsReady ? list.length - pending : '—'}</dd>
         </div>
       </dl>
 
-      <h2 className="sp-home-heading">Oportunidades de cotação</h2>
+      <h2 className="sp-home-heading">{t('Oportunidades de cotação')}</h2>
       <SearchToolbar
         query={query}
         onQuery={setQuery}
-        searchLabel="Buscar oportunidades"
-        placeholder="Buscar por evento, artista ou código…"
+        searchLabel={t('Buscar oportunidades')}
+        placeholder={t('Buscar por evento, artista ou código…')}
         filters={[
           {
             id: 'status',
@@ -127,8 +128,8 @@ export default function SupplierHome() {
             value: status,
             onChange: setStatus,
             options: [
-              { value: 'Todos', label: `Todos os eventos (${list.length})` },
-              ...STATUSES.map((value) => ({ value, label: `${value} (${countBy(value)})` })),
+              { value: 'Todos', label: `${t('Todos os eventos')} (${list.length})` },
+              ...STATUSES.map((value) => ({ value, label: `${t(value)} (${countBy(value)})` })),
             ],
           },
           { id: 'sort', label: 'Ordenar:', value: sort, onChange: setSort, options: SORTS },
@@ -137,19 +138,21 @@ export default function SupplierHome() {
         advanced={
           <>
             <label className="sp-select">
-              <span>Categoria de serviço:</span>
+              <span>{t('Categoria de serviço:')}</span>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
                 {['Todas', ...categories].map((item) => (
-                  <option key={item}>{item}</option>
+                  <option key={item} value={item}>
+                    {t(item)}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="sp-check">
               <input type="checkbox" checked={onlyPending} onChange={(e) => setOnlyPending(e.target.checked)} />
-              Somente sem proposta enviada
+              {t('Somente sem proposta enviada')}
             </label>
             <button type="button" className="sp-link-button" onClick={clearFilters}>
-              Limpar filtros
+              {t('Limpar filtros')}
             </button>
           </>
         }
@@ -157,17 +160,17 @@ export default function SupplierHome() {
 
       {loadError && (
         <div className="api-error" role="alert">
-          <span>Não foi possível carregar eventos do banco: {loadError}</span>
+          <span>{t('Não foi possível carregar eventos do banco:')} {t(loadError)}</span>
           <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       )}
-      {loading && <p role="status" className="muted">Carregando oportunidades do banco de dados…</p>}
+      {loading && <p role="status" className="muted">{t('Carregando oportunidades do banco de dados…')}</p>}
 
       {countsReady && events.length > 0 && (
         <p className="sp-home-results" role="status">
-          {events.length} {events.length === 1 ? 'oportunidade disponível' : 'oportunidades disponíveis'}
+          {events.length} {events.length === 1 ? t('oportunidade disponível') : t('oportunidades disponíveis')}
         </p>
       )}
       {countsReady && (events.length > 0 ? (
@@ -181,12 +184,12 @@ export default function SupplierHome() {
         <Empty>
           {list.length ? (
             <>
-              Nenhuma oportunidade com esses filtros.{' '}
+              {t('Nenhuma oportunidade com esses filtros.')}{' '}
               <button type="button" className="sp-link-button" onClick={clearFilters}>
-                Limpar filtros
+                {t('Limpar filtros')}
               </button>
             </>
-          ) : 'Quando houver eventos publicados para cotação, eles aparecerão aqui.'}
+          ) : t('Quando houver eventos publicados para cotação, eles aparecerão aqui.')}
         </Empty>
       ))}
     </div>

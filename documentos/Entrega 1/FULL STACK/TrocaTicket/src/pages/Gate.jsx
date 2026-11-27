@@ -9,6 +9,7 @@ import {
   resumoPortaria,
   validarEntrada,
 } from '../services/portaria';
+import { t } from '../i18n';
 
 // Portaria simulada do organizador (etapa 5): valida o código mostrado em Meus ingressos.
 // Cada ingresso entra uma vez só; o resultado e as últimas entradas aparecem na hora.
@@ -84,12 +85,12 @@ function Portaria() {
       </p>
     );
   }
-  if (!eventos) return <p role="status">Carregando seus eventos…</p>;
+  if (!eventos) return <p role="status">{t('Carregando seus eventos…')}</p>;
   if (!eventos.length) {
     return (
-      <Empty title="Você ainda não tem eventos" heading="h2">
-        Crie e publique um evento para abrir a portaria.{' '}
-        <Link to="/organizador/novo">Novo evento</Link>
+      <Empty title={t('Você ainda não tem eventos')} heading="h2">
+        {t('Crie e publique um evento para abrir a portaria.')}{' '}
+        <Link to="/organizador/novo">{t('Novo evento')}</Link>
       </Empty>
     );
   }
@@ -97,9 +98,9 @@ function Portaria() {
 
   return (
     <div className="gate-layout">
-      <Panel title="Validar entrada">
+      <Panel title={t('Validar entrada')}>
         <form className="gate-form" onSubmit={validar}>
-          <label htmlFor="gate-evento">Evento</label>
+          <label htmlFor="gate-evento">{t('Evento')}</label>
           <select
             id="gate-evento"
             value={eventoId}
@@ -109,15 +110,15 @@ function Portaria() {
               setResultado(null);
             }}
           >
-            <option value="">Selecione um evento</option>
+            <option value="">{t('Selecione um evento')}</option>
             {eventos.map((item) => (
               <option key={item.id} value={item.id} disabled={!item.open}>
                 {item.title} · {item.startDate}
-                {item.open ? '' : ' (portaria fechada)'}
+                {item.open ? '' : t(' (portaria fechada)')}
               </option>
             ))}
           </select>
-          <label htmlFor="gate-codigo">Código do ingresso</label>
+          <label htmlFor="gate-codigo">{t('Código do ingresso')}</label>
           <input
             id="gate-codigo"
             ref={campoCodigo}
@@ -127,64 +128,66 @@ function Portaria() {
             autoComplete="off"
             autoCapitalize="characters"
             spellCheck={false}
-            placeholder="TT-…"
+            placeholder={t('TT-…')}
             onChange={(e) => {
               setCodigo(e.target.value);
               setResultado(null);
             }}
           />
           <p className="muted">
-            O código está em Meus ingressos, na conta de quem vai entrar. Ele muda a cada revenda,
-            transferência ou troca. Simulação acadêmica: sem câmera e sem leitura offline.
+            {t(
+              'O código está em Meus ingressos, na conta de quem vai entrar. Ele muda a cada revenda, transferência ou troca. Simulação acadêmica: sem câmera e sem leitura offline.',
+            )}
           </p>
           <button
             type="submit"
             className="button primary"
             disabled={ocupado || !eventoId || !evento?.open}
           >
-            {ocupado ? 'Validando…' : 'Validar entrada'}
+            {ocupado ? t('Validando…') : t('Validar entrada')}
           </button>
         </form>
         {resultado?.ok && (
           <div className="gate-result ok" role="status">
-            <strong>Entrada liberada</strong>
+            <strong>{t('Entrada liberada')}</strong>
             <p>
-              {resultado.holderName} · {resultado.type} · ingresso nº {resultado.ticketId}
+              {resultado.holderName} · {resultado.type} {t('· ingresso nº')} {resultado.ticketId}
             </p>
             <small>
-              Registrada às {horaBrasilia(resultado.enteredAt)}. Uma segunda leitura será recusada.
+              {t('Registrada às')} {horaBrasilia(resultado.enteredAt)}
+              {t('. Uma segunda leitura será recusada.')}
             </small>
           </div>
         )}
         {resultado && !resultado.ok && (
           <div className="gate-result erro" role="alert">
-            <strong>Entrada recusada</strong>
+            <strong>{t('Entrada recusada')}</strong>
             <p>{resultado.message}</p>
           </div>
         )}
       </Panel>
-      <Panel title="Entradas do evento">
+      <Panel title={t('Entradas do evento')}>
         {!evento ? (
-          <p>Selecione um evento para ver as entradas.</p>
+          <p>{t('Selecione um evento para ver as entradas.')}</p>
         ) : !resumo ? (
-          <p role="status">Carregando entradas…</p>
+          <p role="status">{t('Carregando entradas…')}</p>
         ) : (
           <>
             <p className="gate-count">
               <strong>{resumo.entered}</strong> {resumo.entered === 1 ? 'entrada' : 'entradas'} ·{' '}
               {resumo.waiting}{' '}
               {resumo.waiting === 1
-                ? 'ingresso ainda não utilizado'
-                : 'ingressos ainda não utilizados'}
+                ? t('ingresso ainda não utilizado')
+                : t('ingressos ainda não utilizados')}
             </p>
             {resumo.lastEntries.length ? (
-              <ul className="resale-list" aria-label="Últimas entradas">
+              <ul className="resale-list" aria-label={t('Últimas entradas')}>
                 {resumo.lastEntries.map((entrada) => (
                   <li key={entrada.ticketId} className="resale-item">
                     <span className="resale-item-text">
                       <strong>{entrada.holderName}</strong>
                       <small>
-                        {entrada.type} · ingresso nº {entrada.ticketId} ·{' '}
+                        {entrada.type} {t('· ingresso nº')} {entrada.ticketId} ·{' '}
                         {horaBrasilia(entrada.enteredAt)}
                       </small>
                     </span>
@@ -192,7 +195,7 @@ function Portaria() {
                 ))}
               </ul>
             ) : (
-              <p>Nenhuma entrada registrada ainda.</p>
+              <p>{t('Nenhuma entrada registrada ainda.')}</p>
             )}
           </>
         )}
@@ -206,19 +209,22 @@ export default function Gate() {
   return (
     <div className="workspace">
       <PageTitle
-        title="Portaria"
-        subtitle="Valide o código do ingresso na entrada do evento. Cada ingresso entra uma vez só."
+        title={t('Portaria')}
+        subtitle={t(
+          'Valide o código do ingresso na entrada do evento. Cada ingresso entra uma vez só.',
+        )}
       >
         <Link className="button outline" to="/organizador/atendimentos">
-          Atendimentos
+          {t('Atendimentos')}
         </Link>
       </PageTitle>
       {isAuthenticated && role === 'organizador' ? (
         <Portaria />
       ) : (
-        <Empty title="Entre com uma conta de organizador para usar a portaria." heading="h2">
-          A portaria valida ingressos do banco de dados; o modo demonstração não tem ingressos
-          reais.
+        <Empty title={t('Entre com uma conta de organizador para usar a portaria.')} heading="h2">
+          {t(
+            'A portaria valida ingressos do banco de dados; o modo demonstração não tem ingressos reais.',
+          )}
         </Empty>
       )}
     </div>

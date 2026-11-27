@@ -8,6 +8,7 @@ import Icon from '../../components/supplier/Icon';
 import { Chip, LabeledSelect } from '../../components/supplier/common';
 import { withEventInfo } from '../../data/supplier';
 import { getSupplierProposals } from '../../services/supplier';
+import { t, tn } from '../../i18n';
 
 const GROUPS = [
   { value: 'Todas', label: 'Todas as propostas', tone: 'blue', match: () => true },
@@ -112,37 +113,37 @@ export default function SupplierProposals() {
       <PageTitle
         title={
           <span className="sp-title-with-chip">
-            Minhas propostas
-            <Chip tone="blue">{active} ativas</Chip>
+            {t('Minhas propostas')}
+            <Chip tone="blue">{active} {t('ativas')}</Chip>
           </span>
         }
-        subtitle="Acompanhe o ciclo de aprovação, status e valores das propostas comerciais enviadas para os eventos."
+        subtitle={t('Acompanhe o ciclo de aprovação, status e valores das propostas comerciais enviadas para os eventos.')}
       >
         <Link className="button blue-button" to="/fornecedor">
-          <Icon name="plus" size={15} /> Nova proposta comercial
+          <Icon name="plus" size={15} /> {t('Nova proposta comercial')}
         </Link>
       </PageTitle>
 
-      <div className="sp-chip-row" aria-label="Resumo das propostas">
-        <Chip>{all.length} propostas totais</Chip>
+      <div className="sp-chip-row" aria-label={t('Resumo das propostas')}>
+        <Chip>{all.length} {t('propostas totais')}</Chip>
         <Chip tone="amber" dot>
-          {count('Em análise')} em análise
+          {count('Em análise')} {t('em análise')}
         </Chip>
         <Chip tone="green" dot>
-          {count('Aprovada')} aprovadas / contratadas
+          {count('Aprovada')} {t('aprovadas / contratadas')}
         </Chip>
-        <Chip dot>{count('Não selecionada')} não selecionadas</Chip>
-        <Chip>{count('Encerrada')} encerrada{count('Encerrada') === 1 ? '' : 's'}</Chip>
+        <Chip dot>{count('Não selecionada')} {t('não selecionadas')}</Chip>
+        <Chip>{tn(count('Encerrada'), '{n} encerrada', '{n} encerradas')}</Chip>
       </div>
       {loadError && (
         <div className="api-error" role="alert">
-          <span>Não foi possível carregar propostas do banco: {loadError}</span>
+          <span>{t('Não foi possível carregar propostas do banco:')} {t(loadError)}</span>
           <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       )}
-      {loading && <p role="status" className="muted">Carregando propostas do banco de dados…</p>}
+      {loading && <p role="status" className="muted">{t('Carregando propostas do banco de dados…')}</p>}
 
       <div className="sp-proposals-layout">
         <FilterSidebar
@@ -172,12 +173,12 @@ export default function SupplierProposals() {
           ]}
         />
 
-        <section aria-label="Lista de propostas">
+        <section aria-label={t('Lista de propostas')}>
           <div className="sp-list-bar">
             <p aria-live="polite">
-              Exibindo: <strong>{proposals.length} {proposals.length === 1 ? 'proposta' : 'propostas'}</strong>
+              {t('Exibindo:')} <strong>{proposals.length} {proposals.length === 1 ? 'proposta' : 'propostas'}</strong>
             </p>
-            <LabeledSelect label="Ordenar por:" value={sort} onChange={setSort} options={SORTS} />
+            <LabeledSelect label={t('Ordenar por:')} value={sort} onChange={setSort} options={SORTS} />
           </div>
           {proposals.length > 0 ? (
             <div className="sp-grid-proposals">
@@ -193,9 +194,9 @@ export default function SupplierProposals() {
             </div>
           ) : (
             <Empty>
-              Nenhuma proposta com esses filtros.{' '}
+              {t('Nenhuma proposta com esses filtros.')}{' '}
               <button type="button" className="sp-link-button" onClick={clear}>
-                Limpar filtros
+                {t('Limpar filtros')}
               </button>
             </Empty>
           )}
@@ -204,22 +205,22 @@ export default function SupplierProposals() {
 
       {selected && (
         <Modal title={selected.title} onClose={() => setSelected(null)}>
-          <Badge tone={outcomeOf(selected).tone === 'gray' ? 'blue' : undefined}>{selected.status}</Badge>
+          <Badge tone={outcomeOf(selected).tone === 'gray' ? 'blue' : undefined}>{t(selected.status)}</Badge>
           <p>{selected.description}</p>
           <p>
-            Total: <strong>{money(selected.total)}</strong> · Pagamento: {selected.payment}
+            {t('Total:')} <strong>{money(selected.total)}</strong> {t('· Pagamento:')} {selected.payment}
           </p>
           <p className="muted">
-            {selected.organizer} · {selected.location} · evento em {dateLabel(selected.eventDate)}
+            {selected.organizer} · {selected.location} {t('· evento em')} {dateLabel(selected.eventDate)}
           </p>
           {selected.items?.length > 0 && (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Item</th>
-                    <th>Qtd.</th>
-                    <th>Valor unit.</th>
+                    <th>{t('Item')}</th>
+                    <th>{t('Qtd.')}</th>
+                    <th>{t('Valor unit.')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -227,7 +228,7 @@ export default function SupplierProposals() {
                     <tr key={item.name}>
                       <td>{item.name}</td>
                       <td>
-                        {item.qty} {item.unit}
+                        {item.qty} {t(item.unit)}
                       </td>
                       <td>{money(item.price)}</td>
                     </tr>
@@ -236,14 +237,14 @@ export default function SupplierProposals() {
               </table>
             </div>
           )}
-          {selected.note && <p>Observações: {selected.note}</p>}
+          {selected.note && <p>{t('Observações:')} {selected.note}</p>}
           <p className="muted">
             {connectedSupplier
-              ? 'Proposta persistida no banco. Nenhum contrato ou pagamento real foi realizado.'
-              : 'Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi realizado.'}
+              ? t('Proposta persistida no banco. Nenhum contrato ou pagamento real foi realizado.')
+              : t('Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi realizado.')}
           </p>
           <button className="button outline" onClick={() => exportOne(selected)}>
-            ↓ Baixar resumo (CSV)
+            {t('↓ Baixar resumo (CSV)')}
           </button>
         </Modal>
       )}

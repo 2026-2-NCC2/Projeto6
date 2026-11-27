@@ -15,6 +15,7 @@ import {
   dateLabel,
   money,
 } from '../components/UI';
+import { t } from '../i18n';
 
 export function Opportunities() {
   const [query, setQuery] = useState('');
@@ -34,58 +35,64 @@ export function Opportunities() {
       <Panel>
         <div className="filter-bar no-margin">
           <input
-            aria-label="Buscar oportunidades"
-            placeholder="Buscar por evento, artista ou organizador…"
+            aria-label={t('Buscar oportunidades')}
+            placeholder={t('Buscar por evento, artista ou organizador…')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <select
-            aria-label="Status da oportunidade"
+            aria-label={t('Status da oportunidade')}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
             {['Todos', 'Cotação aberta', 'Em análise', 'Alta prioridade'].map((s) => (
-              <option key={s}>{s}</option>
+              <option value={s} key={s}>
+                {t(s)}
+              </option>
             ))}
           </select>
           <select
-            aria-label="Ordenar oportunidades"
+            aria-label={t('Ordenar oportunidades')}
             value={sort}
             onChange={(e) => setSort(e.target.value)}
           >
-            <option>Data</option>
-            <option>Nome</option>
+            <option value="Data">{t('Data')}</option>
+            <option value="Nome">{t('Nome')}</option>
           </select>
         </div>
       </Panel>
       <PageTitle
-        title="Grade de Eventos Disponíveis"
-        subtitle={`${filtered.length} oportunidades · selecione uma cotação para enviar sua proposta.`}
+        title={t('Grade de Eventos Disponíveis')}
+        subtitle={t('{length} oportunidades · selecione uma cotação para enviar sua proposta.', {
+          length: filtered.length,
+        })}
       />
       <div className="cards-three">
         {filtered.map((event, i) => (
           <Panel className="opportunity" key={event.id}>
             <div className="card-actions">
-              <Badge>EVENTO {i + 1}</Badge>
-              <Badge>{event.status}</Badge>
+              <Badge>
+                {t('EVENTO')} {i + 1}
+              </Badge>
+              <Badge>{t(event.status)}</Badge>
             </div>
             <h2>{event.title}</h2>
             <p className="muted">{event.subtitle}</p>
             <div className="info-note">
-              <small>DATA DO EVENTO</small>
+              <small>{t('DATA DO EVENTO')}</small>
               <strong>{dateLabel(event.date)}</strong>
               <span>{event.location}</span>
             </div>
             <dl className="key-values">
-              <dt>Organizador solicitante</dt>
+              <dt>{t('Organizador solicitante')}</dt>
               <dd>{event.organizer}</dd>
-              <dt>Serviços solicitados</dt>
-              <dd>{event.category}</dd>
-              <dt>Referência de orçamento</dt>
+              <dt>{t('Serviços solicitados')}</dt>
+              <dd>{t(event.category)}</dd>
+              <dt>{t('Referência de orçamento')}</dt>
               <dd>{money(event.price)}</dd>
             </dl>
             <Link className="button dark full" to={`/fornecedor/cotacao/${event.id}`}>
-              Ver detalhes & cotar →
+              {t('Ver detalhes & cotar →')}
             </Link>
           </Panel>
         ))}
@@ -106,11 +113,13 @@ export function Proposals() {
   return (
     <div className="workspace">
       <PageTitle
-        title="Minhas Propostas"
-        subtitle="Acompanhe o ciclo de vida, os valores e o status das suas propostas comerciais."
+        title={t('Minhas Propostas')}
+        subtitle={t(
+          'Acompanhe o ciclo de vida, os valores e o status das suas propostas comerciais.',
+        )}
       >
         <Link className="button blue-button" to="/fornecedor">
-          + Nova proposta comercial
+          {t('+ Nova proposta comercial')}
         </Link>
       </PageTitle>
       <Tabs
@@ -120,12 +129,12 @@ export function Proposals() {
       />
       <div className="proposal-layout">
         <aside>
-          <Panel title="Resumo das propostas">
+          <Panel title={t('Resumo das propostas')}>
             <div className="large-number">{data.proposals.length}</div>
-            <p className="muted">Propostas neste ambiente</p>
+            <p className="muted">{t('Propostas neste ambiente')}</p>
             <hr />
             <strong>{money(data.proposals.reduce((s, p) => s + p.total, 0))}</strong>
-            <p className="muted">Valor total proposto</p>
+            <p className="muted">{t('Valor total proposto')}</p>
             <DownloadButton
               name="minhas-propostas.csv"
               rows={[
@@ -137,14 +146,16 @@ export function Proposals() {
         </aside>
         <div>
           <div className="filter-bar">
-            <span>{proposals.length} propostas encontradas</span>
+            <span>
+              {proposals.length} {t('propostas encontradas')}
+            </span>
             <select
-              aria-label="Ordenar propostas"
+              aria-label={t('Ordenar propostas')}
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
-              <option>Recentes</option>
-              <option>Maior valor</option>
+              <option value="Recentes">{t('Recentes')}</option>
+              <option value="Maior valor">{t('Maior valor')}</option>
             </select>
           </div>
           <div className="cards-two">
@@ -160,17 +171,17 @@ export function Proposals() {
                 <h2>{p.title}</h2>
                 <p className="muted">{opportunities.find((e) => e.id === p.eventId)?.location}</p>
                 <div className="info-note">
-                  <small>ITENS & SERVIÇOS OFERTADOS</small>
-                  <p>{p.description || 'Proposta de serviços para o evento.'}</p>
+                  <small>{t('ITENS & SERVIÇOS OFERTADOS')}</small>
+                  <p>{p.description || t('Proposta de serviços para o evento.')}</p>
                 </div>
                 <div className="proposal-price">
-                  <small>Valor total proposto</small>
+                  <small>{t('Valor total proposto')}</small>
                   <strong>{money(p.total)}</strong>
                 </div>
                 <Badge>{p.status}</Badge>
                 <p className="muted">{p.payment}</p>
                 <button className="button outline full" onClick={() => setSelected(p)}>
-                  Ver detalhes da proposta →
+                  {t('Ver detalhes da proposta →')}
                 </button>
               </Panel>
             ))}
@@ -180,16 +191,23 @@ export function Proposals() {
       </div>
       {selected && (
         <Modal title={selected.title} onClose={() => setSelected(null)}>
-          <Badge>{selected.status}</Badge>
+          <Badge>{t(selected.status)}</Badge>
           <p>{selected.description}</p>
           <p>
-            Total: <strong>{money(selected.total)}</strong>
+            {t('Total:')} <strong>{money(selected.total)}</strong>
           </p>
-          <p>Pagamento: {selected.payment}</p>
-          {selected.note && <p>Observações: {selected.note}</p>}
+          <p>
+            {t('Pagamento:')} {selected.payment}
+          </p>
+          {selected.note && (
+            <p>
+              {t('Observações:')} {selected.note}
+            </p>
+          )}
           <p className="muted">
-            Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi
-            realizado.
+            {t(
+              'Proposta registrada apenas neste navegador. Nenhum contrato ou pagamento real foi realizado.',
+            )}
           </p>
           <DownloadButton
             name={`${selected.id}.csv`}
@@ -200,7 +218,7 @@ export function Proposals() {
           />
           {selected.status === 'Rascunho' && (
             <Link className="button blue-button" to={`/fornecedor/cotacao/${selected.eventId}`}>
-              Continuar proposta
+              {t('Continuar proposta')}
             </Link>
           )}
         </Modal>
@@ -219,7 +237,7 @@ export function Quote() {
   const [note, setNote] = useState(draft?.note || '');
   const [payment, setPayment] = useState(draft?.payment || '50% sinal + 50% D+10');
   const [error, setError] = useState('');
-  if (!event) return <NotFound title="Cotação não encontrada" />;
+  if (!event) return <NotFound title={t('Cotação não encontrada')} />;
   const items = [
     ['Ilhas de Bares Modulares (Pista & Premium)', 12, 'Módulos', 3800],
     ['Logística Térmica & Abastecimento de Chopp', 3, 'Diárias', 14500],
@@ -256,17 +274,17 @@ export function Quote() {
   return (
     <div className="workspace">
       <PageTitle
-        title="Eventos · Nova Proposta"
-        subtitle="Selecione uma demanda e envie sua proposta técnica e comercial."
+        title={t('Eventos · Nova Proposta')}
+        subtitle={t('Selecione uma demanda e envie sua proposta técnica e comercial.')}
       />
       <div className="quote-layout">
         <aside>
-          <Panel title="Organizadora responsável">
+          <Panel title={t('Organizadora responsável')}>
             <strong>{event.organizer}</strong>
             <p className="muted">{event.location}</p>
-            <Badge>Cadastro demonstrativo</Badge>
+            <Badge>{t('Cadastro demonstrativo')}</Badge>
           </Panel>
-          <h3>Demanda & Concorrência</h3>
+          <h3>{t('Demanda & Concorrência')}</h3>
           {opportunities.map((e) => (
             <Link
               className={`demand-card ${e.id === id ? 'selected' : ''}`}
@@ -278,21 +296,24 @@ export function Quote() {
               <small>{dateLabel(e.date)}</small>
             </Link>
           ))}
-          <Panel title="Evento: detalhes & briefing">
+          <Panel title={t('Evento: detalhes & briefing')}>
             <p className="muted">
-              Operação completa de bebidas e bar. Inclui montagem, abastecimento, equipe e
-              desmontagem.
+              {t(
+                'Operação completa de bebidas e bar. Inclui montagem, abastecimento, equipe e desmontagem.',
+              )}
             </p>
             <DownloadButton
               name="briefing.csv"
               rows={[[event.title], ['Item', 'Quantidade', 'Unidade', 'Referência'], ...items]}
             >
-              ↓ Baixar briefing CSV
+              {t('↓ Baixar briefing CSV')}
             </DownloadButton>
           </Panel>
         </aside>
         <Panel className="quote-main">
-          <Badge>COTAÇÃO ATIVA · {event.id.toUpperCase()}</Badge>
+          <Badge>
+            {t('COTAÇÃO ATIVA ·')} {event.id.toUpperCase()}
+          </Badge>
           <h1>
             {event.title} — {event.subtitle}
           </h1>
@@ -300,19 +321,21 @@ export function Quote() {
             ⌖ {event.location} · {dateLabel(event.date)}
           </p>
           <div className="info-note">
-            <strong>Escopo resumido:</strong> gestão integral dos pontos de bar, armazenamento
-            refrigerado, montagem de ilhas e equipe treinada para atendimento.
+            <strong>{t('Escopo resumido:')}</strong>{' '}
+            {t(
+              'gestão integral dos pontos de bar, armazenamento refrigerado, montagem de ilhas e equipe treinada para atendimento.',
+            )}
           </div>
-          <h2>Itens requisitados para cotação</h2>
+          <h2>{t('Itens requisitados para cotação')}</h2>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Item / Especificação</th>
-                  <th>Quantidade</th>
-                  <th>Unidade</th>
-                  <th>Referência</th>
-                  <th>Sua proposta (R$)</th>
+                  <th>{t('Item / Especificação')}</th>
+                  <th>{t('Quantidade')}</th>
+                  <th>{t('Unidade')}</th>
+                  <th>{t('Referência')}</th>
+                  <th>{t('Sua proposta (R$)')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -320,14 +343,14 @@ export function Quote() {
                   <tr key={name}>
                     <td>
                       <strong>{name}</strong>
-                      <small>Conforme escopo do evento</small>
+                      <small>{t('Conforme escopo do evento')}</small>
                     </td>
                     <td>{qty}</td>
                     <td>{unit}</td>
                     <td>{money(price)}</td>
                     <td>
                       <input
-                        aria-label={`Valor unitário de ${name}`}
+                        aria-label={t('Valor unitário de {name}', { name: name })}
                         type="number"
                         min="0.01"
                         step="0.01"
@@ -343,37 +366,37 @@ export function Quote() {
             </table>
           </div>
           <div className="form-grid quote-notes">
-            <Field label="Observações & diferenciais" name="quote-note">
+            <Field label={t('Observações & diferenciais')} name="quote-note">
               <textarea
                 id="quote-note"
                 rows={4}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Informe prazo de montagem, equipe e diferenciais…"
+                placeholder={t('Informe prazo de montagem, equipe e diferenciais…')}
               />
             </Field>
-            <Field label="Condição de faturamento" name="payment">
+            <Field label={t('Condição de faturamento')} name="payment">
               <select id="payment" value={payment} onChange={(e) => setPayment(e.target.value)}>
-                <option>50% sinal + 50% D+10</option>
-                <option>Faturamento 28 DDL</option>
+                <option value="50% sinal + 50% D+10">{t('50% sinal + 50% D+10')}</option>
+                <option value="Faturamento 28 DDL">{t('Faturamento 28 DDL')}</option>
               </select>
             </Field>
           </div>
           {error && (
             <p role="alert" className="field-error">
-              {error}
+              {t(error)}
             </p>
           )}
           <div className="quote-total">
             <div>
-              <small>TOTAL PROPOSTO DA COTAÇÃO</small>
+              <small>{t('TOTAL PROPOSTO DA COTAÇÃO')}</small>
               <strong>{money(total)}</strong>
             </div>
             <button className="button outline" onClick={() => submit('Rascunho')}>
-              Salvar rascunho
+              {t('Salvar rascunho')}
             </button>
             <button className="button blue-button" onClick={() => submit('Em análise')}>
-              Enviar proposta comercial →
+              {t('Enviar proposta comercial →')}
             </button>
           </div>
         </Panel>
@@ -419,8 +442,11 @@ export function Inventory() {
   return (
     <div className="workspace">
       <PageTitle
-        title="Itens & Inventário"
-        subtitle={`${data.inventory.length} itens cadastrados · ${data.inventory.filter((i) => i.status === 'Disponível').length} disponíveis para cotação`}
+        title={t('Itens & Inventário')}
+        subtitle={t('{length} itens cadastrados · {length2} disponíveis para cotação', {
+          length: data.inventory.length,
+          length2: data.inventory.filter((i) => i.status === 'Disponível').length,
+        })}
       >
         <DownloadButton
           name="catalogo-fornecedor.csv"
@@ -443,24 +469,26 @@ export function Inventory() {
             });
           }}
         >
-          + Adicionar novo item
+          {t('+ Adicionar novo item')}
         </button>
       </PageTitle>
       <Panel>
         <div className="filter-bar">
           <input
-            aria-label="Buscar inventário"
-            placeholder="Buscar por nome ou código…"
+            aria-label={t('Buscar inventário')}
+            placeholder={t('Buscar por nome ou código…')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <select
-            aria-label="Disponibilidade"
+            aria-label={t('Disponibilidade')}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
             {['Todos', 'Disponível', 'Alocado', 'Manutenção', 'Inativo'].map((s) => (
-              <option key={s}>{s}</option>
+              <option value={s} key={s}>
+                {t(s)}
+              </option>
             ))}
           </select>
           <button
@@ -471,25 +499,25 @@ export function Inventory() {
               setCategory('Todas');
             }}
           >
-            Limpar filtros
+            {t('Limpar filtros')}
           </button>
         </div>
         <Tabs options={categories} value={category} onChange={setCategory} />
       </Panel>
       <div className="dashboard-layout">
         <Panel
-          title="Composição de custos & itens cadastrados"
-          subtitle={`${items.length} resultados`}
+          title={t('Composição de custos & itens cadastrados')}
+          subtitle={t('{length} resultados', { length: items.length })}
         >
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Item & código</th>
-                  <th>Categoria</th>
-                  <th>Valor</th>
-                  <th>Status</th>
-                  <th>Ação</th>
+                  <th>{t('Item & código')}</th>
+                  <th>{t('Categoria')}</th>
+                  <th>{t('Valor')}</th>
+                  <th>{t('Status')}</th>
+                  <th>{t('Ação')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -500,19 +528,19 @@ export function Inventory() {
                       <small>#{item.id}</small>
                     </td>
                     <td>
-                      {item.category}
-                      <small>{item.unit}</small>
+                      {t(item.category)}
+                      <small>{t(item.unit)}</small>
                     </td>
                     <td>
                       <strong>{money(item.price)}</strong>
                     </td>
                     <td>
-                      <Badge>{item.status}</Badge>
+                      <Badge>{t(item.status)}</Badge>
                     </td>
                     <td>
                       <button
                         className="icon-button"
-                        aria-label={`Ver ${item.name}`}
+                        aria-label={t('Ver {name}', { name: item.name })}
                         onClick={() => setSelectedId(item.id)}
                       >
                         ◉
@@ -529,25 +557,25 @@ export function Inventory() {
           {selected && (
             <Panel className="inventory-detail">
               <div className="blue-panel">
-                <Badge tone="light">ITEM EM COMPOSIÇÃO</Badge>
+                <Badge tone="light">{t('ITEM EM COMPOSIÇÃO')}</Badge>
                 <h2>{selected.name}</h2>
                 <small>#{selected.id}</small>
                 <strong>{money(selected.price)}</strong>
               </div>
-              <h3>Especificações técnicas</h3>
+              <h3>{t('Especificações técnicas')}</h3>
               <p>{selected.description}</p>
               <dl className="key-values">
-                <dt>Categoria</dt>
-                <dd>{selected.category}</dd>
-                <dt>Unidade</dt>
+                <dt>{t('Categoria')}</dt>
+                <dd>{t(selected.category)}</dd>
+                <dt>{t('Unidade')}</dt>
                 <dd>{selected.unit}</dd>
-                <dt>Situação</dt>
+                <dt>{t('Situação')}</dt>
                 <dd>
-                  <Badge>{selected.status}</Badge>
+                  <Badge>{t(selected.status)}</Badge>
                 </dd>
               </dl>
               <Link className="button blue-button full" to="/fornecedor">
-                + Ver oportunidades de cotação
+                {t('+ Ver oportunidades de cotação')}
               </Link>
               <div className="actions">
                 <button
@@ -557,7 +585,7 @@ export function Inventory() {
                     setEditing({ ...selected });
                   }}
                 >
-                  Editar cadastro
+                  {t('Editar cadastro')}
                 </button>
                 <button
                   className="button danger-outline"
@@ -572,7 +600,7 @@ export function Inventory() {
                     notify(selected.status === 'Inativo' ? 'Item reativado.' : 'Item desativado.');
                   }}
                 >
-                  {selected.status === 'Inativo' ? 'Reativar' : 'Desativar'} item
+                  {selected.status === 'Inativo' ? t('Reativar') : t('Desativar')} {t('item')}
                 </button>
               </div>
             </Panel>
@@ -581,19 +609,19 @@ export function Inventory() {
       </div>
       {editing && (
         <Modal
-          title={editing.id ? 'Editar item' : 'Novo item do catálogo'}
+          title={editing.id ? t('Editar item') : t('Novo item do catálogo')}
           onClose={() => setEditing(null)}
         >
           <form onSubmit={save}>
             <Field
-              label="Nome do item"
+              label={t('Nome do item')}
               name="item-name"
               required
               value={editing.name}
               onChange={(e) => setEditing({ ...editing, name: e.target.value })}
             />
             <div className="form-grid">
-              <Field label="Categoria" name="item-category">
+              <Field label={t('Categoria')} name="item-category">
                 <select
                   id="item-category"
                   value={editing.category}
@@ -607,19 +635,21 @@ export function Inventory() {
                     'Som & Acústica',
                     'Segurança & Apoio',
                   ].map((s) => (
-                    <option key={s}>{s}</option>
+                    <option value={s} key={s}>
+                      {t(s)}
+                    </option>
                   ))}
                 </select>
               </Field>
               <Field
-                label="Unidade"
+                label={t('Unidade')}
                 name="item-unit"
                 required
                 value={editing.unit}
                 onChange={(e) => setEditing({ ...editing, unit: e.target.value })}
               />
               <Field
-                label="Valor de referência (R$)"
+                label={t('Valor de referência (R$)')}
                 name="item-price"
                 type="number"
                 min="0.01"
@@ -628,19 +658,21 @@ export function Inventory() {
                 value={editing.price}
                 onChange={(e) => setEditing({ ...editing, price: e.target.value })}
               />
-              <Field label="Status" name="item-status">
+              <Field label={t('Status')} name="item-status">
                 <select
                   id="item-status"
                   value={editing.status}
                   onChange={(e) => setEditing({ ...editing, status: e.target.value })}
                 >
                   {['Disponível', 'Alocado', 'Manutenção', 'Inativo'].map((s) => (
-                    <option key={s}>{s}</option>
+                    <option value={s} key={s}>
+                      {t(s)}
+                    </option>
                   ))}
                 </select>
               </Field>
             </div>
-            <Field label="Descrição técnica" name="item-description">
+            <Field label={t('Descrição técnica')} name="item-description">
               <textarea
                 id="item-description"
                 value={editing.description}
@@ -649,10 +681,10 @@ export function Inventory() {
             </Field>
             {error && (
               <p role="alert" className="field-error">
-                {error}
+                {t(error)}
               </p>
             )}
-            <button className="button blue-button full">Salvar item</button>
+            <button className="button blue-button full">{t('Salvar item')}</button>
           </form>
         </Modal>
       )}

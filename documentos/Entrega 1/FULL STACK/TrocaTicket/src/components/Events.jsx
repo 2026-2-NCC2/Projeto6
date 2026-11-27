@@ -3,8 +3,10 @@ import { Link, useSearchParams } from 'react-router';
 import { getEvents, getPublishedEvents } from '../services/events';
 import EventCard from './EventCard';
 import { useStore } from '../context/Store';
+import { t } from '../i18n';
+import { money } from './UI';
 
-export const currency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+export const currency = (value) => money(value);
 
 // Eventos exibidos no site:
 // - conta autenticada: só os eventos do banco (API);
@@ -57,22 +59,22 @@ export function LoadState({ loading, error, retry, warning }) {
   if (loading)
     return (
       <p className="feedback" role="status">
-        Carregando eventos…
+        {t('Carregando eventos…')}
       </p>
     );
   if (error)
     return (
       <div className="feedback" role="alert">
-        <p>{error}</p>
+        <p>{t(error)}</p>
         <button className="button primary" onClick={retry}>
-          Tentar novamente
+          {t('Tentar novamente')}
         </button>
       </div>
     );
   if (warning)
     return (
       <p className="feedback warning" role="status">
-        {warning}
+        {t(warning)}
       </p>
     );
   return null;
@@ -93,25 +95,25 @@ export function EventList({ catalog = false, state, title = 'Festivais de Músic
     <section className="events section" aria-labelledby="events-title">
       <div className="section-row">
         <div>
-          <p className="eyebrow purple">Eventos</p>
+          <p className="eyebrow purple">{t('Eventos')}</p>
           <h2 id="events-title">
-            {catalog ? 'Encontre seu próximo evento' : title}
+            {catalog ? t('Encontre seu próximo evento') : t(title)}
           </h2>
         </div>
         {!catalog && (
           <Link className="text-link" to="/eventos">
-            Ver todos os eventos <span aria-hidden="true">›</span>
+            {t('Ver todos os eventos')} <span aria-hidden="true">›</span>
           </Link>
         )}
       </div>
       {catalog && (
         <label className="search">
-          Buscar por evento ou local
+          {t('Buscar por evento ou local')}
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Busque por nome ou cidade"
+            placeholder={t('Busque por nome ou cidade')}
           />
         </label>
       )}
@@ -124,7 +126,7 @@ export function EventList({ catalog = false, state, title = 'Festivais de Músic
             ))}
           </div>
           {events.length === 0 && (
-            <p role="status">Nenhum evento encontrado. Experimente outro nome ou cidade.</p>
+            <p role="status">{t('Nenhum evento encontrado. Experimente outro nome ou cidade.')}</p>
           )}
         </>
       )}

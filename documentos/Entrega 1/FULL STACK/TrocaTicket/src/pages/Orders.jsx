@@ -13,6 +13,7 @@ import {
   listarPedidos,
   pagarPedido,
 } from '../services/orders';
+import { t } from '../i18n';
 
 // "Meus pedidos" (etapa 3): reservas, pagamento simulado, cancelamento e estorno.
 export default function Orders() {
@@ -69,9 +70,12 @@ export default function Orders() {
   if (!podeUsar) {
     return (
       <div className="workspace">
-        <PageTitle title="Meus pedidos" subtitle="Reservas, pagamentos simulados e estornos." />
-        <Empty heading="h2" title="Área disponível para usuários">
-          Entre com uma conta de usuário para acompanhar seus pedidos.
+        <PageTitle
+          title={t('Meus pedidos')}
+          subtitle={t('Reservas, pagamentos simulados e estornos.')}
+        />
+        <Empty heading="h2" title={t('Área disponível para usuários')}>
+          {t('Entre com uma conta de usuário para acompanhar seus pedidos.')}
         </Empty>
       </div>
     );
@@ -80,34 +84,36 @@ export default function Orders() {
   return (
     <div className="workspace participant-orders">
       <PageTitle
-        title="Meus pedidos"
-        subtitle="Acompanhe reservas, pagamentos simulados e estornos. Nenhum valor é cobrado de verdade."
+        title={t('Meus pedidos')}
+        subtitle={t(
+          'Acompanhe reservas, pagamentos simulados e estornos. Nenhum valor é cobrado de verdade.',
+        )}
       >
         <Link className="button outline" to="/ingressos">
-          Meus ingressos
+          {t('Meus ingressos')}
         </Link>
         <Link className="button outline" to="/atendimento">
-          Atendimento
+          {t('Atendimento')}
         </Link>
         <Link className="button primary" to="/eventos">
-          Explorar eventos
+          {t('Explorar eventos')}
         </Link>
       </PageTitle>
       {erro && (
         <div className="api-error" role="alert">
-          <span>{erro}</span>
+          <span>{t(erro)}</span>
           <button
             type="button"
             className="button outline tiny"
             onClick={() => setTentativa((valor) => valor + 1)}
           >
-            Atualizar
+            {t('Atualizar')}
           </button>
         </div>
       )}
-      {carregando && <p role="status">Carregando pedidos…</p>}
+      {carregando && <p role="status">{t('Carregando pedidos…')}</p>}
       <section aria-labelledby="orders-heading">
-        <h2 id="orders-heading">Pedidos da sua conta</h2>
+        <h2 id="orders-heading">{t('Pedidos da sua conta')}</h2>
         {pedidos.length ? (
           <div className="cards-three">
             {pedidos.map((pedido) => {
@@ -117,7 +123,7 @@ export default function Orders() {
               return (
                 <Panel key={pedido.id} className="order-card">
                   <img className="supplier-cover" src={pedido.image} alt={pedido.eventTitle} />
-                  <Badge tone={tom}>{situacao}</Badge>
+                  <Badge tone={tom}>{t(situacao)}</Badge>
                   <h3>{pedido.eventTitle}</h3>
                   <p>
                     {pedido.eventDate} · {pedido.location}
@@ -126,8 +132,8 @@ export default function Orders() {
                     {pedido.quantity} × {pedido.type} · <strong>{money(pedido.total)}</strong>
                   </p>
                   <p className="muted">
-                    Pedido nº {pedido.id}
-                    {pedido.resale ? ' · Revenda' : ''}
+                    {t('Pedido nº')} {pedido.id}
+                    {pedido.resale ? t(' · Revenda') : ''}
                     {pedido.paymentMethod
                       ? ` · ${FORMA_PAGAMENTO[pedido.paymentMethod] || pedido.paymentMethod}`
                       : ''}
@@ -135,11 +141,13 @@ export default function Orders() {
                   {/* Etapa 6: evento cancelado pela organização ou pela administração. */}
                   {pedido.eventCancelled && (
                     <p className="info-note event-cancelled-note">
-                      <strong>Evento cancelado.</strong>{' '}
-                      {pedido.cancelReason ? `Motivo: ${pedido.cancelReason}. ` : ''}
+                      <strong>{t('Evento cancelado.')}</strong>{' '}
+                      {pedido.cancelReason
+                        ? t('Motivo: {cancelReason}. ', { cancelReason: pedido.cancelReason })
+                        : ''}
                       {pedido.refundedAmount > 0
-                        ? 'O estorno simulado já foi registrado neste pedido.'
-                        : 'Não há valor a estornar neste pedido.'}
+                        ? t('O estorno simulado já foi registrado neste pedido.')
+                        : t('Não há valor a estornar neste pedido.')}
                     </p>
                   )}
                   {pedido.reason &&
@@ -152,10 +160,12 @@ export default function Orders() {
                   {pedido.canPay && (
                     <>
                       <p className="info-note">
-                        Reservado até {horaLimite(pedido.secondsToExpire)}.{' '}
+                        {t('Reservado até')} {horaLimite(pedido.secondsToExpire)}.{' '}
                         {pedido.resale
-                          ? 'Depois disso, o ingresso volta para a revenda e passa para o próximo da fila.'
-                          : 'Depois disso, os lugares são liberados.'}
+                          ? t(
+                              'Depois disso, o ingresso volta para a revenda e passa para o próximo da fila.',
+                            )
+                          : t('Depois disso, os lugares são liberados.')}
                       </p>
                       {pedido.total > 0 && (
                         <PaymentChoice
@@ -184,10 +194,10 @@ export default function Orders() {
                           }
                         >
                           {emAndamento === `pagar:${pedido.id}`
-                            ? 'Processando…'
+                            ? t('Processando…')
                             : pedido.total > 0
-                              ? `Pagar ${money(pedido.total)}`
-                              : 'Confirmar inscrição'}
+                              ? t('Pagar {v1}', { v1: money(pedido.total) })
+                              : t('Confirmar inscrição')}
                         </button>
                         <button
                           type="button"
@@ -201,26 +211,31 @@ export default function Orders() {
                             )
                           }
                         >
-                          Cancelar reserva
+                          {t('Cancelar reserva')}
                         </button>
                       </div>
                     </>
                   )}
 
                   {pedido.tickets.length > 0 && (
-                    <ul className="order-tickets" aria-label={`Ingressos do pedido ${pedido.id}`}>
+                    <ul
+                      className="order-tickets"
+                      aria-label={t('Ingressos do pedido {id}', { id: pedido.id })}
+                    >
                       {pedido.tickets.map((ticket) => (
                         <li key={ticket.id}>
                           {ticket.code ? (
                             <code>{ticket.code}</code>
                           ) : (
-                            <span>Ingresso nº {ticket.id}</span>
+                            <span>
+                              {t('Ingresso nº')} {ticket.id}
+                            </span>
                           )}
                           <span className="muted">
                             {ticket.refunded
-                              ? 'Estornado'
+                              ? t('Estornado')
                               : !ticket.withBuyer
-                                ? 'Repassado (troca, revenda ou transferência)'
+                                ? t('Repassado (troca, revenda ou transferência)')
                                 : ticket.status}
                           </span>
                         </li>
@@ -229,7 +244,8 @@ export default function Orders() {
                   )}
                   {pedido.refundedAmount > 0 && (
                     <p>
-                      Estornado: <strong>{money(pedido.refundedAmount)}</strong> (simulação)
+                      {t('Estornado:')} <strong>{money(pedido.refundedAmount)}</strong>{' '}
+                      {t('(simulação)')}
                     </p>
                   )}
                   {pedido.canRefund && (
@@ -240,12 +256,12 @@ export default function Orders() {
                         disabled={ocupado}
                         onClick={() => setConfirmarEstorno(pedido)}
                       >
-                        Solicitar estorno de {money(pedido.refundableAmount)}
+                        {t('Solicitar estorno de')} {money(pedido.refundableAmount)}
                       </button>
                     </div>
                   )}
                   <Link className="text-link" to={`/atendimento?pedido=${pedido.id}`}>
-                    Ajuda com o pedido nº {pedido.id}
+                    {t('Ajuda com o pedido nº')} {pedido.id}
                   </Link>
                 </Panel>
               );
@@ -253,24 +269,27 @@ export default function Orders() {
           </div>
         ) : (
           !carregando && (
-            <Empty title="Você ainda não fez pedidos">
-              Escolha um evento publicado e reserve seus ingressos. O pagamento é simulado.
+            <Empty title={t('Você ainda não fez pedidos')}>
+              {t('Escolha um evento publicado e reserve seus ingressos. O pagamento é simulado.')}
             </Empty>
           )
         )}
       </section>
 
       {confirmarEstorno && (
-        <Modal title="Solicitar estorno" onClose={() => !emAndamento && setConfirmarEstorno(null)}>
+        <Modal
+          title={t('Solicitar estorno')}
+          onClose={() => !emAndamento && setConfirmarEstorno(null)}
+        >
           <h3>{confirmarEstorno.eventTitle}</h3>
           <p>
-            Os ingressos deste pedido que ainda estão com você serão cancelados e o valor de{' '}
-            <strong>{money(confirmarEstorno.refundableAmount)}</strong> será estornado (simulação).
-            Ingressos repassados em troca não entram no estorno.
+            {t('Os ingressos deste pedido que ainda estão com você serão cancelados e o valor de')}{' '}
+            <strong>{money(confirmarEstorno.refundableAmount)}</strong>{' '}
+            {t('será estornado (simulação). Ingressos repassados em troca não entram no estorno.')}
           </p>
           {erro && (
             <p className="api-error" role="alert">
-              {erro}
+              {t(erro)}
             </p>
           )}
           <button
@@ -286,7 +305,7 @@ export default function Orders() {
               if (atualizado) setConfirmarEstorno(null);
             }}
           >
-            {emAndamento ? 'Registrando…' : 'Confirmar estorno'}
+            {emAndamento ? t('Registrando…') : t('Confirmar estorno')}
           </button>
           <button
             type="button"
@@ -294,7 +313,7 @@ export default function Orders() {
             disabled={Boolean(emAndamento)}
             onClick={() => setConfirmarEstorno(null)}
           >
-            Voltar
+            {t('Voltar')}
           </button>
         </Modal>
       )}

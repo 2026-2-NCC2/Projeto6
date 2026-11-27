@@ -6,6 +6,7 @@ import { Empty, Modal, Tabs } from '../components/UI';
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
 import EventCard from '../components/EventCard';
+import { localeAtual, t } from '../i18n';
 
 const FINALIZED_THIS_YEAR = 42; // sem eventos finalizados nos dados de demonstração
 const PAGE_SIZE = 3;
@@ -31,9 +32,9 @@ const STATUS_FILTERS = ['Todos', 'Confirmado', 'Em andamento', 'Agendado', 'Rasc
 
 const parse = (iso) => new Date(`${iso}T12:00:00`);
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
-const monthName = (iso) => capitalize(parse(iso).toLocaleDateString('pt-BR', { month: 'long' }));
+const monthName = (iso) => capitalize(parse(iso).toLocaleDateString(localeAtual(), { month: 'long' }));
 const shortMonth = (key) =>
-  capitalize(parse(`${key}-01`).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''));
+  capitalize(parse(`${key}-01`).toLocaleDateString(localeAtual(), { month: 'short' }).replace('.', ''));
 function rangeLabel(event) {
   const start = parse(event.date);
   const end = parse(event.endDate || event.date);
@@ -70,7 +71,9 @@ export default function OrganizerHome({ list = false }) {
     {
       label: 'Confirmados',
       value: confirmed,
-      note: `${upcoming ? Math.round((confirmed / upcoming) * 100) : 0}% taxa`,
+      note: t('{percentual}% taxa', {
+        percentual: upcoming ? Math.round((confirmed / upcoming) * 100) : 0,
+      }),
       tone: 'green',
       icon: 'check',
     },
@@ -92,13 +95,13 @@ export default function OrganizerHome({ list = false }) {
             {stats.map((stat) => (
               <div className="oh-stat" key={stat.label}>
                 <div>
-                  <span>{stat.label}</span>
+                  <span>{t(stat.label)}</span>
                   <i className={stat.tone}>
                     <Icon name={stat.icon} size={18} />
                   </i>
                 </div>
                 <strong>
-                  {stat.value} <small className={stat.tone}>{stat.note}</small>
+                  {stat.value} <small className={stat.tone}>{t(stat.note)}</small>
                 </strong>
               </div>
             ))}
@@ -110,11 +113,11 @@ export default function OrganizerHome({ list = false }) {
           <section className="oh-card oh-suppliers" aria-labelledby="oh-suppliers-title">
             <header>
               <div>
-                <h2 id="oh-suppliers-title">Últimos Fornecedores</h2>
-                <p>Contratos recentes e contatos rápidos</p>
+                <h2 id="oh-suppliers-title">{t('Últimos Fornecedores')}</h2>
+                <p>{t('Contratos recentes e contatos rápidos')}</p>
               </div>
               <Link className="text-link" to="/organizador/fornecedores">
-                Gerenciar todos
+                {t('Gerenciar todos')}
               </Link>
             </header>
             <ul>
@@ -123,22 +126,22 @@ export default function OrganizerHome({ list = false }) {
                   <img src={s.image} alt="" />
                   <div>
                     <strong>{s.name}</strong>
-                    <span>{s.category}</span>
+                    <span>{t(s.category)}</span>
                     <em className={s.tone}>
                       <i aria-hidden="true" />
-                      {s.status}
+                      {t(s.status)}
                     </em>
                   </div>
                   <button
                     type="button"
-                    aria-label={`Conversar com ${s.name}`}
+                    aria-label={t('Conversar com {name}', { name: s.name })}
                     onClick={() =>
                       notify(`Conversa com ${s.name} disponível quando o chat for conectado.`)
                     }
                   >
                     <Icon name="chat" size={18} />
                   </button>
-                  <Link to="/organizador/fornecedores" aria-label={`Mais ações para ${s.name}`}>
+                  <Link to="/organizador/fornecedores" aria-label={t('Mais ações para {name}', { name: s.name })}>
                     <Icon name="dots" size={18} />
                   </Link>
                 </li>
@@ -151,7 +154,7 @@ export default function OrganizerHome({ list = false }) {
                 notify('Convites por e-mail ficam disponíveis quando o backend for conectado.')
               }
             >
-              <Icon name="user-plus" size={18} /> Convidar Novo Fornecedor
+              <Icon name="user-plus" size={18} /> {t('Convidar Novo Fornecedor')}
             </button>
           </section>
         </aside>
@@ -173,15 +176,15 @@ function MyEvents({ events, list }) {
     <section className="oh-section" aria-labelledby="oh-mine">
       <div className="oh-section-head">
         <h2 id="oh-mine">
-          {list ? 'Todos os Eventos' : 'Meus Eventos'}{' '}
-          <span className="oh-badge">Painel Ativo</span>
+          {list ? t('Todos os Eventos') : t('Meus Eventos')}{' '}
+          <span className="oh-badge">{t('Painel Ativo')}</span>
         </h2>
         {!list && (
           <div className="oh-arrows">
-            <button type="button" aria-label="Eventos anteriores" onClick={() => scroll(-1)}>
+            <button type="button" aria-label={t('Eventos anteriores')} onClick={() => scroll(-1)}>
               <Icon name="chevron-left" />
             </button>
-            <button type="button" aria-label="Próximos eventos" onClick={() => scroll(1)}>
+            <button type="button" aria-label={t('Próximos eventos')} onClick={() => scroll(1)}>
               <Icon name="chevron-right" />
             </button>
           </div>
@@ -192,7 +195,7 @@ function MyEvents({ events, list }) {
         ref={track}
         tabIndex={list ? undefined : 0}
         role={list ? undefined : 'region'}
-        aria-label={list ? undefined : 'Meus eventos (role para o lado)'}
+        aria-label={list ? undefined : t('Meus eventos (role para o lado)')}
       >
         {events.map((event) => (
           <EventCard
@@ -206,7 +209,7 @@ function MyEvents({ events, list }) {
               <>
                 <button
                   type="button"
-                  aria-label={`Mais ações: ${event.title}`}
+                  aria-label={t('Mais ações: {title}', { title: event.title })}
                   aria-expanded={menu === event.id}
                   onClick={() => setMenu(menu === event.id ? null : event.id)}
                 >
@@ -214,9 +217,9 @@ function MyEvents({ events, list }) {
                 </button>
                 {menu === event.id && (
                   <div className="oh-menu-list">
-                    <Link to={`/organizador/eventos/${event.id}/editar`}>Editar evento</Link>
+                    <Link to={`/organizador/eventos/${event.id}/editar`}>{t('Editar evento')}</Link>
                     <Link to={`/organizador/eventos/${event.id}/consolidar`}>
-                      Consolidar fornecedores
+                      {t('Consolidar fornecedores')}
                     </Link>
                   </div>
                 )}
@@ -252,14 +255,14 @@ function MonthEvents({ events }) {
       <header className="oh-month-head">
         <div>
           <h2 id="oh-month-title">
-            Eventos em {shortMonth(activeMonth)}/{year}{' '}
-            <span className="oh-badge gray">{inMonth.length} cadastrados</span>
+            {t('Eventos em')} {shortMonth(activeMonth)}/{year}{' '}
+            <span className="oh-badge gray">{inMonth.length} {t('cadastrados')}</span>
           </h2>
-          <p>Filtrados por cronograma mensal e disponibilidade de fornecedores</p>
+          <p>{t('Filtrados por cronograma mensal e disponibilidade de fornecedores')}</p>
         </div>
         <div className="oh-month-tools">
           <Tabs
-            label="Modo de exibição"
+            label={t('Modo de exibição')}
             options={VIEWS}
             value={view}
             onChange={(v) => {
@@ -268,7 +271,7 @@ function MonthEvents({ events }) {
             }}
           />
           <select
-            aria-label="Mês"
+            aria-label={t('Mês')}
             value={activeMonth}
             onChange={(e) => {
               setMonth(e.target.value);
@@ -284,7 +287,7 @@ function MonthEvents({ events }) {
           <button
             type="button"
             className="oh-filter"
-            aria-label="Filtrar por status"
+            aria-label={t('Filtrar por status')}
             aria-expanded={filters}
             onClick={() => setFilters(!filters)}
           >
@@ -295,7 +298,7 @@ function MonthEvents({ events }) {
       {filters && (
         <div className="oh-month-filters">
           <label>
-            Status:
+            {t('Status:')}
             <select
               value={status}
               onChange={(e) => {
@@ -304,14 +307,14 @@ function MonthEvents({ events }) {
               }}
             >
               {STATUS_FILTERS.map((s) => (
-                <option key={s}>{s}</option>
+                <option value={s} key={s}>{t(s)}</option>
               ))}
             </select>
           </label>
         </div>
       )}
 
-      {!inMonth.length && <Empty>Nenhum evento neste período.</Empty>}
+      {!inMonth.length && <Empty>{t('Nenhum evento neste período.')}</Empty>}
 
       {inMonth.length > 0 && view === 'Grade' && (
         <div className="oh-month-grid">
@@ -332,14 +335,14 @@ function MonthEvents({ events }) {
                 </div>
                 <h3>{event.title}</h3>
                 <p>
-                  {event.location} • {event.capacity.toLocaleString('pt-BR')} lugares
+                  {event.location} • {event.capacity.toLocaleString(localeAtual())} {t('lugares')}
                 </p>
                 <footer>
                   <em className={org.tone}>
                     <i aria-hidden="true" />
-                    {org.label}
+                    {t(org.label)}
                   </em>
-                  <span>{event.suppliers.length} fornecedores</span>
+                  <span>{event.suppliers.length} {t('fornecedores')}</span>
                 </footer>
               </Link>
             );
@@ -362,9 +365,9 @@ function MonthEvents({ events }) {
                 </div>
                 <em className={org.tone}>
                   <i aria-hidden="true" />
-                  {org.label}
+                  {t(org.label)}
                 </em>
-                <Link to={`/organizador/eventos/${event.id}/editar`}>Editar →</Link>
+                <Link to={`/organizador/eventos/${event.id}/editar`}>{t('Editar →')}</Link>
               </li>
             );
           })}
@@ -394,7 +397,7 @@ function MonthEvents({ events }) {
           </p>
           <p className="muted">{selected.description}</p>
           <Link className="button dark" to={`/organizador/eventos/${selected.id}/editar`}>
-            Editar evento
+            {t('Editar evento')}
           </Link>
         </Modal>
       )}
@@ -408,10 +411,10 @@ function Calendar({ month, events, onSelect }) {
   const days = new Date(year, number, 0).getDate();
   const cells = [...Array(offset).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
   return (
-    <div className="oh-calendar" role="grid" aria-label="Calendário do mês">
+    <div className="oh-calendar" role="grid" aria-label={t('Calendário do mês')}>
       {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((d) => (
         <span className="oh-cal-head" role="columnheader" key={d}>
-          {d}
+          {t(d)}
         </span>
       ))}
       {cells.map((day, i) => (

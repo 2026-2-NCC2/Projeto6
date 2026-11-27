@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Icon } from './Icons';
+import { t } from '../i18n';
 
 /** Seção de formulário com ícone, título e subtítulo. */
 export function FormSection({ icon, title, subtitle, children, className = '' }) {
@@ -8,9 +9,9 @@ export function FormSection({ icon, title, subtitle, children, className = '' })
       <header className="fc-section-head">
         <h2>
           {icon && <Icon name={icon} size={20} />}
-          {title}
+          {t(title)}
         </h2>
-        {subtitle && <p>{subtitle}</p>}
+        {subtitle && <p>{t(subtitle)}</p>}
       </header>
       {children}
     </section>
@@ -23,7 +24,7 @@ export function FieldShell({ id, label, required, aside, hint, error, children }
     <div className={`fc-field ${error ? 'has-error' : ''}`}>
       <div className="fc-label-row">
         <label htmlFor={id}>
-          {label}
+          {t(label)}
           {required && (
             <span className="fc-required" aria-hidden="true">
               {' '}
@@ -31,13 +32,13 @@ export function FieldShell({ id, label, required, aside, hint, error, children }
             </span>
           )}
         </label>
-        {aside && <span className="fc-aside">{aside}</span>}
+        {aside && <span className="fc-aside">{t(aside)}</span>}
       </div>
       {children}
-      {hint && !error && <small className="fc-hint">{hint}</small>}
+      {hint && !error && <small className="fc-hint">{t(hint)}</small>}
       {error && (
         <small className="fc-error" id={`${id}-error`} role="alert">
-          {error}
+          {t(error)}
         </small>
       )}
     </div>
@@ -75,7 +76,7 @@ export function SelectField({ label, name, options, required, aside, hint, error
               typeof option === 'string' ? { value: option, label: option } : option;
             return (
               <option key={value} value={value}>
-                {text}
+                {t(text)}
               </option>
             );
           })}
@@ -94,8 +95,8 @@ export function ToggleRow({ icon, title, description, checked, onChange, onLabel
         <Icon name={icon} size={20} />
       </span>
       <span className="fc-toggle-text">
-        <strong>{title}</strong>
-        <small>{description}</small>
+        <strong>{t(title)}</strong>
+        <small>{t(description)}</small>
       </span>
       <span className={`fc-badge ${checked ? 'on' : 'off'}`}>{checked ? onLabel : offLabel}</span>
       <input
@@ -181,21 +182,25 @@ export function PhotoUpload({
   return (
     <div className="fc-photo">
       <div className="fc-photo-avatar">
-        {photo ? <img src={photo} alt={`Foto de ${name}`} /> : <span>{initials}</span>}
+        {photo ? (
+          <img src={photo} alt={t('Foto de {name}', { name: name })} />
+        ) : (
+          <span>{initials}</span>
+        )}
         <button
           type="button"
           className="fc-photo-camera"
-          aria-label="Trocar foto"
+          aria-label={t('Trocar foto')}
           onClick={() => input.current.click()}
         >
           <Icon name="camera" size={16} />
         </button>
       </div>
       <div className="fc-photo-body">
-        <h2>{title}</h2>
+        <h2>{t(title)}</h2>
         <div className="fc-photo-actions">
           <button type="button" className="button dark" onClick={() => input.current.click()}>
-            <Icon name="upload" size={15} /> Enviar Nova Foto
+            <Icon name="upload" size={15} /> {t('Enviar Nova Foto')}
           </button>
           <button
             type="button"
@@ -203,12 +208,13 @@ export function PhotoUpload({
             disabled={!photo}
             onClick={() => onChange('')}
           >
-            Remover Foto
+            {t('Remover Foto')}
           </button>
         </div>
         <p>
-          Formatos recomendados: PNG, JPG ou WEBP (Resolução mínima {minSize}×{minSize}px, máx.{' '}
-          {maxMb}MB).
+          {t('Formatos recomendados: PNG, JPG ou WEBP (Resolução mínima')} {minSize}×{minSize}
+          {t('px, máx.')} {maxMb}
+          {t('MB).')}
         </p>
         <input
           ref={input}

@@ -54,6 +54,17 @@
   padding-top: 16px;
   border-top: 1px dashed var(--line);
 }
+/* Rótulos e opções mais longos em outros idiomas (etapa 7) não alargam a página. */
+.ah-filters label,
+.ah-more label {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.ah-filters select,
+.ah-more select {
+  min-width: 0;
+  max-width: 100%;
+}
 .ah-summary {
   display: flex;
   align-items: center;

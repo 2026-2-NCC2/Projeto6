@@ -4,6 +4,7 @@ import { Modal, PageTitle } from '../components/UI';
 import { FormSection, PhotoUpload, SelectField, TextField, ToggleRow } from '../components/Form';
 import { Icon } from '../components/Icons';
 import { roleNames } from '../data/demo';
+import { localeAtual, t } from '../i18n';
 
 const TIMEZONES = [
   { value: 'America/Noronha', label: 'Fernando de Noronha (GMT-2)' },
@@ -37,9 +38,9 @@ function daysAgo(timestamp) {
 }
 function syncLabel(timestamp) {
   const date = new Date(timestamp);
-  const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const time = date.toLocaleTimeString(localeAtual(), { hour: '2-digit', minute: '2-digit' });
   const sameDay = date.toDateString() === new Date().toDateString();
-  return `${sameDay ? 'hoje' : date.toLocaleDateString('pt-BR')} às ${time}`;
+  return `${sameDay ? 'hoje' : date.toLocaleDateString(localeAtual())} às ${time}`;
 }
 
 export default function AdminProfile() {
@@ -100,11 +101,13 @@ export default function AdminProfile() {
   return (
     <div className="workspace narrow admin-profile">
       <PageTitle
-        title="Configurações & Perfil"
-        subtitle="Gerencie seus dados pessoais, foto, credenciais de acesso corporativo e parâmetros de comunicação."
+        title={t('Configurações & Perfil')}
+        subtitle={t(
+          'Gerencie seus dados pessoais, foto, credenciais de acesso corporativo e parâmetros de comunicação.',
+        )}
       >
         <button type="button" className="button outline" onClick={() => setHistory(true)}>
-          <Icon name="clock" size={15} /> Histórico de Acesso
+          <Icon name="clock" size={15} /> {t('Histórico de Acesso')}
         </button>
       </PageTitle>
 
@@ -127,12 +130,14 @@ export default function AdminProfile() {
 
         <FormSection
           icon="user"
-          title="Informações Pessoais & Contato"
-          subtitle="Estes dados aparecem nos contratos, ordens de serviço e credenciais dos eventos."
+          title={t('Informações Pessoais & Contato')}
+          subtitle={t(
+            'Estes dados aparecem nos contratos, ordens de serviço e credenciais dos eventos.',
+          )}
         >
           <div className="fc-grid">
             <TextField
-              label="Nome completo"
+              label={t('Nome completo')}
               name="admin-name"
               required
               autoComplete="name"
@@ -141,7 +146,7 @@ export default function AdminProfile() {
               onChange={set('name')}
             />
             <SelectField
-              label="Tipo de perfil"
+              label={t('Tipo de perfil')}
               name="admin-role"
               disabled
               value={form.role}
@@ -149,7 +154,7 @@ export default function AdminProfile() {
               onChange={set('role')}
             />
             <TextField
-              label="E-mail corporativo"
+              label={t('E-mail corporativo')}
               name="admin-email"
               type="email"
               icon="mail"
@@ -160,7 +165,7 @@ export default function AdminProfile() {
               aside={
                 form.emailVerified && (
                   <span className="fc-verified">
-                    <Icon name="check" size={13} /> Verificado
+                    <Icon name="check" size={13} /> {t('Verificado')}
                   </span>
                 )
               }
@@ -169,7 +174,7 @@ export default function AdminProfile() {
               }
             />
             <TextField
-              label="Telefone / WhatsApp"
+              label={t('Telefone / WhatsApp')}
               name="admin-phone"
               type="tel"
               icon="phone"
@@ -181,14 +186,14 @@ export default function AdminProfile() {
               onChange={(event) => setForm({ ...form, phone: maskPhone(event.target.value) })}
             />
             <TextField
-              label="Documento fiscal (CPF)"
+              label={t('Documento fiscal (CPF)')}
               name="admin-cpf"
               readOnly
-              aside="Bloqueado para edição"
+              aside={t('Bloqueado para edição')}
               value={form.cpf}
             />
             <SelectField
-              label="Fuso horário operacional"
+              label={t('Fuso horário operacional')}
               name="admin-timezone"
               value={form.timezone}
               options={TIMEZONES}
@@ -198,36 +203,38 @@ export default function AdminProfile() {
 
           <div className="fc-divider" />
           <div className="fc-subhead">
-            <h3>Segurança da Conta & Credenciais</h3>
-            <span>Última alteração de senha: {daysAgo(form.passwordChangedAt)}</span>
+            <h3>{t('Segurança da Conta & Credenciais')}</h3>
+            <span>
+              {t('Última alteração de senha:')} {daysAgo(form.passwordChangedAt)}
+            </span>
           </div>
           <div className="fc-grid three">
             <TextField
-              label="Senha atual"
+              label={t('Senha atual')}
               name="admin-password-current"
               type="password"
               autoComplete="current-password"
-              placeholder="Digite a senha atual"
+              placeholder={t('Digite a senha atual')}
               value={passwords.current}
               error={errors.current}
               onChange={setPassword('current')}
             />
             <TextField
-              label="Nova senha"
+              label={t('Nova senha')}
               name="admin-password-new"
               type="password"
               autoComplete="new-password"
-              placeholder="Mínimo 8 caracteres"
+              placeholder={t('Mínimo 8 caracteres')}
               value={passwords.next}
               error={errors.next}
               onChange={setPassword('next')}
             />
             <TextField
-              label="Confirmar senha"
+              label={t('Confirmar senha')}
               name="admin-password-confirm"
               type="password"
               autoComplete="new-password"
-              placeholder="Repita a nova senha"
+              placeholder={t('Repita a nova senha')}
               value={passwords.confirm}
               error={errors.confirm}
               onChange={setPassword('confirm')}
@@ -235,50 +242,50 @@ export default function AdminProfile() {
           </div>
           <ToggleRow
             icon="shield"
-            title="Autenticação de 2 Fatores (2FA)"
-            description="Exigir código via app autenticador ao conectar de um novo navegador."
+            title={t('Autenticação de 2 Fatores (2FA)')}
+            description={t('Exigir código via app autenticador ao conectar de um novo navegador.')}
             checked={form.twoFactor}
             onChange={(twoFactor) => setForm({ ...form, twoFactor })}
-            onLabel="Ativado"
-            offLabel="Desativado"
+            onLabel={t('Ativado')}
+            offLabel={t('Desativado')}
           />
         </FormSection>
 
         <div className="fc-actions">
           <span className="fc-sync">
-            <Icon name="check" size={16} /> Última sincronização do perfil{' '}
+            <Icon name="check" size={16} /> {t('Última sincronização do perfil')}{' '}
             {syncLabel(saved.syncedAt)}
           </span>
           <div>
             <button type="button" className="button outline" disabled={!dirty} onClick={cancel}>
-              Cancelar
+              {t('Cancelar')}
             </button>
             <button type="submit" className="button dark" disabled={!dirty}>
-              <Icon name="check" size={16} /> Salvar Alterações
+              <Icon name="check" size={16} /> {t('Salvar Alterações')}
             </button>
           </div>
         </div>
       </form>
 
       {history && (
-        <Modal title="Histórico de Acesso" onClose={() => setHistory(false)}>
-          <p className="muted">Registros fictícios para demonstração.</p>
+        <Modal title={t('Histórico de Acesso')} onClose={() => setHistory(false)}>
+          <p className="muted">{t('Registros fictícios para demonstração.')}</p>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Data</th>
-                  <th>Dispositivo</th>
-                  <th>IP</th>
-                  <th>Local</th>
-                  <th>Resultado</th>
+                  <th>{t('Data')}</th>
+                  <th>{t('Dispositivo')}</th>
+                  <th>{t('IP')}</th>
+                  <th>{t('Local')}</th>
+                  <th>{t('Resultado')}</th>
                 </tr>
               </thead>
               <tbody>
                 {ACCESS_HISTORY.map((row) => (
                   <tr key={row[0]}>
                     {row.map((cell, i) => (
-                      <td key={i}>{cell}</td>
+                      <td key={i}>{t(cell)}</td>
                     ))}
                   </tr>
                 ))}

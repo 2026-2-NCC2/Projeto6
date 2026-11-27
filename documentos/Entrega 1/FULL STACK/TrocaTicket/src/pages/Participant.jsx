@@ -29,6 +29,7 @@ import {
   setTicketExchangeListing,
   updateExchangeOffer,
 } from '../services/tickets';
+import { t } from '../i18n';
 
 export function EventCardWrapper({ event }) {
   const { data, toggleFavorite } = useStore();
@@ -60,25 +61,25 @@ export function Catalog({ favorites = false }) {
   return (
     <div className="workspace discovery">
       <div className="discovery-heading">
-        <Badge>EXPERIÊNCIAS QUE CONECTAM PESSOAS</Badge>
-        <h1>{favorites ? 'Seus favoritos' : 'EVENTOS'}</h1>
+        <Badge>{t('EXPERIÊNCIAS QUE CONECTAM PESSOAS')}</Badge>
+        <h1>{favorites ? t('Seus favoritos') : t('EVENTOS')}</h1>
         <p>
-          Explore festivais, grandes turnês e experiências ao vivo.
+          {t('Explore festivais, grandes turnês e experiências ao vivo.')}
           <br />
-          Encontre o seu próximo momento inesquecível.
+          {t('Encontre o seu próximo momento inesquecível.')}
         </p>
         <div className="discovery-search">
           <input
             type="search"
-            aria-label="Buscar eventos"
-            placeholder="Buscar por artista, festival ou cidade…"
+            aria-label={t('Buscar eventos')}
+            placeholder={t('Buscar por artista, festival ou cidade…')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <select aria-label="Cidade" value={city} onChange={(e) => setCity(e.target.value)}>
-            <option>Todas</option>
-            <option>São Paulo</option>
-            <option>Rio de Janeiro</option>
+          <select aria-label={t('Cidade')} value={city} onChange={(e) => setCity(e.target.value)}>
+            <option value="Todas">{t('Todas')}</option>
+            <option value="São Paulo">{t('São Paulo')}</option>
+            <option value="Rio de Janeiro">{t('Rio de Janeiro')}</option>
           </select>
         </div>
       </div>
@@ -87,8 +88,8 @@ export function Catalog({ favorites = false }) {
         <>
           <PageTitle
             heading="h2"
-            title={favorites ? 'Eventos salvos' : 'Recomendados para Você'}
-            subtitle={`${filtered.length} eventos encontrados`}
+            title={favorites ? t('Eventos salvos') : t('Recomendados para Você')}
+            subtitle={t('{length} eventos encontrados', { length: filtered.length })}
           />
           <div className="discovery-grid">
             {filtered.slice(0, 4).map((e) => (
@@ -99,8 +100,8 @@ export function Catalog({ favorites = false }) {
             <>
               <PageTitle
                 heading="h2"
-                title="Mais experiências para descobrir"
-                subtitle="Shows, cultura e encontros para todos os gostos."
+                title={t('Mais experiências para descobrir')}
+                subtitle={t('Shows, cultura e encontros para todos os gostos.')}
               />
               <div className="discovery-grid">
                 {filtered.slice(4).map((e) => (
@@ -110,10 +111,10 @@ export function Catalog({ favorites = false }) {
             </>
           )}
           {!filtered.length && (
-            <Empty title={favorites ? 'Você ainda não tem favoritos' : 'Nenhum evento encontrado'}>
+            <Empty title={favorites ? t('Você ainda não tem favoritos') : t('Nenhum evento encontrado')}>
               {favorites
-                ? 'Toque no coração de um evento para encontrá-lo aqui.'
-                : 'Experimente outro nome ou cidade.'}
+                ? t('Toque no coração de um evento para encontrá-lo aqui.')
+                : t('Experimente outro nome ou cidade.')}
             </Empty>
           )}
         </>
@@ -173,9 +174,9 @@ export function EventDetails() {
   if (!event)
     return (
       <div className="workspace">
-        <Empty title="Evento não encontrado" />
+        <Empty title={t('Evento não encontrado')} />
         <Link className="button primary" to="/eventos">
-          Voltar aos eventos
+          {t('Voltar aos eventos')}
         </Link>
       </div>
     );
@@ -335,11 +336,11 @@ export function EventDetails() {
   return (
     <div className="workspace">
       <div className="breadcrumb">
-        <Link to="/eventos">Eventos</Link>
+        <Link to="/eventos">{t('Eventos')}</Link>
         <span>›</span>
         <span>{event.title}</span>
       </div>
-      <PageTitle title={event.title} eyebrow="Eventos" subtitle={event.location}>
+      <PageTitle title={event.title} eyebrow={t('Eventos')} subtitle={event.location}>
         <button
           className="button outline"
           onClick={() => {
@@ -351,10 +352,10 @@ export function EventDetails() {
             );
           }}
         >
-          {data.favorites.some((favoriteId) => String(favoriteId) === String(id)) ? '♥ Salvo' : '♡ Salvar'}
+          {data.favorites.some((favoriteId) => String(favoriteId) === String(id)) ? t('♥ Salvo') : t('♡ Salvar')}
         </button>
         <Link className="button outline" to="/comunidade">
-          Troca-Papo →
+          {t('Troca-Papo →')}
         </Link>
       </PageTitle>
       <div className="dashboard-layout detail-layout">
@@ -366,13 +367,13 @@ export function EventDetails() {
                 alt={event.title}
               />
               <div>
-                <Badge>Experiência ao vivo</Badge>
+                <Badge>{t('Experiência ao vivo')}</Badge>
                 <h2>{event.location}</h2>
               </div>
             </div>
             <div className="card-actions">
-              <span>Uma experiência para guardar na memória</span>
-              <strong className="stars" aria-label={`${averageRating || 0} de 5 estrelas`}>
+              <span>{t('Uma experiência para guardar na memória')}</span>
+              <strong className="stars" aria-label={t('{v1} de 5 estrelas', { v1: averageRating || 0 })}>
                 {averageRating
                   ? `${'★'.repeat(Math.round(averageRating))}${'☆'.repeat(5 - Math.round(averageRating))}`
                   : '☆☆☆☆☆'}
@@ -390,50 +391,48 @@ export function EventDetails() {
                 <>
                   <p>{event.description}</p>
                   <p>
-                    Encontre sua entrada, escolha o tipo de ingresso e acompanhe tudo em sua área de
-                    usuário.
+                    {t('Encontre sua entrada, escolha o tipo de ingresso e acompanhe tudo em sua área de usuário.')}
                   </p>
                   <div className="info-note">
-                    Os eventos, valores e avaliações deste protótipo são demonstrativos.
+                    {t('Os eventos, valores e avaliações deste protótipo são demonstrativos.')}
                   </div>
                 </>
               ) : tab === 'Line-up & atrações' ? (
                 <>
-                  <h3>Programação do evento</h3>
+                  <h3>{t('Programação do evento')}</h3>
                   <p>
-                    Abertura dos portões, apresentações principais e experiências de gastronomia e
-                    cultura.
+                    {t('Abertura dos portões, apresentações principais e experiências de gastronomia e cultura.')}
                   </p>
                   <p className="muted">
-                    A programação oficial será disponibilizada pelo organizador no serviço real.
+                    {t('A programação oficial será disponibilizada pelo organizador no serviço real.')}
                   </p>
                 </>
               ) : tab === 'Como funciona' ? (
                 <>
-                  <h3>Escolha, reserve e acompanhe</h3>
+                  <h3>{t('Escolha, reserve e acompanhe')}</h3>
                   <ol>
-                    <li>Selecione o tipo de ingresso e a quantidade.</li>
-                    <li>Reserve: os ingressos ficam guardados por 15 minutos.</li>
-                    <li>Pague de forma simulada (Pix ou cartão) e receba os ingressos em “Meus ingressos”.</li>
-                    <li>Até a véspera do evento, peça o estorno em “Meus pedidos”.</li>
+                    <li>{t('Selecione o tipo de ingresso e a quantidade.')}</li>
+                    <li>{t('Reserve: os ingressos ficam guardados por 15 minutos.')}</li>
+                    <li>{t('Pague de forma simulada (Pix ou cartão) e receba os ingressos em “Meus ingressos”.')}</li>
+                    <li>{t('Até a véspera do evento, peça o estorno em “Meus pedidos”.')}</li>
                   </ol>
-                  <p>Nenhuma cobrança é feita e nenhum dado de pagamento é pedido.</p>
+                  <p>{t('Nenhuma cobrança é feita e nenhum dado de pagamento é pedido.')}</p>
                 </>
               ) : (
                 <>
-                  <h3>Avaliações da comunidade</h3>
+                  <h3>{t('Avaliações da comunidade')}</h3>
                   {reviewsFromApi && (
                     <p className="muted">
-                      Média {averageRating.toFixed(1)} de 5 · {reviewsFromApi.count} avaliações
+                      {t('Média')} {averageRating.toFixed(1)} {t('de 5 ·')} {reviewsFromApi.count} {t('avaliações')}
                     </p>
                   )}
                   {reviewError && <p className="api-error" role="alert">{reviewError}</p>}
-                  {!reviews.length && <p className="muted">Este evento ainda não recebeu avaliações.</p>}
+                  {!reviews.length && <p className="muted">{t('Este evento ainda não recebeu avaliações.')}</p>}
                   <ul className="event-reviews">
                     {reviews.map((review) => (
                       <li key={review.id || `${review.userId || review.name}-${review.date}`}>
                         <strong>{review.name}</strong>
-                        <span className="stars" aria-label={`${review.rating} de 5 estrelas`}>
+                        <span className="stars" aria-label={t('{rating} de 5 estrelas', { rating: review.rating })}>
                           {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                         </span>
                         {review.comment && <p>{review.comment}</p>}
@@ -443,32 +442,32 @@ export function EventDetails() {
                   </ul>
                   {role === 'comprador' ? (
                     <form className="event-review-form" onSubmit={submitReview}>
-                      <label htmlFor="event-review-rating">Sua nota</label>
+                      <label htmlFor="event-review-rating">{t('Sua nota')}</label>
                       <select id="event-review-rating" value={reviewRating} onChange={(e) => setReviewRating(e.target.value)}>
                         {[5, 4, 3, 2, 1].map((value) => (
-                          <option key={value} value={value}>{value} estrelas</option>
+                          <option key={value} value={value}>{value} {t('estrelas')}</option>
                         ))}
                       </select>
-                      <label htmlFor="event-review-comment">Comentário (opcional)</label>
+                      <label htmlFor="event-review-comment">{t('Comentário (opcional)')}</label>
                       <textarea
                         id="event-review-comment"
                         maxLength={255}
                         value={reviewComment}
                         onChange={(e) => setReviewComment(e.target.value)}
-                        placeholder="Compartilhe sua experiência…"
+                        placeholder={t('Compartilhe sua experiência…')}
                       />
                       <small>{reviewComment.length}/255</small>
                       <button className="button blue-button" disabled={reviewSaving}>
-                        {reviewSaving ? 'Salvando…' : 'Salvar avaliação'}
+                        {reviewSaving ? t('Salvando…') : t('Salvar avaliação')}
                       </button>
                     </form>
                   ) : (
                     <p className="muted">
-                      <Link to="/entrar">Entre como usuário</Link> para avaliar este evento.
+                      <Link to="/entrar">{t('Entre como usuário')}</Link> {t('para avaliar este evento.')}
                     </p>
                   )}
                   <Link className="text-link" to="/comunidade">
-                    Participar da conversa →
+                    {t('Participar da conversa →')}
                   </Link>
                 </>
               )}
@@ -479,24 +478,24 @@ export function EventDetails() {
           <Panel className="booking-panel">
             {isAuthenticated && !canBuyTicket ? (
               <>
-                <Badge>Compra indisponível</Badge>
+                <Badge>{t('Compra indisponível')}</Badge>
                 <p className="muted">
                   {role !== 'comprador'
-                    ? 'A reserva simulada está disponível somente para contas de usuário.'
-                    : 'Este evento não está conectado a um evento publicado do banco.'}
+                    ? t('A reserva simulada está disponível somente para contas de usuário.')
+                    : t('Este evento não está conectado a um evento publicado do banco.')}
                 </p>
               </>
             ) : (
               <>
-                <Badge>{isAuthenticated ? 'Compra simulada' : 'Reserva de demonstração'}</Badge>
-                <p className="muted">Ingressos a partir de</p>
+                <Badge>{isAuthenticated ? t('Compra simulada') : t('Reserva de demonstração')}</Badge>
+                <p className="muted">{t('Ingressos a partir de')}</p>
                 <div className="booking-price">{money(price)}</div>
-                <label htmlFor="ticket-type">Selecione o tipo de entrada</label>
+                <label htmlFor="ticket-type">{t('Selecione o tipo de entrada')}</label>
                 <select id="ticket-type" value={type} onChange={(e) => setType(e.target.value)}>
-                  <option>Inteira</option>
-                  <option>Meia-entrada</option>
+                  <option value="Inteira">{t('Inteira')}</option>
+                  <option value="Meia-entrada">{t('Meia-entrada')}</option>
                 </select>
-                <label htmlFor="ticket-quantity">Quantidade</label>
+                <label htmlFor="ticket-quantity">{t('Quantidade')}</label>
                 <input
                   id="ticket-quantity"
                   type="number"
@@ -508,7 +507,7 @@ export function EventDetails() {
                   }
                 />
                 <div className="card-actions">
-                  <span>Total</span>
+                  <span>{t('Total')}</span>
                   <strong>{money(total)}</strong>
                 </div>
                 <button
@@ -518,34 +517,34 @@ export function EventDetails() {
                     setModal(true);
                   }}
                 >
-                  {isAuthenticated ? 'Comprar ingresso →' : 'Simular reserva →'}
+                  {isAuthenticated ? t('Comprar ingresso →') : t('Simular reserva →')}
                 </button>
                 <small className="muted">
-                  Sem pagamento real. O ingresso é válido apenas como registro da plataforma.
+                  {t('Sem pagamento real. O ingresso é válido apenas como registro da plataforma.')}
                 </small>
               </>
             )}
-            {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+            {reservationError && <p className="api-error" role="alert">{t(reservationError)}</p>}
           </Panel>
           {canBuyTicket && <EventResale key={numericEventId} eventId={numericEventId} userId={userId} />}
-          <Panel title="Detalhes e Localização">
-            <p>▦ {event.date}</p>
+          <Panel title={t('Detalhes e Localização')}>
+            <p>▦ {t(event.date)}</p>
             <p>⌖ {event.location}</p>
             <p className="muted">
-              Consulte as regras e a classificação indicativa na programação oficial.
+              {t('Consulte as regras e a classificação indicativa na programação oficial.')}
             </p>
             {id === 'lollapalooza' && (
               <img
                 className="venue-map"
                 src="/images/asset-33.jpg"
-                alt="Mapa ilustrativo do local do festival"
+                alt={t('Mapa ilustrativo do local do festival')}
               />
             )}
           </Panel>
-          <Panel title="Troca-Papo">
-            <p>Encontre outras pessoas e compartilhe sua expectativa.</p>
+          <Panel title={t('Troca-Papo')}>
+            <p>{t('Encontre outras pessoas e compartilhe sua expectativa.')}</p>
             <Link className="button outline full" to="/comunidade">
-              Entrar no Troca-Papo →
+              {t('Entrar no Troca-Papo →')}
             </Link>
           </Panel>
         </aside>
@@ -554,10 +553,10 @@ export function EventDetails() {
         <Modal
           title={
             !isAuthenticated
-              ? 'Confirmar reserva de demonstração'
+              ? t('Confirmar reserva de demonstração')
               : etapa === 'pagar'
-                ? 'Pagamento simulado'
-                : 'Confirmar pedido'
+                ? t('Pagamento simulado')
+                : t('Confirmar pedido')
           }
           onClose={fecharModal}
         >
@@ -568,42 +567,39 @@ export function EventDetails() {
           {!isAuthenticated ? (
             <>
               <p>
-                Esta ação salva uma reserva local de demonstração. Não há pagamento e o registro não é
-                válido para entrada.
+                {t('Esta ação salva uma reserva local de demonstração. Não há pagamento e o registro não é válido para entrada.')}
               </p>
-              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              {reservationError && <p className="api-error" role="alert">{t(reservationError)}</p>}
               <button className="button primary full" onClick={reserve} disabled={reserving}>
-                {reserving ? 'Salvando…' : 'Confirmar reserva de demonstração'}
+                {reserving ? t('Salvando…') : t('Confirmar reserva de demonstração')}
               </button>
             </>
           ) : etapa === 'pagar' && pedido ? (
             <>
               <p className="info-note">
-                Pedido nº {pedido.id} reservado até {horaLimite(pedido.secondsToExpire)}. Se o pagamento
-                não for concluído até lá, os lugares são liberados.
+                {t('Pedido nº')} {pedido.id} {t('reservado até')} {horaLimite(pedido.secondsToExpire)}{t('. Se o pagamento não for concluído até lá, os lugares são liberados.')}
               </p>
               {pedido.total > 0 ? (
                 <PaymentChoice value={formaPagamento} onChange={setFormaPagamento} name="forma-pagamento-evento" />
               ) : (
-                <p>Evento gratuito: é só confirmar a inscrição.</p>
+                <p>{t('Evento gratuito: é só confirmar a inscrição.')}</p>
               )}
-              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              {reservationError && <p className="api-error" role="alert">{t(reservationError)}</p>}
               <button className="button primary full" onClick={pagar} disabled={reserving}>
                 {reserving
-                  ? 'Processando…'
+                  ? t('Processando…')
                   : pedido.total > 0
-                    ? `Pagar ${money(pedido.total)} (simulado)`
-                    : 'Confirmar inscrição'}
+                    ? t('Pagar {v1} (simulado)', { v1: money(pedido.total) })
+                    : t('Confirmar inscrição')}
               </button>
               <button className="button outline full" onClick={cancelarReserva} disabled={reserving}>
-                Cancelar reserva
+                {t('Cancelar reserva')}
               </button>
             </>
           ) : (
             <>
               <p>
-                Os ingressos ficam reservados por 15 minutos enquanto você conclui o pagamento simulado.
-                Nenhum valor é cobrado e os ingressos não são válidos para entrada no evento.
+                {t('Os ingressos ficam reservados por 15 minutos enquanto você conclui o pagamento simulado. Nenhum valor é cobrado e os ingressos não são válidos para entrada no evento.')}
               </p>
               {type === 'Meia-entrada' && (
                 <label className="checkbox">
@@ -612,16 +608,16 @@ export function EventDetails() {
                     checked={declaracaoMeia}
                     onChange={(e) => setDeclaracaoMeia(e.target.checked)}
                   />
-                  Declaro ter direito à meia-entrada (simulação; nenhum documento é conferido).
+                  {t('Declaro ter direito à meia-entrada (simulação; nenhum documento é conferido).')}
                 </label>
               )}
-              {reservationError && <p className="api-error" role="alert">{reservationError}</p>}
+              {reservationError && <p className="api-error" role="alert">{t(reservationError)}</p>}
               <button
                 className="button primary full"
                 onClick={reserve}
                 disabled={reserving || (type === 'Meia-entrada' && !declaracaoMeia)}
               >
-                {reserving ? 'Reservando…' : 'Reservar e ir para o pagamento'}
+                {reserving ? t('Reservando…') : t('Reservar e ir para o pagamento')}
               </button>
             </>
           )}
@@ -687,9 +683,9 @@ export function Tickets() {
   if (isAuthenticated && !canManageAccountTickets) {
     return (
       <div className="workspace">
-        <PageTitle title="Meus Ingressos" subtitle="Suas reservas vinculadas à conta." />
-        <Empty title="Reservas ainda não disponíveis">
-          Esta área está disponível para contas de usuário.
+        <PageTitle title={t('Meus Ingressos')} subtitle={t('Suas reservas vinculadas à conta.')} />
+        <Empty title={t('Reservas ainda não disponíveis')}>
+          {t('Esta área está disponível para contas de usuário.')}
         </Empty>
       </div>
     );
@@ -706,45 +702,45 @@ export function Tickets() {
     return (
       <div className="workspace participant-tickets">
         <PageTitle
-          title="Meus Ingressos"
-          subtitle="Gerencie seus ingressos simulados e combine trocas com outros usuários."
+          title={t('Meus Ingressos')}
+          subtitle={t('Gerencie seus ingressos simulados e combine trocas com outros usuários.')}
         >
-          <Link className="button outline" to="/repasses">Repasses e transferências</Link>
-          <Link className="button outline" to="/pedidos">Meus pedidos</Link>
-          <Link className="button primary" to="/eventos">Explorar eventos</Link>
+          <Link className="button outline" to="/repasses">{t('Repasses e transferências')}</Link>
+          <Link className="button outline" to="/pedidos">{t('Meus pedidos')}</Link>
+          <Link className="button primary" to="/eventos">{t('Explorar eventos')}</Link>
         </PageTitle>
         {error && (
           <div className="api-error" role="alert">
-            <span>{error}</span>
+            <span>{t(error)}</span>
             <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
-              Tentar novamente
+              {t('Tentar novamente')}
             </button>
           </div>
         )}
-        {loading && <p role="status">Carregando ingressos e solicitações de troca…</p>}
+        {loading && <p role="status">{t('Carregando ingressos e solicitações de troca…')}</p>}
         <section aria-labelledby="account-tickets-heading">
-          <h2 id="account-tickets-heading">Ingressos da sua conta</h2>
+          <h2 id="account-tickets-heading">{t('Ingressos da sua conta')}</h2>
           {tickets.length ? (
             <div className="cards-three">
               {tickets.map((ticket) => (
                 <Panel key={ticket.id}>
                   <img className="supplier-cover" src={ticket.image} alt={ticket.eventTitle} />
-                  <Badge tone={ticket.statusCode === 'A' ? 'green' : 'gray'}>{ticket.status}</Badge>
-                  {ticket.inResale && <Badge tone="amber">Em repasse</Badge>}
+                  <Badge tone={ticket.statusCode === 'A' ? 'green' : 'gray'}>{t(ticket.status)}</Badge>
+                  {ticket.inResale && <Badge tone="amber">{t('Em repasse')}</Badge>}
                   <h3>{ticket.eventTitle}</h3>
                   <p>{ticket.date} · {ticket.location}</p>
                   <p>{ticket.type} · {money(ticket.price)}</p>
                   <code>{ticket.code}</code>
                   <p className="muted">
-                    {ticket.orderId ? `Pedido nº ${ticket.orderId} · ` : ''}
+                    {ticket.orderId ? t('Pedido nº {orderId} · ', { orderId: ticket.orderId }) : ''}
                     {ticket.usedAt
-                      ? `Entrada registrada na portaria em ${horaBrasilia(ticket.usedAt)}.`
-                      : 'Pagamento simulado. Mostre este código na portaria do evento (simulação).'}
+                      ? t('Entrada registrada na portaria em {v1}.', { v1: horaBrasilia(ticket.usedAt) })
+                      : t('Pagamento simulado. Mostre este código na portaria do evento (simulação).')}
                   </p>
                   {ticket.statusCode === 'A' && ticket.inResale && (
                     <p className="info-note">
-                      Anunciado para revenda ou com convite de transferência pendente.{' '}
-                      <Link to="/repasses">Gerenciar repasse</Link>
+                      {t('Anunciado para revenda ou com convite de transferência pendente.')}{' '}
+                      <Link to="/repasses">{t('Gerenciar repasse')}</Link>
                     </p>
                   )}
                   {ticket.statusCode === 'A' && !ticket.inResale && (
@@ -760,7 +756,7 @@ export function Tickets() {
                             : 'Ingresso anunciado para troca.',
                         )}
                       >
-                        {ticket.availableForExchange ? 'Retirar da troca' : 'Oferecer para troca'}
+                        {ticket.availableForExchange ? t('Retirar da troca') : t('Oferecer para troca')}
                       </button>
                       {ticket.cancellable && (
                         <button
@@ -768,8 +764,8 @@ export function Tickets() {
                           className="button danger-outline"
                           disabled={saving}
                           title={ticket.refundOnCancel
-                            ? `Cancela o ingresso e estorna ${money(ticket.price)} (simulação).`
-                            : 'Cancela o ingresso sem estorno: ele veio de troca, revenda ou transferência.'}
+                            ? t('Cancela o ingresso e estorna {v1} (simulação).', { v1: money(ticket.price) })
+                            : t('Cancela o ingresso sem estorno: ele veio de troca, revenda ou transferência.')}
                           onClick={() => perform(
                             () => cancelParticipantTicket(ticket.id, userId),
                             ticket.refundOnCancel
@@ -777,7 +773,7 @@ export function Tickets() {
                               : 'Ingresso cancelado. Como ele veio de troca, revenda ou transferência, não há estorno.',
                           )}
                         >
-                          {ticket.refundOnCancel ? 'Cancelar e estornar' : 'Cancelar ingresso'}
+                          {ticket.refundOnCancel ? t('Cancelar e estornar') : t('Cancelar ingresso')}
                         </button>
                       )}
                     </div>
@@ -786,28 +782,28 @@ export function Tickets() {
               ))}
             </div>
           ) : !loading && (
-            <Empty title="Você ainda não tem ingressos">
-              Escolha um evento publicado e faça uma compra simulada. Nenhum pagamento será processado.
+            <Empty title={t('Você ainda não tem ingressos')}>
+              {t('Escolha um evento publicado e faça uma compra simulada. Nenhum pagamento será processado.')}
             </Empty>
           )}
         </section>
 
         <section aria-labelledby="ticket-exchange-heading" className="ticket-exchange-section">
-          <h2 id="ticket-exchange-heading">Ingressos disponíveis para troca</h2>
-          <p className="muted">Escolha um dos seus ingressos ativos para propor uma troca direta. Não há pagamentos ou cobranças.</p>
+          <h2 id="ticket-exchange-heading">{t('Ingressos disponíveis para troca')}</h2>
+          <p className="muted">{t('Escolha um dos seus ingressos ativos para propor uma troca direta. Não há pagamentos ou cobranças.')}</p>
           {listings.length ? (
             <div className="cards-three">
               {listings.map((listing) => (
                 <Panel key={listing.ticketId}>
                   <img className="supplier-cover" src={listing.image} alt={listing.eventTitle} />
-                  <Badge>Oferta de {listing.ownerName}</Badge>
+                  <Badge>{t('Oferta de')} {listing.ownerName}</Badge>
                   <h3>{listing.eventTitle}</h3>
                   <p>{listing.eventDate} · {listing.location}</p>
                   <p>{listing.type} · {money(listing.price)}</p>
                   <code>{listing.code}</code>
                   {offerableTickets.length ? (
                     <>
-                      <label htmlFor={`ticket-offer-${listing.ticketId}`}>Seu ingresso para oferecer</label>
+                      <label htmlFor={`ticket-offer-${listing.ticketId}`}>{t('Seu ingresso para oferecer')}</label>
                       <select
                         id={`ticket-offer-${listing.ticketId}`}
                         value={selectedOfferTickets[listing.ticketId] || ''}
@@ -816,7 +812,7 @@ export function Tickets() {
                           [listing.ticketId]: event.target.value,
                         }))}
                       >
-                        <option value="">Selecione um ingresso ativo</option>
+                        <option value="">{t('Selecione um ingresso ativo')}</option>
                         {offerableTickets.map((ticket) => (
                           <option key={ticket.id} value={ticket.id}>
                             {ticket.eventTitle} · {ticket.type} ({ticket.code})
@@ -836,32 +832,32 @@ export function Tickets() {
                           'Solicitação de troca enviada ao usuário.',
                         )}
                       >
-                        Propor troca
+                        {t('Propor troca')}
                       </button>
                     </>
                   ) : (
-                    <p className="muted">Você precisa ter um ingresso ativo para propor uma troca.</p>
+                    <p className="muted">{t('Você precisa ter um ingresso ativo para propor uma troca.')}</p>
                   )}
                 </Panel>
               ))}
             </div>
-          ) : !loading && <Empty title="Nenhuma oferta de troca disponível" />}
+          ) : !loading && <Empty title={t('Nenhuma oferta de troca disponível')} />}
         </section>
 
         <section aria-labelledby="ticket-exchange-offers-heading" className="ticket-exchange-section">
-          <h2 id="ticket-exchange-offers-heading">Solicitações de troca</h2>
+          <h2 id="ticket-exchange-offers-heading">{t('Solicitações de troca')}</h2>
           {offers.length ? (
             <div className="cards-two">
               {offers.map((offer) => (
                 <Panel key={offer.id}>
                   <Badge tone={offer.status === 'Pendente' ? 'amber' : 'gray'}>{offer.status}</Badge>
-                  <h3>{offer.direction === 'recebida' ? 'Proposta recebida' : 'Proposta enviada'}</h3>
+                  <h3>{offer.direction === 'recebida' ? t('Proposta recebida') : t('Proposta enviada')}</h3>
                   <p>
                     {offer.direction === 'recebida'
-                      ? `${offer.requesterName} oferece ${offer.offeredEventTitle} (${offer.offeredType}) pelo seu ingresso de ${offer.requestedEventTitle} (${offer.requestedType}).`
-                      : `Você ofereceu ${offer.offeredEventTitle} (${offer.offeredType}) pelo ingresso de ${offer.requesterName} em ${offer.requestedEventTitle} (${offer.requestedType}).`}
+                      ? t('{requesterName} oferece {offeredEventTitle} ({offeredType}) pelo seu ingresso de {requestedEventTitle} ({requestedType}).', { requesterName: offer.requesterName, offeredEventTitle: offer.offeredEventTitle, offeredType: offer.offeredType, requestedEventTitle: offer.requestedEventTitle, requestedType: offer.requestedType })
+                      : t('Você ofereceu {offeredEventTitle} ({offeredType}) pelo ingresso de {requesterName} em {requestedEventTitle} ({requestedType}).', { offeredEventTitle: offer.offeredEventTitle, offeredType: offer.offeredType, requesterName: offer.requesterName, requestedEventTitle: offer.requestedEventTitle, requestedType: offer.requestedType })}
                   </p>
-                  <small className="muted">Solicitação {offer.date}</small>
+                  <small className="muted">{t('Solicitação')} {offer.date}</small>
                   {offer.status === 'Pendente' && (
                     <div className="actions">
                       {offer.direction === 'recebida' ? (
@@ -875,7 +871,7 @@ export function Tickets() {
                               'Solicitação de troca recusada.',
                             )}
                           >
-                            Recusar
+                            {t('Recusar')}
                           </button>
                           <button
                             type="button"
@@ -886,7 +882,7 @@ export function Tickets() {
                               'Troca concluída. Os ingressos foram transferidos entre as contas.',
                             )}
                           >
-                            Aceitar troca
+                            {t('Aceitar troca')}
                           </button>
                         </>
                       ) : (
@@ -899,7 +895,7 @@ export function Tickets() {
                             'Solicitação de troca cancelada.',
                           )}
                         >
-                          Cancelar solicitação
+                          {t('Cancelar solicitação')}
                         </button>
                       )}
                     </div>
@@ -907,7 +903,7 @@ export function Tickets() {
                 </Panel>
               ))}
             </div>
-          ) : !loading && <Empty title="Nenhuma solicitação de troca" />}
+          ) : !loading && <Empty title={t('Nenhuma solicitação de troca')} />}
         </section>
       </div>
     );
@@ -915,45 +911,45 @@ export function Tickets() {
 
   return (
     <div className="workspace">
-      <PageTitle title="Meus Ingressos" subtitle="Acompanhe as reservas feitas na demonstração.">
+      <PageTitle title={t('Meus Ingressos')} subtitle={t('Acompanhe as reservas feitas na demonstração.')}>
         <Link className="button primary" to="/eventos">
-          Explorar eventos
+          {t('Explorar eventos')}
         </Link>
       </PageTitle>
       <div className="cards-three">
         {data.tickets.map((ticket) => (
           <Panel key={ticket.id}>
             <img className="supplier-cover" src={ticket.image} alt={ticket.title} />
-            <Badge>{ticket.status}</Badge>
+            <Badge>{t(ticket.status)}</Badge>
             <h2>{ticket.title}</h2>
             <code>{ticket.id}</code>
             <p>
               {ticket.quantity} × {ticket.type} · {money(ticket.total)}
             </p>
-            <p className="muted">SEM VALIDADE PARA ENTRADA</p>
+            <p className="muted">{t('SEM VALIDADE PARA ENTRADA')}</p>
             <div className="actions">
               <Link className="button outline" to={`/eventos/${ticket.eventId}`}>
-                Ver evento
+                {t('Ver evento')}
               </Link>
               <button
                 className="button danger-outline"
                 disabled={ticket.status === 'Cancelado'}
                 onClick={() => {
                   update('tickets', (old) =>
-                    old.map((t) => (t.id === ticket.id ? { ...t, status: 'Cancelado' } : t)),
+                    old.map((tk) => (tk.id === ticket.id ? { ...tk, status: 'Cancelado' } : tk)),
                   );
                   notify('Reserva de demonstração cancelada.');
                 }}
               >
-                Cancelar reserva
+                {t('Cancelar reserva')}
               </button>
             </div>
           </Panel>
         ))}
       </div>
       {!data.tickets.length && (
-        <Empty title="Sua próxima experiência começa aqui">
-          Explore os eventos e simule uma reserva para vê-la nesta página.
+        <Empty title={t('Sua próxima experiência começa aqui')}>
+          {t('Explore os eventos e simule uma reserva para vê-la nesta página.')}
         </Empty>
       )}
     </div>
@@ -995,11 +991,11 @@ export function Community() {
     return (
       <div className="workspace narrow">
         <PageTitle
-          title="Troca-Papo"
-          subtitle="Um espaço para compartilhar suas próximas experiências."
+          title={t('Troca-Papo')}
+          subtitle={t('Um espaço para compartilhar suas próximas experiências.')}
         />
-        <Empty title="Área disponível para usuários">
-          Entre com uma conta de usuário para publicar e consultar mensagens do Troca-Papo.
+        <Empty title={t('Área disponível para usuários')}>
+          {t('Entre com uma conta de usuário para publicar e consultar mensagens do Troca-Papo.')}
         </Empty>
       </div>
     );
@@ -1051,28 +1047,28 @@ export function Community() {
   return (
     <div className="workspace narrow">
       <PageTitle
-        title="Troca-Papo"
-        subtitle="Um espaço para compartilhar suas próximas experiências."
+        title={t('Troca-Papo')}
+        subtitle={t('Um espaço para compartilhar suas próximas experiências.')}
       />
-      <Panel title="O que você está planejando?">
+      <Panel title={t('O que você está planejando?')}>
         <form onSubmit={submitMessage}>
           <textarea
-            aria-label="Sua mensagem"
+            aria-label={t('Sua mensagem')}
             required
             maxLength={500}
             rows={4}
-            placeholder="Conte qual evento você quer conhecer…"
+            placeholder={t('Conte qual evento você quer conhecer…')}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           <div className="form-footer">
             <small className="muted">
               {isParticipantAccount
-                ? 'Visível para os usuários cadastrados.'
-                : 'Visível apenas neste navegador.'}
+                ? t('Visível para os usuários cadastrados.')
+                : t('Visível apenas neste navegador.')}
             </small>
             <button className="button primary" disabled={submitting}>
-              {submitting ? 'Publicando…' : isParticipantAccount ? 'Publicar mensagem' : 'Publicar na demo'}
+              {submitting ? t('Publicando…') : isParticipantAccount ? t('Publicar mensagem') : t('Publicar na demo')}
             </button>
           </div>
         </form>
@@ -1082,14 +1078,14 @@ export function Community() {
           {messagesError}
           {isParticipantAccount && (
             <button className="plain-button" onClick={() => loadAccountMessages()}>
-              Tentar novamente
+              {t('Tentar novamente')}
             </button>
           )}
         </div>
       )}
-      {loadingMessages && <p className="muted" role="status">Carregando mensagens…</p>}
+      {loadingMessages && <p className="muted" role="status">{t('Carregando mensagens…')}</p>}
       {!loadingMessages && !messagesError && messages.length === 0 && (
-        <Empty title="Nenhuma mensagem por enquanto">Compartilhe o que você está planejando.</Empty>
+        <Empty title={t('Nenhuma mensagem por enquanto')}>{t('Compartilhe o que você está planejando.')}</Empty>
       )}
       {messages.map((m) => (
         <Panel key={m.id}>
@@ -1100,15 +1096,15 @@ export function Community() {
               className="plain-button text-danger"
               onClick={() => removeMessage(m.id)}
             >
-              Remover mensagem
+              {t('Remover mensagem')}
             </button>
           )}
         </Panel>
       ))}
       <Panel>
-        <Badge>Boas-vindas</Badge>
-        <h2>Viva a próxima experiência</h2>
-        <p>Salve seus eventos favoritos, explore as áreas e teste os fluxos do TrocaTicket.</p>
+        <Badge>{t('Boas-vindas')}</Badge>
+        <h2>{t('Viva a próxima experiência')}</h2>
+        <p>{t('Salve seus eventos favoritos, explore as áreas e teste os fluxos do TrocaTicket.')}</p>
       </Panel>
     </div>
   );

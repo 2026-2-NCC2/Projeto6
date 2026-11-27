@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { dateLabel, money } from '../UI';
 import { toRoman } from '../../utils/format';
 import { Callout, DateBox, InfoList, InfoRow, StatusPill, TagList } from './common';
+import { t } from '../../i18n';
 
 const STATUS_TONES = {
   'Cotação aberta': 'green',
@@ -17,8 +18,8 @@ export default function OpportunityCard({ event, index }) {
   return (
     <article className="sp-card sp-opportunity" aria-labelledby={titleId}>
       <header className="sp-opportunity-head">
-        <span className="sp-index">EVENTO {toRoman(index + 1)}</span>
-        <StatusPill tone={STATUS_TONES[event.status] || 'blue'}>{event.status}</StatusPill>
+        <span className="sp-index">{t('EVENTO')} {toRoman(index + 1)}</span>
+        <StatusPill tone={STATUS_TONES[event.status] || 'blue'}>{t(event.status)}</StatusPill>
       </header>
       <h3 className="sp-card-title" id={titleId}>
         {event.title}
@@ -28,16 +29,16 @@ export default function OpportunityCard({ event, index }) {
       <DateBox date={dateLabel(event.date)} place={event.location} />
 
       <InfoList>
-        <InfoRow label={`${event.requesterLabel || 'Organizador solicitante'}:`}>{event.organizer}</InfoRow>
-        <InfoRow label="Serviços solicitados:">
+        <InfoRow label={`${t(event.requesterLabel || 'Organizador solicitante')}:`}>{event.organizer}</InfoRow>
+        <InfoRow label={t('Serviços solicitados:')}>
           <TagList items={event.services || [event.category]} />
         </InfoRow>
         {submitted ? (
-          <InfoRow label="Valor ofertado:">{money(event.proposal.value)}</InfoRow>
+          <InfoRow label={t('Valor ofertado:')}>{money(event.proposal.value)}</InfoRow>
         ) : (
           event.deadline && (
-            <InfoRow label={`${event.deadline.label}:`} tone={event.deadline.tone}>
-              {event.deadline.value}
+            <InfoRow label={`${t(event.deadline.label)}:`} tone={event.deadline.tone}>
+              {t(event.deadline.value)}
             </InfoRow>
           )
         )}
@@ -46,8 +47,8 @@ export default function OpportunityCard({ event, index }) {
       {submitted && (
         <Callout
           icon="check"
-          title={`Proposta submetida em ${event.proposal.sentAt}`}
-          action={<span className="sp-protocol">Protocolo {event.proposal.protocol}</span>}
+          title={t('Proposta submetida em {sentAt}', { sentAt: event.proposal.sentAt })}
+          action={<span className="sp-protocol">{t('Protocolo')} {event.proposal.protocol}</span>}
         />
       )}
       {event.highlight && (
@@ -57,7 +58,7 @@ export default function OpportunityCard({ event, index }) {
           title={event.highlight}
           action={
             <Link className="sp-callout-link" to={`/fornecedor/cotacao/${event.id}`}>
-              Ver edital
+              {t('Ver edital')}
             </Link>
           }
         />
@@ -67,7 +68,7 @@ export default function OpportunityCard({ event, index }) {
         className="button dark full sp-cta"
         to={submitted ? '/fornecedor/propostas' : `/fornecedor/cotacao/${event.id}`}
       >
-        {submitted ? 'Acompanhar proposta' : 'Ver detalhes & cotar'}
+        {submitted ? t('Acompanhar proposta') : t('Ver detalhes & cotar')}
       </Link>
     </article>
   );

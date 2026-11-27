@@ -8,6 +8,7 @@ import { Field, Tabs } from '../components/UI';
 
 import { validateAccount, validateRecovery, maskDocument, normalizeEmail } from '../utils/validation';
 import { buscarUsuario, cadastrarUsuario, fazerLogin, guardarCsrf } from '../services/api';
+import { t } from '../i18n';
 
 export default function Account({ login = false }) {
   const navigate = useNavigate();
@@ -185,7 +186,7 @@ export default function Account({ login = false }) {
         <span className="auth-symbol">♙</span>
 
         <h1>
-          {login ? 'Acesse sua Conta' : 'Crie sua Conta'}
+          {login ? t('Acesse sua Conta') : t('Crie sua Conta')}
         </h1>
 
         <AccountNavigation login={login} />
@@ -204,9 +205,9 @@ export default function Account({ login = false }) {
 
         {!login && profile !== 'comprador' && (
           <p className="auth-note approval-note">
-            Contas de {roleNames[profile].toLowerCase()} passam pela aprovação da administração.
-            Até lá, você pode completar o perfil
-            {profile === 'organizador' ? ' e preparar eventos como rascunho' : ''}.
+            {profile === 'organizador'
+              ? t('Contas de organizador passam pela aprovação da administração. Até lá, você pode completar o perfil e preparar eventos como rascunho.')
+              : t('Contas de fornecedor passam pela aprovação da administração. Até lá, você pode completar o perfil.')}
           </p>
         )}
 
@@ -215,11 +216,11 @@ export default function Account({ login = false }) {
           {!login && (
             <>
               <Field
-                label="Nome completo"
+                label={t('Nome completo')}
                 name="name"
                 id="name"
                 autoComplete="name"
-                placeholder="João da Silva"
+                placeholder={t('João da Silva')}
                 error={errors.name}
                 disabled={busy}
               />
@@ -227,8 +228,8 @@ export default function Account({ login = false }) {
               <Field
                 label={
                   profile === 'comprador'
-                    ? 'CPF'
-                    : 'CPF / CNPJ'
+                    ? t('CPF')
+                    : t('CPF / CNPJ')
                 }
                 name="document"
                 id="document"
@@ -243,31 +244,31 @@ export default function Account({ login = false }) {
           )}
 
           <Field
-            label="E-mail"
+            label={t('E-mail')}
             name="email"
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="exemplo@email.com"
+            placeholder={t('exemplo@email.com')}
             onBlur={handleEmailBlur}
             error={errors.email}
             disabled={busy}
           />
 
           <Field
-            label="Senha"
+            label={t('Senha')}
             name="password"
             id="password"
             type={showPassword ? 'text' : 'password'}
             autoComplete={login ? 'current-password' : 'new-password'}
-            placeholder="Mínimo de 8 caracteres"
+            placeholder={t('Mínimo de 8 caracteres')}
             error={errors.password}
             disabled={busy}
           />
 
           {!login && (
             <Field
-              label="Confirme sua senha"
+              label={t('Confirme sua senha')}
               name="confirm"
               id="confirm"
               type={showPassword ? 'text' : 'password'}
@@ -286,7 +287,7 @@ export default function Account({ login = false }) {
 
           {submitError && (
             <p className="form-error" role="alert">
-              {submitError}
+              {t(submitError)}
             </p>
           )}
 
@@ -296,10 +297,10 @@ export default function Account({ login = false }) {
             disabled={busy}
           >
             {busy
-              ? 'A processar…'
+              ? t('A processar…')
               : login
-                ? 'Entrar na plataforma'
-                : 'Cadastrar'}
+                ? t('Entrar na plataforma')
+                : t('Cadastrar')}
           </button>
 
         </form>
@@ -307,11 +308,11 @@ export default function Account({ login = false }) {
         {!isAuthenticated && (
           <>
             <p className="auth-note">
-              Acesse com sua conta ou cadastre-se para usar os dados vinculados ao banco.
+              {t('Acesse com sua conta ou cadastre-se para usar os dados vinculados ao banco.')}
             </p>
-            <div className="divider">OU EXPLORE SEM CADASTRO</div>
+            <div className="divider">{t('OU EXPLORE SEM CADASTRO')}</div>
             <Link className="button outline full" to="/perfis">
-              Escolher perfil de demonstração →
+              {t('Escolher perfil de demonstração →')}
             </Link>
           </>
         )}
@@ -330,14 +331,14 @@ function AccountNavigation({ login }) {
         className={login ? 'active' : ''}
         to="/entrar"
       >
-        Entrar
+        {t('Entrar')}
       </Link>
 
       <Link
         className={!login ? 'active' : ''}
         to="/cadastro"
       >
-        Criar Conta
+        {t('Criar Conta')}
       </Link>
 
     </div>
@@ -350,12 +351,12 @@ function AccountOptions({login, showPassword, onTogglePassword}) {
 
       <label>
         <input type="checkbox" checked={showPassword} onChange={onTogglePassword}/>
-        Mostrar palavra-passe
+        {t('Mostrar palavra-passe')}
       </label>
 
       {login && (
         <Link to="/recuperar">
-          Esqueceu-se da sua palavra-passe?
+          {t('Esqueceu-se da sua palavra-passe?')}
         </Link>
       )}
 
@@ -439,11 +440,11 @@ export function Profiles() {
   return (
     <section className="pf-picker" aria-labelledby="pf-title">
       <div className="pf-intro">
-        <h1 id="pf-title">Selecione o tipo de perfil</h1>
-        <p className="pf-note">Apenas disponível no Modo demonstração</p>
+        <h1 id="pf-title">{t('Selecione o tipo de perfil')}</h1>
+        <p className="pf-note">{t('Apenas disponível no Modo demonstração')}</p>
       </div>
 
-      <div className="pf-grid" role="group" aria-label="Tipo de perfil">
+      <div className="pf-grid" role="group" aria-label={t('Tipo de perfil')}>
         {PERFIS_DEMO.map((perfil) => (
           <button
             key={perfil.id}
@@ -456,16 +457,16 @@ export function Profiles() {
                 {perfil.icon}
               </svg>
             </span>
-            <span className="pf-tag">{perfil.tag}</span>
-            <h2>{perfil.title}</h2>
-            <span className="pf-desc">{perfil.description}</span>
+            <span className="pf-tag">{t(perfil.tag)}</span>
+            <h2>{t(perfil.title)}</h2>
+            <span className="pf-desc">{t(perfil.description)}</span>
             <ul>
               {perfil.items.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item}>{t(item)}</li>
               ))}
             </ul>
             <span className="pf-cta">
-              {perfil.cta}
+              {t(perfil.cta)}
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M4 12h16m-6-6 6 6-6 6" />
               </svg>
@@ -509,12 +510,12 @@ export function Recover() {
 
       <div className="auth-card">
 
-        <h1>Recuperar acesso</h1>
+        <h1>{t('Recuperar acesso')}</h1>
 
         {done ? (
 
           <p role="status">
-            Solicitação simulada. Nenhum e-mail foi enviado.
+            {t('Solicitação simulada. Nenhum e-mail foi enviado.')}
           </p>
 
         ) : (
@@ -522,12 +523,12 @@ export function Recover() {
           <form noValidate onSubmit={handleSubmit}>
 
             <Field
-              label="E-mail da conta"
+              label={t('E-mail da conta')}
               name="recover-email"
               id="recover-email"
               type="email"
               autoComplete="email"
-              placeholder="exemplo@email.com"
+              placeholder={t('exemplo@email.com')}
               onBlur={(event) => {
                   event.currentTarget.value = normalizeEmail(
                   event.currentTarget.value
@@ -540,7 +541,7 @@ export function Recover() {
               type="submit"
               className="button blue-button"
             >
-              Simular recuperação
+              {t('Simular recuperação')}
             </button>
 
           </form>
@@ -549,7 +550,7 @@ export function Recover() {
 
 
         <Link className="text-link" to="/entrar">
-          Voltar para entrar
+          {t('Voltar para entrar')}
         </Link>
 
       </div>

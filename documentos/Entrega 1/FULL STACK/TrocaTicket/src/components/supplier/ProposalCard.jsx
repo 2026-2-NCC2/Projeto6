@@ -4,6 +4,7 @@ import { dateLabel, money } from '../UI';
 import { agoLabel } from '../../utils/format';
 import Icon from './Icon';
 import { Callout } from './common';
+import { t } from '../../i18n';
 
 const DEFAULT_OUTCOMES = {
   Rascunho: { tone: 'blue', title: 'Rascunho — ainda não enviado', detail: 'Continue a edição para enviar ao organizador.' },
@@ -31,8 +32,8 @@ export default function ProposalCard({ proposal, onDetails, onSecondary, onExpor
       <header className="sp-proposal-head">
         <code>#{proposal.id}</code>
         <small>
-          <Icon name="clock" size={12} /> {draft ? 'Salvo' : 'Enviada'} em {dateLabel(proposal.date)}
-          {ago && ` (${ago})`}
+          <Icon name="clock" size={12} /> {draft ? t('Salvo') : t('Enviada')} {t('em')} {dateLabel(proposal.date)}
+          {ago && ` (${t(ago)})`}
         </small>
       </header>
 
@@ -44,51 +45,51 @@ export default function ProposalCard({ proposal, onDetails, onSecondary, onExpor
           <Icon name="calendar" size={13} /> {dateLabel(proposal.eventDate)} • {proposal.location}
         </li>
         <li>
-          <Icon name="building" size={13} /> Organizador: {proposal.organizer}
+          <Icon name="building" size={13} /> {t('Organizador:')} {proposal.organizer}
         </li>
       </ul>
 
       <div className="sp-scope">
-        <small>ITENS & SERVIÇOS OFERTADOS</small>
+        <small>{t('ITENS & SERVIÇOS OFERTADOS')}</small>
         <p>{proposal.description}</p>
       </div>
 
       <div className="sp-values">
         <div>
-          <small>Valor total proposto</small>
+          <small>{t('Valor total proposto')}</small>
           <strong>{money(proposal.total)}</strong>
         </div>
         <div className="end">
-          <small>{proposal.aside?.label || 'Condição de pagamento'}</small>
-          <span>{proposal.aside?.value || proposal.payment}</span>
+          <small>{t(proposal.aside?.label || 'Condição de pagamento')}</small>
+          <span>{t(proposal.aside?.value || proposal.payment)}</span>
         </div>
       </div>
 
       <Callout tone={outcome.tone} icon={CALLOUT_ICONS[outcome.tone]} title={outcome.title}>
-        {outcome.detail}
+        {t(outcome.detail)}
       </Callout>
 
       <footer className="sp-proposal-actions">
         {draft ? (
           <Link className="sp-link-action" to={`/fornecedor/cotacao/${proposal.eventId}`}>
-            Continuar edição <Icon name="chevron-right" size={13} />
+            {t('Continuar edição')} <Icon name="chevron-right" size={13} />
           </Link>
         ) : (
           <button type="button" className="sp-link-action" onClick={() => onDetails(proposal)}>
-            {closed ? 'Ver detalhes do histórico' : 'Ver detalhes da proposta'} <Icon name="chevron-right" size={13} />
+            {closed ? t('Ver detalhes do histórico') : t('Ver detalhes da proposta')} <Icon name="chevron-right" size={13} />
           </button>
         )}
         <div className="sp-proposal-buttons">
           {proposal.secondaryAction && (
             <button type="button" className="button outline sp-small-button" onClick={() => onSecondary(proposal)}>
-              {proposal.secondaryAction}
+              {t(proposal.secondaryAction)}
             </button>
           )}
-          {closed && <small className="sp-inactive">STATUS: NÃO ATIVO</small>}
+          {closed && <small className="sp-inactive">{t('STATUS: NÃO ATIVO')}</small>}
           <button
             type="button"
             className="sp-icon-button"
-            aria-label={`Baixar resumo da proposta ${proposal.id}`}
+            aria-label={t('Baixar resumo da proposta {id}', { id: proposal.id })}
             onClick={() => onExport(proposal)}
           >
             <Icon name="file" size={15} />

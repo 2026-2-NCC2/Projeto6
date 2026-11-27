@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field } from '../UI';
+import { t } from '../../i18n';
 
 /*
  * Controles de formulário construídos sobre o <Field> do projeto.
@@ -9,8 +10,8 @@ const describedBy = (name, error, hint) => (error ? `${name}-error` : hint ? `${
 
 export function FormInput({ label, name, error, hint, mask, onChange, className, required, aside, ...props }) {
   return (
-    <Field label={required ? `${label} *` : label} name={name} error={error} className={className}>
-      {aside && <span className="sp-field-aside">{aside}</span>}
+    <Field label={required ? `${t(label)} *` : label} name={name} error={error} className={className}>
+      {aside && <span className="sp-field-aside">{t(aside)}</span>}
       <input
         id={name}
         name={name}
@@ -22,7 +23,7 @@ export function FormInput({ label, name, error, hint, mask, onChange, className,
       />
       {hint && !error && (
         <small className="sp-field-hint" id={`${name}-hint`}>
-          {hint}
+          {t(hint)}
         </small>
       )}
     </Field>
@@ -31,7 +32,7 @@ export function FormInput({ label, name, error, hint, mask, onChange, className,
 
 export function FormSelect({ label, name, error, options, placeholder, onChange, className, required, ...props }) {
   return (
-    <Field label={required ? `${label} *` : label} name={name} error={error} className={className}>
+    <Field label={required ? `${t(label)} *` : label} name={name} error={error} className={className}>
       <select
         id={name}
         name={name}
@@ -41,12 +42,12 @@ export function FormSelect({ label, name, error, options, placeholder, onChange,
         onChange={(event) => onChange?.(event.target.value)}
         {...props}
       >
-        {placeholder && <option value="">{placeholder}</option>}
+        {placeholder && <option value="">{t(placeholder)}</option>}
         {options.map((option) => {
           const { value, label: text } = typeof option === 'string' ? { value: option, label: option } : option;
           return (
             <option key={value} value={value}>
-              {text}
+              {t(text)}
             </option>
           );
         })}
@@ -55,14 +56,16 @@ export function FormSelect({ label, name, error, options, placeholder, onChange,
   );
 }
 
-export function FormTextArea({ label, name, error, hint, onChange, className, maxLength, value = '', rows = 4, ...props }) {
+export function FormTextArea({ label, name, error, hint, onChange, className, maxLength, value, rows = 4, ...props }) {
+  // Campo vazio no banco chega como null: o texto e o contador tratam como vazio.
+  const texto = value ?? '';
   return (
     <Field label={label} name={name} error={error} className={className}>
       <textarea
         id={name}
         name={name}
         rows={rows}
-        value={value}
+        value={texto}
         maxLength={maxLength}
         aria-invalid={!!error}
         aria-describedby={describedBy(name, error, hint)}
@@ -72,14 +75,14 @@ export function FormTextArea({ label, name, error, hint, onChange, className, ma
       <div className="sp-field-meta">
         {hint && !error ? (
           <small className="sp-field-hint" id={`${name}-hint`}>
-            {hint}
+            {t(hint)}
           </small>
         ) : (
           <span />
         )}
         {maxLength && (
           <small className="sp-field-hint" aria-hidden="true">
-            {value.length}/{maxLength}
+            {texto.length}/{maxLength}
           </small>
         )}
       </div>
@@ -92,8 +95,8 @@ export function PreferenceItem({ title, description, checked, onChange }) {
   return (
     <label className="sp-preference">
       <span>
-        <strong>{title}</strong>
-        {description && <small>{description}</small>}
+        <strong>{t(title)}</strong>
+        {description && <small>{t(description)}</small>}
       </span>
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
     </label>
@@ -104,11 +107,11 @@ export function PreferenceItem({ title, description, checked, onChange }) {
 export function RadioCards({ legend, name, options, value, onChange }) {
   return (
     <fieldset className="sp-radio-cards">
-      <legend>{legend}</legend>
+      <legend>{t(legend)}</legend>
       {options.map((option) => (
         <label key={option} className={value === option ? 'checked' : ''}>
           <input type="radio" name={name} checked={value === option} onChange={() => onChange(option)} />
-          <span>{option}</span>
+          <span>{t(option)}</span>
         </label>
       ))}
     </fieldset>

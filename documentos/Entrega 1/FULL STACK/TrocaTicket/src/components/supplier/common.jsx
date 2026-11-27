@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from './Icon';
+import { t } from '../../i18n';
 
 /* Peças pequenas reutilizadas pelas telas do fornecedor. */
 
@@ -20,17 +21,23 @@ export function SearchInput({ value, onChange, placeholder, label, className = '
 }
 
 // Select com rótulo em linha: "STATUS: [Todos os eventos ▾]"
-export function LabeledSelect({ label, value, onChange, options, className = '' }) {
+export function LabeledSelect({ label, ariaLabel, value, onChange, options, className = '' }) {
   return (
     <label className={`sp-select ${className}`}>
-      {label && <span>{label}</span>}
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
+      {label && <span>{t(label)}</span>}
+      <select
+        value={value}
+        aria-label={!label && ariaLabel ? t(ariaLabel) : undefined}
+        onChange={(event) => onChange(event.target.value)}
+      >
         {options.map((option) =>
           typeof option === 'string' ? (
-            <option key={option}>{option}</option>
+            <option value={option} key={option}>
+              {t(option)}
+            </option>
           ) : (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {t(option.label)}
             </option>
           ),
         )}
@@ -59,7 +66,7 @@ export function TagList({ items, tone }) {
     <span className="sp-tag-list">
       {items.map((item) => (
         <Tag key={item} tone={tone}>
-          {item}
+          {t(item)}
         </Tag>
       ))}
     </span>
@@ -73,7 +80,7 @@ export function InfoList({ children, className = '' }) {
 export function InfoRow({ label, tone, children }) {
   return (
     <div className="sp-info-row">
-      <dt>{label}</dt>
+      <dt>{t(label)}</dt>
       <dd className={tone ? `tone-${tone}` : ''}>{children}</dd>
     </div>
   );
@@ -86,7 +93,7 @@ export function Callout({ tone = 'blue', icon, title, children, action }) {
       <div className="sp-callout-body">
         {icon && <Icon name={icon} size={15} />}
         <div>
-          {title && <strong>{title}</strong>}
+          {title && <strong>{t(title)}</strong>}
           {children && <p>{children}</p>}
         </div>
       </div>
@@ -101,7 +108,7 @@ export function DateBox({ label = 'Data do evento', date, place }) {
     <div className="sp-date-box">
       <Icon name="calendar" size={18} />
       <div>
-        <small>{label}</small>
+        <small>{t(label)}</small>
         <strong>{date}</strong>
       </div>
       {place && <span className="sp-place-chip">{place}</span>}
@@ -112,7 +119,7 @@ export function DateBox({ label = 'Data do evento', date, place }) {
 // Filtro em "pílulas" com contador. options: [{ value, label, count? }]
 export function ChipTabs({ options, value, onChange, label = 'Filtrar por categoria' }) {
   return (
-    <div className="sp-chip-tabs" role="group" aria-label={label}>
+    <div className="sp-chip-tabs" role="group" aria-label={t(label)}>
       {options.map((option) => (
         <button
           type="button"
@@ -121,7 +128,7 @@ export function ChipTabs({ options, value, onChange, label = 'Filtrar por catego
           aria-pressed={value === option.value}
           onClick={() => onChange(option.value)}
         >
-          {option.label}
+          {t(option.label)}
           {option.count !== undefined && <span>{option.count}</span>}
         </button>
       ))}
@@ -157,12 +164,12 @@ export function Pagination({ page, pageSize, total, onPage, noun = 'itens' }) {
   return (
     <div className="sp-pagination">
       <small>
-        Mostrando {from} a {to} de {total} {noun}
+        {t('Mostrando')} {from} {t('a')} {to} {t('de')} {total} {noun}
       </small>
       {pages > 1 && (
-        <nav aria-label="Paginação">
+        <nav aria-label={t('Paginação')}>
           <button type="button" disabled={page === 1} onClick={() => onPage(page - 1)}>
-            Anterior
+            {t('Anterior')}
           </button>
           {Array.from({ length: pages }, (_, i) => i + 1).map((number) => (
             <button
@@ -176,7 +183,7 @@ export function Pagination({ page, pageSize, total, onPage, noun = 'itens' }) {
             </button>
           ))}
           <button type="button" disabled={page === pages} onClick={() => onPage(page + 1)}>
-            Próxima
+            {t('Próxima')}
           </button>
         </nav>
       )}

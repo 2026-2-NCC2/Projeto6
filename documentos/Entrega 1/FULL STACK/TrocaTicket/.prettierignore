@@ -2,3 +2,5 @@ node_modules
 dist
 reference
 pnpm-lock.yaml
+# Tabelas de tradução (etapa 7): uma linha por texto, nos seis idiomas, para revisar com facilidade.
+src/i18n/textos

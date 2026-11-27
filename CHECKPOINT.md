@@ -1,5 +1,70 @@
 # Integração TrocaTicket
 
+## Integração com a TrocaTicket 2.0 — etapa 7: idiomas do site (27/11/2026)
+
+Etapa iniciada sobre o commit da etapa 6 (3ae77de). O usuário chegou a passar o trabalho para o ChatGPT, que perguntou como tratar as mensagens de erro da API; a resposta foi a opção A (o site traduz, a API continua em português). Depois o usuário pediu que eu fizesse a etapa ("esgotou, ent pode fazer voce mesmo"). Houve duas interrupções (limite de uso e reinício da máquina); os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.
+
+**O que entrou**
+- `src/i18n/` (novo), adaptado de src/i18n da 2.0:
+  - `idiomas.js`: português do Brasil (padrão), inglês, espanhol, francês, alemão e italiano; a escolha fica em `localStorage` (`trocaticket-idioma`).
+  - `index.js`: `t(texto, valores)`, `tn(quantidade, singular, plural)`, `useIdioma()`, `definirIdioma`, `localeAtual`, `formatarNumero` e `formatarMoeda`. O texto em português é a chave; sem tradução, aparece o português.
+  - Textos montados fora do site (mensagens da API com horário, número ou nome) são reconhecidos por modelos com `{marcador}`. Três regras evitam frases com dois idiomas: marcadores de quantidade só aceitam números, o modelo com mais texto fixo é tentado primeiro e modelos quase sem texto fixo (como `{v1} às {time}`) não reconhecem frases soltas.
+  - `textos/`: 2.063 linhas (2.038 textos) nas seis línguas. `reaproveitados.js` tem 477 traduções que já existiam na 2.0; `lote01.js` a `lote09.js` têm as deste site, inclusive todas as mensagens que a API envia.
+- `src/components/SeletorIdioma.jsx` (novo): botão PT/EN/ES/FR/DE/IT no header, com os nomes no próprio idioma. Esc e clique fora fecham o painel e o foco volta ao botão. O `lang` da página e o título da aba acompanham o idioma.
+- Telas, componentes e serviços (58 arquivos alterados em `src/`, contando estilos) passam por `t()` os textos, rótulos acessíveis, dicas, opções, avisos e erros. Os textos foram marcados com um script que lê o código (Babel) e revisados à mão; frases que o código montava em pedaços viraram frases inteiras, e plurais feitos com "s" no fim passaram a usar `tn()`.
+- Datas e números seguem o idioma. Datas guardadas como AAAA-MM-DD nos cartões de eventos do banco agora aparecem no formato do idioma (antes saíam cruas, como "2026-12-26"). Valores continuam em reais, sempre com "R$".
+- Mensagens da API: o servidor não mudou. O site traduz cada mensagem pelo texto exato ou por modelo; mensagem desconhecida aparece em português.
+- Header: o menu recolhe no ☰ medindo a caixa inteira dos links (com o preenchimento), e não só o texto. Com o botão de idioma no header, o critério antigo deixava a "pílula" do link ativo encostar nas ferramentas em algumas larguras (1 a 3 px).
+- Painel da administração: rótulos e listas de filtro mais longos (francês) não alargam mais a página a 320 px.
+- Denúncia de anúncio: o assunto sugerido no formulário vem no idioma escolhido. Depois de enviado, o assunto é texto da pessoa e não muda com o idioma.
+- Testes: `src/tests/i18n.test.js` (9 testes) e o roteiro de navegador `scripts/e2e/idiomas.py`.
+- `.prettierignore` passa a ignorar `src/i18n/textos`, para as tabelas continuarem com uma linha por texto.
+
+**Defeitos antigos encontrados e corrigidos (já existiam antes da etapa)**
+- O perfil de um fornecedor com conta real ficava em branco quando a descrição estava vazia no banco, que é o caso de toda conta nova (`FormTextArea` lia `null.length`).
+- Acessibilidade: a página de repasses da demonstração e o fórum público não tinham título h1; os campos de arquivo (importar CSV e foto do fornecedor) e dois filtros do inventário não tinham nome acessível.
+
+**Defeitos que eu introduzi e corrigi antes do commit**
+- A marcação automática traduzia o valor de uma célula na proteção contra fórmulas do CSV (`'${t(text)}`); voltou a `'${text}`.
+- `tn` sem importação em `Organizer.jsx` deixava a consolidação em branco; achado pela varredura e por uma checagem de identificadores sem declaração.
+- Rótulo acessível diferente do texto visível: botão Sair (espanhol), logotipo (alemão), link "Ver opções" dos eventos (inglês e alemão) e botão de idioma (o código "PT" agora abre o rótulo).
+
+**Decisões**
+- A API continua em português e com os mesmos códigos HTTP (opção A).
+- Não são traduzidos os dados do banco e da demonstração: nomes de eventos, locais, pessoas, empresas, descrições, motivos de recusa ou cancelamento e mensagens escritas pelas pessoas. Rótulos fixos da demonstração (situações, filtros, preferências, datas da vitrine e textos alternativos de imagens) foram traduzidos.
+- Os arquivos CSV exportados continuam com cabeçalhos em português em todos os idiomas, para o mesmo arquivo servir a qualquer pessoa da equipe e a planilhas.
+- O fórum Troca-Papo é uma aplicação separada e continua em português; o título da página dele é traduzido.
+- Horários "de Brasília" continuam no fuso de Brasília, no formato do idioma.
+
+**Testes executados (bancos e contas descartáveis)**
+- `npm test`: site 19/19 (10 anteriores e 9 novos de idiomas); API 79/79 em MariaDB 10.11.14 e em MySQL 8.0.46, sem testes pulados. O servidor não mudou nesta etapa.
+- Sabotagens propositais, todas acusadas pelos testes do site:
+  - linha de tradução removida;
+  - marcador diferente em uma tradução;
+  - marcadores numéricos desligados;
+  - modelos quase sem texto fixo liberados;
+  - escolha do idioma não gravada no navegador;
+  - moeda voltando ao código "BRL" (a primeira versão do teste não pegou essa, porque só olhava inglês e português; o teste foi reforçado com espanhol e italiano).
+- **Varredura de todas as telas** (visitante, os quatro perfis da demonstração e quatro contas reais: usuário, organizador aprovado, fornecedor aguardando aprovação e administração) em inglês, espanhol, francês, alemão e italiano, com regras do axe para nome acessível, rótulos, título h1 e textos alternativos: zero erros de página e zero violações nos cinco idiomas. Texto em português que sobrou na tela é dado (nomes, locais, descrições, assuntos e mensagens das pessoas e itens fictícios).
+- **Navegador** (Chromium 158 com Playwright, API e MariaDB reais). `idiomas.py` passou:
+  - seletor: seis idiomas com o nome no próprio idioma, Esc, clique fora, foco de volta ao botão, `lang`, título da aba e escolha mantida ao recarregar e ao navegar;
+  - erro da API traduzido no site (login recusado em inglês e francês; a API respondeu em português);
+  - organizador aguardando aprovação tenta publicar: 403 `APPROVAL_REQUIRED` em português na API e aviso em inglês no site;
+  - plurais, paginação e descrição do gráfico em inglês e alemão;
+  - axe 4.14.1: zero violações em 290 combinações (5 idiomas; 12 telas em 1366 e 390 px e o painel de idiomas aberto em 1366 px, nos temas claro e escuro);
+  - header: 1.080 medições (6 idiomas; visitante, os quatro perfis da demonstração e quatro contas reais; 2 temas; 10 larguras de 320 a 1920 px), sem sobreposição, quebra de linha ou rolagem lateral.
+- Regressão em português: `navegador.py` (`regressao`, `compra` e `recusado`), `repasse.py`, `portaria.py` e `administracao.py` passaram; axe sem violações em 40, 20 e 12 combinações, como na etapa 6.
+- O build passou. Prettier: nenhum arquivo novo fora do padrão (os 51 antigos continuam iguais; as tabelas de tradução ficam fora, pelo `.prettierignore`).
+- **Erro meu de processo:** rodei o Prettier e as sabotagens enquanto roteiros usavam o servidor de desenvolvimento. O Vite recarregou as páginas e duas rodadas ficaram inválidas. Elas foram descartadas e repetidas do zero com o código parado; os números acima são das rodadas limpas.
+
+**Pendências e riscos**
+- As traduções foram feitas por IA e conferidas pelos testes, mas não por falantes nativos. Em alemão, por exemplo, convivem "Event" e "Veranstaltung" (as duas formas são corretas). Vale uma revisão de quem fala cada idioma.
+- A API responde em português; quem usar a API diretamente recebe as mensagens em português.
+- O fórum Troca-Papo continua só em português.
+- Itens e eventos fictícios da demonstração ficam em português em todos os idiomas, por serem dados.
+- Pendências anteriores continuam: a aprovação não envia e-mail, não há tela para gerenciar contas de administração, propostas de fornecedor de evento cancelado continuam como estavam e o histórico de trocas da main segue em aberto.
+- **Próximo passo:** aguardar a confirmação do usuário para publicar ou para outra etapa. Sugestão: as ferramentas de acessibilidade da 2.0 (`src/accessibility`: tamanho da letra, espaçamento, alto contraste, fonte legível, destaque de links, tema do sistema e VLibras, que carrega um script de vlibras.gov.br e precisa de autorização).
+
 ## Integração com a TrocaTicket 2.0 — etapa 6: administração, aprovação de contas e cancelamento de evento (26/11/2026)
 
 Etapa iniciada com autorização do usuário ("Etapa 6") sobre o commit da etapa 5 (5c450b8). Houve uma interrupção por limite de uso no meio do trabalho; os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.
@@ -93,7 +158,7 @@ Etapa iniciada com autorização do usuário ("Etapa 6") sobre o commit da etapa
 - O painel lista até 500 eventos e a aprovação até 200 contas por consulta, sem paginação no servidor.
 - Propostas de fornecedores de evento cancelado continuam como estavam.
 - **Achado da etapa 4:** o histórico de trocas da main continua em aberto.
-- **Próximo passo:** aguardar a confirmação do usuário para publicar ou para começar a etapa 7 (idiomas).
+- **Próximo passo (na época):** aguardar a confirmação do usuário para publicar ou para começar a etapa 7 (idiomas).
 
 ## Integração com a TrocaTicket 2.0 — etapa 5: portaria e atendimento (26/11/2026)
 

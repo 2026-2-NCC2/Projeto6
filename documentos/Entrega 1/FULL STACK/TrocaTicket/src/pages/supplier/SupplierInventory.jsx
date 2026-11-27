@@ -11,6 +11,7 @@ import InventoryTable from '../../components/supplier/InventoryTable';
 import ItemDetail from '../../components/supplier/ItemDetail';
 import ItemFormModal from '../../components/supplier/ItemFormModal';
 import { getSupplierInventory, saveSupplierProduct } from '../../services/supplier';
+import { t } from '../../i18n';
 
 const PAGE_SIZE = 5;
 const STATUS_FILTERS = [
@@ -236,12 +237,20 @@ export default function SupplierInventory() {
   return (
     <div className="workspace sp-page">
       <PageTitle
-        title="Itens & inventário"
-        subtitle="Gerencie o catálogo de produtos, serviços e equipamentos usados nas suas propostas."
+        title={t('Itens & inventário')}
+        subtitle={t('Gerencie o catálogo de produtos, serviços e equipamentos usados nas suas propostas.')}
       >
-        <input ref={importRef} className="sp-hidden-input" type="file" accept=".csv,text/csv" tabIndex={-1} onChange={importFile} />
+        <input
+          ref={importRef}
+          className="sp-hidden-input"
+          type="file"
+          accept=".csv,text/csv"
+          tabIndex={-1}
+          aria-label={t('Importar planilha (CSV)')}
+          onChange={importFile}
+        />
         <button type="button" className="button outline" onClick={() => importRef.current?.click()}>
-          <Icon name="upload" size={15} /> Importar planilha (CSV)
+          <Icon name="upload" size={15} /> {t('Importar planilha (CSV)')}
         </button>
         <DownloadButton
           name="catalogo-fornecedor.csv"
@@ -250,38 +259,38 @@ export default function SupplierInventory() {
             ...inventory.map((i) => [i.id, i.name, i.category, i.type || '', i.unit, i.price, i.cost || '', i.status]),
           ]}
         >
-          <Icon name="download" size={15} /> Exportar catálogo
+          <Icon name="download" size={15} /> {t('Exportar catálogo')}
         </DownloadButton>
         <button type="button" className="button blue-button" onClick={() => setEditing({ ...BLANK })}>
-          <Icon name="plus" size={15} /> Adicionar novo item
+          <Icon name="plus" size={15} /> {t('Adicionar novo item')}
         </button>
       </PageTitle>
 
-      <div className="sp-chip-row" aria-label="Resumo do inventário">
-        <Chip tone="green" dot>{homologated} itens homologados</Chip>
-        <Chip tone="blue" dot>{available} disponíveis imediatos</Chip>
-        <Chip tone="amber" dot>{offline} em manutenção / alocados</Chip>
+      <div className="sp-chip-row" aria-label={t('Resumo do inventário')}>
+        <Chip tone="green" dot>{homologated} {t('itens homologados')}</Chip>
+        <Chip tone="blue" dot>{available} {t('disponíveis imediatos')}</Chip>
+        <Chip tone="amber" dot>{offline} {t('em manutenção / alocados')}</Chip>
       </div>
-      {apiError && <p className="api-error" role="alert">{apiError}</p>}
-      {loading && <p role="status" className="muted">Carregando inventário do banco de dados…</p>}
+      {apiError && <p className="api-error" role="alert">{t(apiError)}</p>}
+      {loading && <p role="status" className="muted">{t('Carregando inventário do banco de dados…')}</p>}
 
       <Panel className="sp-inventory-filters">
         <SearchToolbar
           query={query}
           onQuery={filter(setQuery)}
-          searchLabel="Buscar no inventário"
-          placeholder="Buscar por nome, código ou SKU…"
+          searchLabel={t('Buscar no inventário')}
+          placeholder={t('Buscar por nome, código ou SKU…')}
           filters={[
-            { id: 'kind', value: kind, onChange: filter(setKind), options: [{ value: 'Todos', label: 'Tipo: todos os tipos' }, ...inventoryTypes] },
-            { id: 'status', value: status, onChange: filter(setStatus), options: STATUS_FILTERS },
+            { id: 'kind', ariaLabel: 'Filtrar por tipo', value: kind, onChange: filter(setKind), options: [{ value: 'Todos', label: 'Tipo: todos os tipos' }, ...inventoryTypes] },
+            { id: 'status', ariaLabel: 'Filtrar por status', value: status, onChange: filter(setStatus), options: STATUS_FILTERS },
           ]}
         >
           <button type="button" className="button outline" onClick={clearFilters}>
-            Limpar filtros
+            {t('Limpar filtros')}
           </button>
         </SearchToolbar>
         <div className="sp-category-row">
-          <small>CATEGORIAS:</small>
+          <small>{t('CATEGORIAS:')}</small>
           <ChipTabs
             value={category}
             onChange={filter(setCategory)}
@@ -297,8 +306,8 @@ export default function SupplierInventory() {
         <Panel className="sp-inventory-list">
           <div className="sp-inventory-title">
             <div>
-              <h2>Composição de custos & itens cadastrados</h2>
-              <small>Tabela de preço homologada · {category === 'Todas' ? 'todas as categorias' : category}</small>
+              <h2>{t('Composição de custos & itens cadastrados')}</h2>
+              <small>{t('Tabela de preço homologada ·')} {category === 'Todas' ? t('todas as categorias') : category}</small>
             </div>
           </div>
           {visible.length > 0 ? (
@@ -314,9 +323,9 @@ export default function SupplierInventory() {
             </>
           ) : (
             <Empty>
-              Nenhum item encontrado.{' '}
+              {t('Nenhum item encontrado.')}{' '}
               <button type="button" className="sp-link-button" onClick={clearFilters}>
-                Limpar filtros
+                {t('Limpar filtros')}
               </button>
             </Empty>
           )}

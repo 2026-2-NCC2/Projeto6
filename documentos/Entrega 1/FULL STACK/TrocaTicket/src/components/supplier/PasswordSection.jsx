@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FormInput } from './FormControls';
+import { t } from '../../i18n';
 
 /*
  * Troca de senha (opcional), controlada pelo pai.
@@ -14,7 +15,7 @@ export default function PasswordSection({ values, onChange, errors = {}, idPrefi
     <>
       <div className="sp-form-grid cols-3">
         <FormInput
-          label="Senha atual"
+          label={t('Senha atual')}
           name={`${idPrefix}-currentPassword`}
           type={type}
           autoComplete="current-password"
@@ -23,28 +24,28 @@ export default function PasswordSection({ values, onChange, errors = {}, idPrefi
           onChange={set('current')}
         />
         <FormInput
-          label="Nova senha"
+          label={t('Nova senha')}
           name={`${idPrefix}-newPassword`}
           type={type}
           autoComplete="new-password"
-          placeholder="Mínimo 8 caracteres"
+          placeholder={t('Mínimo 8 caracteres')}
           value={values.next}
           error={errors[`${idPrefix}-newPassword`]}
           onChange={set('next')}
         />
         <FormInput
-          label="Confirmar senha"
+          label={t('Confirmar senha')}
           name={`${idPrefix}-confirmPassword`}
           type={type}
           autoComplete="new-password"
-          placeholder="Repita a nova senha"
+          placeholder={t('Repita a nova senha')}
           value={values.confirm}
           error={errors[`${idPrefix}-confirmPassword`]}
           onChange={set('confirm')}
         />
       </div>
       <label className="sp-check sp-show-password">
-        <input type="checkbox" checked={show} onChange={(event) => setShow(event.target.checked)} /> Mostrar senhas
+        <input type="checkbox" checked={show} onChange={(event) => setShow(event.target.checked)} /> {t('Mostrar senhas')}
       </label>
     </>
   );

@@ -12,11 +12,12 @@ import {
   relatorioEvento,
   situacaoEvento,
 } from '../../services/admin';
+import { formatarNumero, t } from '../../i18n';
 
 // Relatório de um evento com os números do banco (etapa 6). A versão de demonstração continua
 // em pages/Report.jsx. A administração também cancela o evento por aqui (com estorno simulado).
 
-const numero = (valor) => Number(valor || 0).toLocaleString('pt-BR');
+const numero = (valor) => formatarNumero(valor);
 const CORES = { ativos: '#2860ee', utilizados: '#0b8a65', cancelados: '#c2410c' };
 
 export default function RelatorioAdminRota() {
@@ -44,26 +45,26 @@ function RelatorioAdmin({ id }) {
     return () => controller.abort();
   }, [id, valido, tentativa]);
 
-  if (!valido) return <NotFound title="Relatório não encontrado" />;
+  if (!valido) return <NotFound title={t('Relatório não encontrado')} />;
   if (!evento) {
     return (
       <div className="workspace">
         {erro ? (
           <div className="api-error" role="alert">
-            <span>{erro}</span>
+            <span>{t(erro)}</span>
             <button
               type="button"
               className="button outline tiny"
               onClick={() => setTentativa((n) => n + 1)}
             >
-              Tentar novamente
+              {t('Tentar novamente')}
             </button>
           </div>
         ) : (
-          <p role="status">Carregando o relatório do evento…</p>
+          <p role="status">{t('Carregando o relatório do evento…')}</p>
         )}
         <Link className="text-link" to="/admin">
-          ← Voltar ao painel geral
+          {t('← Voltar ao painel geral')}
         </Link>
       </div>
     );
@@ -103,16 +104,16 @@ function RelatorioAdmin({ id }) {
   return (
     <div className="workspace report admin-report">
       <div className="rp-topbar">
-        <nav className="rp-crumbs" aria-label="Trilha de navegação">
-          <Link to="/admin">Painel geral</Link>
+        <nav className="rp-crumbs" aria-label={t('Trilha de navegação')}>
+          <Link to="/admin">{t('Painel geral')}</Link>
           <Icon name="chevron-right" size={14} />
           <span>{evento.title}</span>
           <Icon name="chevron-right" size={14} />
-          <strong aria-current="page">Relatório</strong>
+          <strong aria-current="page">{t('Relatório')}</strong>
         </nav>
         <div className="rp-tools">
           <button type="button" className="button dark" onClick={exportar}>
-            <Icon name="download" size={15} /> Exportar CSV
+            <Icon name="download" size={15} /> {t('Exportar CSV')}
           </button>
           {!cancelado && (
             <button
@@ -120,7 +121,7 @@ function RelatorioAdmin({ id }) {
               className="button danger-outline"
               onClick={() => setCancelando(true)}
             >
-              Cancelar evento
+              {t('Cancelar evento')}
             </button>
           )}
         </div>
@@ -129,20 +130,23 @@ function RelatorioAdmin({ id }) {
       {cancelado && (
         <p className="info-note admin-cancel-note" role="note">
           <strong>
-            Evento cancelado
-            {evento.cancelledAt ? ` em ${dataHoraBrasilia(evento.cancelledAt)}` : ''}
+            {evento.cancelledAt
+              ? t('Evento cancelado em {data}', { data: dataHoraBrasilia(evento.cancelledAt) })
+              : t('Evento cancelado')}
           </strong>
-          Motivo: {evento.cancelReason || 'não informado'}.
+          {t('Motivo:')} {evento.cancelReason || t('não informado')}.
         </p>
       )}
 
       <div className="rp-grid">
         <section className="rp-card" aria-labelledby="rp-evento">
           <div className="rp-card-top">
-            <span className="rp-tag">EVENTO Nº {evento.id}</span>
+            <span className="rp-tag">
+              {t('EVENTO Nº')} {evento.id}
+            </span>
             <span className={`rp-status ${tom}`}>
               <i aria-hidden="true" />
-              {situacao}
+              {t(situacao)}
             </span>
           </div>
           <h1 className="rp-title" id="rp-evento">
@@ -151,7 +155,7 @@ function RelatorioAdmin({ id }) {
           <p className="rp-tagline">
             {evento.organizer}
             {evento.organizerName && evento.organizerName !== evento.organizer
-              ? ` · responsável: ${evento.organizerName}`
+              ? t(' · responsável: {organizerName}', { organizerName: evento.organizerName })
               : ''}
           </p>
           <div className="rp-info">
@@ -160,12 +164,12 @@ function RelatorioAdmin({ id }) {
                 <Icon name="calendar" size={22} />
               </span>
               <div>
-                <small>DATA DO EVENTO</small>
+                <small>{t('DATA DO EVENTO')}</small>
                 <strong>{dateLabel(evento.startDate)}</strong>
                 <span>
                   {evento.endDate && evento.endDate !== evento.startDate
-                    ? `Até ${dateLabel(evento.endDate)}`
-                    : 'Evento de um dia'}
+                    ? t('Até {v1}', { v1: dateLabel(evento.endDate) })
+                    : t('Evento de um dia')}
                 </span>
               </div>
             </div>
@@ -174,31 +178,35 @@ function RelatorioAdmin({ id }) {
                 <Icon name="pin" size={22} />
               </span>
               <div>
-                <small>LOCAL</small>
-                <strong>{evento.location || 'A definir'}</strong>
+                <small>{t('LOCAL')}</small>
+                <strong>{evento.location || t('A definir')}</strong>
               </div>
             </div>
           </div>
           <dl className="rp-facts">
             <div>
-              <dt>CAPACIDADE</dt>
-              <dd>{evento.capacity === null ? 'Sem limite' : `${numero(evento.capacity)} un.`}</dd>
+              <dt>{t('CAPACIDADE')}</dt>
+              <dd>
+                {evento.capacity === null
+                  ? t('Sem limite')
+                  : t('{v1} un.', { v1: numero(evento.capacity) })}
+              </dd>
             </div>
             <div>
-              <dt>PREÇO BASE</dt>
+              <dt>{t('PREÇO BASE')}</dt>
               <dd>{money(evento.basePrice)}</dd>
             </div>
             <div>
-              <dt>ATENDIMENTOS ABERTOS</dt>
+              <dt>{t('ATENDIMENTOS ABERTOS')}</dt>
               <dd className="blue">{numero(evento.openSupport)}</dd>
             </div>
           </dl>
           <div className="rp-buttons">
             <Link className="button soft" to="/admin/atendimentos">
-              Ver atendimentos
+              {t('Ver atendimentos')}
             </Link>
             <Link className="button soft" to="/admin">
-              Voltar ao painel
+              {t('Voltar ao painel')}
             </Link>
           </div>
         </section>
@@ -206,25 +214,27 @@ function RelatorioAdmin({ id }) {
         <section className="rp-card" aria-labelledby="rp-vendas">
           <div className="rp-sales-head">
             <div>
-              <p className="rp-eyebrow">TOTALIZADORES DE BILHETERIA</p>
+              <p className="rp-eyebrow">{t('TOTALIZADORES DE BILHETERIA')}</p>
               <h2 id="rp-vendas">
-                INGRESSOS VENDIDOS: <span>{numero(tickets.sold)}</span>
+                {t('INGRESSOS VENDIDOS:')} <span>{numero(tickets.sold)}</span>
               </h2>
             </div>
             <div className="rp-occupancy">
               <span className="rp-pill">
                 {evento.occupancy === null
-                  ? 'Sem capacidade'
-                  : `${String(evento.occupancy).replace('.', ',')}% Ocupação`}
+                  ? t('Sem capacidade')
+                  : t('{percentual}% Ocupação', { percentual: formatarNumero(evento.occupancy) })}
               </span>
-              {restantes !== null && <small>Restam {numero(restantes)} lugares</small>}
+              {restantes !== null && (
+                <small>{t('Restam {quantidade} lugares', { quantidade: numero(restantes) })}</small>
+              )}
             </div>
           </div>
           {evento.occupancy !== null && (
             <div
               className="rp-progress"
               role="progressbar"
-              aria-label="Ocupação do evento"
+              aria-label={t('Ocupação do evento')}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.min(100, evento.occupancy)}
@@ -234,62 +244,68 @@ function RelatorioAdmin({ id }) {
           )}
           <div className="rp-kpis">
             <div>
-              <small>Receita bruta (venda original)</small>
+              <small>{t('Receita bruta (venda original)')}</small>
               <strong>{money(evento.grossRevenue)}</strong>
-              <span>Estornos: {money(estornos)} (simulação)</span>
+              <span>
+                {t('Estornos:')} {money(estornos)} {t('(simulação)')}
+              </span>
             </div>
             <div>
-              <small>Revendas</small>
+              <small>{t('Revendas')}</small>
               <strong>{numero(evento.resales.count)}</strong>
-              <span>Volume: {money(evento.resales.volume)}</span>
+              <span>
+                {t('Volume:')} {money(evento.resales.volume)}
+              </span>
             </div>
           </div>
           <dl className="admin-report-facts">
             <div>
-              <dt>Transferências aceitas</dt>
+              <dt>{t('Transferências aceitas')}</dt>
               <dd>{numero(evento.transfers)}</dd>
             </div>
             <div>
-              <dt>Trocas concluídas</dt>
+              <dt>{t('Trocas concluídas')}</dt>
               <dd>{numero(evento.exchanges)}</dd>
             </div>
             <div>
-              <dt>Estornos da venda</dt>
+              <dt>{t('Estornos da venda')}</dt>
               <dd>{money(evento.refunds.sales)}</dd>
             </div>
             <div>
-              <dt>Estornos de revenda</dt>
+              <dt>{t('Estornos de revenda')}</dt>
               <dd>{money(evento.refunds.resales)}</dd>
             </div>
           </dl>
           <div className="rp-chart-head">
-            <h3>INGRESSOS POR SITUAÇÃO</h3>
+            <h3>{t('INGRESSOS POR SITUAÇÃO')}</h3>
           </div>
           {totalSituacoes ? (
             <div className="rp-chart">
               <DonutChart
                 items={grafico}
                 ariaLabel={`Ingressos por situação: ${grafico
-                  .map((item) => `${item.label} ${item.value}`)
+                  .map((item) => `${t(item.label)} ${item.value}`)
                   .join(', ')}`}
               >
-                <small>Total</small>
+                <small>{t('Total')}</small>
                 <strong>{numero(totalSituacoes)}</strong>
-                <small>ingressos</small>
+                <small>{t('ingressos')}</small>
               </DonutChart>
               <ul className="rp-legend">
                 {grafico.map((item) => (
                   <li key={item.label}>
                     <i style={{ background: item.color }} aria-hidden="true" />
-                    <span>{item.label}</span>
-                    <strong>{numero(item.value)} un.</strong>
+                    <span>{t(item.label)}</span>
+                    <strong>
+                      {numero(item.value)} {t('un.')}
+                    </strong>
                     <em>({item.share}%)</em>
                   </li>
                 ))}
               </ul>
             </div>
           ) : (
-            <p className="muted">Nenhum ingresso emitido para este evento.</p>
+            <p className="muted">{t('Nenhum ingresso emitido para este evento.')}</p>
           )}
         </section>
       </div>
@@ -297,8 +313,11 @@ function RelatorioAdmin({ id }) {
       <section className="rp-card rp-table-card" aria-labelledby="rp-tipos">
         <header className="rp-table-head">
           <div>
-            <h2 id="rp-tipos">Ingressos por tipo</h2>
-            <p>Emitidos para {evento.title}, pela situação atual de cada ingresso.</p>
+            <h2 id="rp-tipos">{t('Ingressos por tipo')}</h2>
+            <p>
+              {t('Emitidos para')} {evento.title}
+              {t(', pela situação atual de cada ingresso.')}
+            </p>
           </div>
         </header>
         {evento.byType.length ? (
@@ -307,16 +326,16 @@ function RelatorioAdmin({ id }) {
             className="table-wrap"
             tabIndex={0}
             role="region"
-            aria-label="Tabela de ingressos por tipo"
+            aria-label={t('Tabela de ingressos por tipo')}
           >
             <table className="rp-table">
               <thead>
                 <tr>
-                  <th>Tipo</th>
-                  <th className="center">Emitidos</th>
-                  <th className="center">Ativos</th>
-                  <th className="center">Utilizados</th>
-                  <th className="center">Cancelados</th>
+                  <th>{t('Tipo')}</th>
+                  <th className="center">{t('Emitidos')}</th>
+                  <th className="center">{t('Ativos')}</th>
+                  <th className="center">{t('Utilizados')}</th>
+                  <th className="center">{t('Cancelados')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -335,15 +354,15 @@ function RelatorioAdmin({ id }) {
             </table>
           </div>
         ) : (
-          <p className="muted">Nenhum ingresso emitido ainda.</p>
+          <p className="muted">{t('Nenhum ingresso emitido ainda.')}</p>
         )}
       </section>
 
       <section className="rp-card rp-table-card" aria-labelledby="rp-pedidos">
         <header className="rp-table-head">
           <div>
-            <h2 id="rp-pedidos">Últimos pedidos</h2>
-            <p>Os 50 pedidos mais recentes do evento, da venda original e da revenda.</p>
+            <h2 id="rp-pedidos">{t('Últimos pedidos')}</h2>
+            <p>{t('Os 50 pedidos mais recentes do evento, da venda original e da revenda.')}</p>
           </div>
         </header>
         {evento.orders.length ? (
@@ -351,17 +370,17 @@ function RelatorioAdmin({ id }) {
             className="table-wrap"
             tabIndex={0}
             role="region"
-            aria-label="Tabela dos últimos pedidos"
+            aria-label={t('Tabela dos últimos pedidos')}
           >
             <table className="rp-table">
               <thead>
                 <tr>
-                  <th>Pedido</th>
-                  <th>Comprador</th>
-                  <th>Data e hora</th>
-                  <th className="center">Qtd.</th>
-                  <th className="right">Total</th>
-                  <th className="center">Situação</th>
+                  <th>{t('Pedido')}</th>
+                  <th>{t('Comprador')}</th>
+                  <th>{t('Data e hora')}</th>
+                  <th className="center">{t('Qtd.')}</th>
+                  <th className="right">{t('Total')}</th>
+                  <th className="center">{t('Situação')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -371,7 +390,7 @@ function RelatorioAdmin({ id }) {
                     <tr key={pedido.id}>
                       <td>
                         <code>nº {pedido.id}</code>
-                        <small>{pedido.resale ? 'Revenda' : pedido.type}</small>
+                        <small>{pedido.resale ? t('Revenda') : pedido.type}</small>
                       </td>
                       <td>{pedido.buyer}</td>
                       <td>{dataHoraBrasilia(pedido.createdAt)}</td>
@@ -389,7 +408,7 @@ function RelatorioAdmin({ id }) {
             </table>
           </div>
         ) : (
-          <p className="muted">Nenhum pedido para este evento.</p>
+          <p className="muted">{t('Nenhum pedido para este evento.')}</p>
         )}
       </section>
 

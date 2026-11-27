@@ -478,6 +478,90 @@ html[data-theme='dark'] .demo-switcher-foot button {
     transform: translateY(0);
   }
 }
+/* ---------- Seletor de idioma (etapa 7) ---------- */
+.language-switcher {
+  position: relative;
+}
+.header .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f7f9ff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.header .language-toggle:hover,
+.header .language-toggle[aria-expanded='true'] {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+.language-panel {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 14px);
+  right: 0;
+  width: 236px;
+  padding: 14px;
+  border: 1px solid var(--tt-border, #e3e9f3);
+  border-radius: 16px;
+  background: var(--tt-surface, #fff);
+  color: var(--tt-ink, #17233a);
+  box-shadow: 0 18px 40px rgba(12, 20, 35, 0.2);
+  text-transform: none;
+  letter-spacing: normal;
+  animation: demo-panel-in 0.18s ease-out;
+}
+.language-panel ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.language-code {
+  display: inline-grid;
+  width: 30px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid var(--tt-border, #e3e9f3);
+  border-radius: 8px;
+  background: var(--tt-surface-soft, #f3f6fb);
+  font-size: 11px;
+  font-weight: 700;
+}
+html[data-theme='dark'] .language-panel {
+  border-color: #2a3546;
+  background: #121a28;
+  color: #e7eaf1;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+html[data-theme='dark'] .language-code {
+  border-color: #344257;
+  background: #1a2436;
+}
+
+@media (max-width: 620px) {
+  .language-panel {
+    position: fixed;
+    top: calc(var(--tt-header-offset) + 10px);
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+}
 @media (max-width: 620px) {
   .demo-switcher-text,
   .demo-caret {
@@ -635,7 +719,8 @@ html[data-theme='dark'] .demo-switcher-foot button {
   .account-shell > .header,
   .app-shell > .header,
   .header *,
-  .demo-switcher-panel {
+  .demo-switcher-panel,
+  .language-panel {
     transition-duration: 0.01ms !important;
     animation: none !important;
   }

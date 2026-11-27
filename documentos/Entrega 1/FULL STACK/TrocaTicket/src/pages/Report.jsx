@@ -16,10 +16,17 @@ import {
 import DonutChart from '../components/DonutChart';
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
+import { formatarNumero, localeAtual, t } from '../i18n';
 
 const GROUPS = { 'Por Setor': 'sector', 'Por Canal': 'channel', 'Por Idade': 'age' };
-const fmt = (n) => n.toLocaleString('pt-BR');
-const compact = (n) => `${(n / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}K`;
+// Descrição do gráfico para leitores de tela, uma frase completa por agrupamento.
+const DESCRICAO_GRAFICO = {
+  'Por Setor': 'Distribuição de ingressos por setor: {itens}',
+  'Por Canal': 'Distribuição de ingressos por canal: {itens}',
+  'Por Idade': 'Distribuição de ingressos por idade: {itens}',
+};
+const fmt = (n) => n.toLocaleString(localeAtual());
+const compact = (n) => `${(n / 1000).toLocaleString(localeAtual(), { maximumFractionDigits: 1 })}K`;
 
 // Relatório gerencial: o mesmo painel para qualquer evento de `eventReports`.
 export default function ReportPage() {
@@ -36,11 +43,11 @@ function Report({ id }) {
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(null);
-  if (!event || !report) return <NotFound title="Relatório não encontrado" />;
+  if (!event || !report) return <NotFound title={t('Relatório não encontrado')} />;
 
   const items = report.groups[GROUPS[group]];
-  const rows = report.transactions.filter((t) =>
-    `${t.id} ${t.sector} ${t.detail}`.toLowerCase().includes(query.trim().toLowerCase()),
+  const rows = report.transactions.filter((tk) =>
+    `${tk.id} ${tk.sector} ${tk.detail}`.toLowerCase().includes(query.trim().toLowerCase()),
   );
   const pages = Math.max(1, Math.ceil(rows.length / pageSize));
   const current = Math.min(page, pages);
@@ -51,19 +58,19 @@ function Report({ id }) {
   return (
     <div className="workspace report">
       <div className="rp-topbar">
-        <nav className="rp-crumbs" aria-label="Trilha de navegação">
-          <Link to="/admin">Início</Link>
+        <nav className="rp-crumbs" aria-label={t('Trilha de navegação')}>
+          <Link to="/admin">{t('Início')}</Link>
           <Icon name="chevron-right" size={14} />
           <span>{event.title}</span>
           <Icon name="chevron-right" size={14} />
-          <strong aria-current="page">Relatórios Gerenciais</strong>
+          <strong aria-current="page">{t('Relatórios Gerenciais')}</strong>
         </nav>
         <div className="rp-tools">
           <label className="search-box">
             <Icon name="search" size={16} />
             <input
-              aria-label="Buscar lote, setor ou ID"
-              placeholder="Buscar lote, setor, ID..."
+              aria-label={t('Buscar lote, setor ou ID')}
+              placeholder={t('Buscar lote, setor, ID...')}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -78,20 +85,20 @@ function Report({ id }) {
               downloadCSV(`relatorio-${id}.csv`, [
                 [event.title],
                 ['ID', 'Setor', 'Detalhe', 'Data', 'Hora', 'Quantidade', 'Valor total', 'Status'],
-                ...rows.map((t) => [
-                  t.id,
-                  t.sector,
-                  t.detail,
-                  t.date,
-                  t.time,
-                  t.qty,
-                  t.total,
-                  t.status,
+                ...rows.map((tk) => [
+                  tk.id,
+                  tk.sector,
+                  tk.detail,
+                  tk.date,
+                  tk.time,
+                  tk.qty,
+                  tk.total,
+                  tk.status,
                 ]),
               ])
             }
           >
-            <Icon name="download" size={15} /> Exportar CSV
+            <Icon name="download" size={15} /> {t('Exportar CSV')}
           </button>
         </div>
       </div>
@@ -102,7 +109,7 @@ function Report({ id }) {
             <span className="rp-tag">{report.tag}</span>
             <span className={`rp-status ${STATUS_TONE[report.status] || 'blue'}`}>
               <i aria-hidden="true" />
-              {report.status}
+              {t(report.status)}
             </span>
           </div>
           <h1 className="rp-title" id="rp-event">
@@ -116,10 +123,10 @@ function Report({ id }) {
                 <Icon name="calendar" size={22} />
               </span>
               <div>
-                <small>DATA DO EVENTO</small>
+                <small>{t('DATA DO EVENTO')}</small>
                 <strong>{dateLabel(event.date)}</strong>
                 <span>
-                  Abertura: {report.doors} • Início: {report.start}
+                  {t('Abertura:')} {report.doors} {t('• Início:')} {report.start}
                 </span>
               </div>
             </div>
@@ -128,11 +135,15 @@ function Report({ id }) {
                 <Icon name="pin" size={22} />
               </span>
               <div>
-                <small>LOCAL / PRAÇA</small>
+                <small>{t('LOCAL / PRAÇA')}</small>
                 <strong>{report.venue}</strong>
                 <span>
                   {report.city}{' '}
-                  <i className="rp-stars" role="img" aria-label={`${report.rating} de 5 estrelas`}>
+                  <i
+                    className="rp-stars"
+                    role="img"
+                    aria-label={t('{rating} de 5 estrelas', { rating: report.rating })}
+                  >
                     {'★'.repeat(report.rating)}
                     {'☆'.repeat(5 - report.rating)}
                   </i>
@@ -142,28 +153,30 @@ function Report({ id }) {
           </div>
           <dl className="rp-facts">
             <div>
-              <dt>CAPACIDADE MAX</dt>
-              <dd>{fmt(report.capacity)} un.</dd>
+              <dt>{t('CAPACIDADE MAX')}</dt>
+              <dd>
+                {fmt(report.capacity)} {t('un.')}
+              </dd>
             </div>
             <div>
-              <dt>LOTE VIGENTE</dt>
+              <dt>{t('LOTE VIGENTE')}</dt>
               <dd>{report.lot}</dd>
             </div>
             <div>
-              <dt>PRODUÇÃO</dt>
+              <dt>{t('PRODUÇÃO')}</dt>
               <dd className="blue">{report.producer}</dd>
             </div>
           </dl>
           <div className="rp-buttons">
             <Link className="button soft" to="/admin">
-              Gerenciar Lotes
+              {t('Gerenciar Lotes')}
             </Link>
             <button
               type="button"
               className="button soft"
               onClick={() => notify('Mapa de assentos disponível quando o backend for conectado.')}
             >
-              Mapa de Assentos
+              {t('Mapa de Assentos')}
             </button>
           </div>
         </section>
@@ -171,22 +184,24 @@ function Report({ id }) {
         <section className="rp-card" aria-labelledby="rp-sales">
           <div className="rp-sales-head">
             <div>
-              <p className="rp-eyebrow">TOTALIZADORES DE BILHETERIA</p>
+              <p className="rp-eyebrow">{t('TOTALIZADORES DE BILHETERIA')}</p>
               <h2 id="rp-sales">
-                TICKETS VENDIDOS: <span>{compact(report.sold)}</span>
+                {t('TICKETS VENDIDOS:')} <span>{compact(report.sold)}</span>
               </h2>
             </div>
             <div className="rp-occupancy">
               <span className="rp-pill">
-                {String(report.occupancy).replace('.', ',')}% Ocupação
+                {t('{percentual}% Ocupação', { percentual: formatarNumero(report.occupancy) })}
               </span>
-              <small>Restam {fmt(report.remaining)} un.</small>
+              <small>
+                {t('Restam')} {fmt(report.remaining)} {t('un.')}
+              </small>
             </div>
           </div>
           <div
             className="rp-progress"
             role="progressbar"
-            aria-label="Ocupação do evento"
+            aria-label={t('Ocupação do evento')}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={report.occupancy}
@@ -195,20 +210,25 @@ function Report({ id }) {
           </div>
           <div className="rp-kpis">
             <div>
-              <small>Faturamento Bruto</small>
+              <small>{t('Faturamento Bruto')}</small>
               <strong>{money(report.revenue)}</strong>
-              <em>▲ +{report.projection}% vs projeção</em>
+              <em>
+                ▲ +{report.projection}
+                {t('% vs projeção')}
+              </em>
             </div>
             <div>
-              <small>Ticket Médio</small>
+              <small>{t('Ticket Médio')}</small>
               <strong>{money(report.avgTicket)}</strong>
-              <span>Em 5 setores ativos</span>
+              <span>{t('Em 5 setores ativos')}</span>
             </div>
           </div>
           <div className="rp-chart-head">
-            <h3>GRÁFICO: DISTRIBUIÇÃO {group.toUpperCase()}</h3>
+            <h3>
+              {t('GRÁFICO: DISTRIBUIÇÃO')} {t(group).toLocaleUpperCase(localeAtual())}
+            </h3>
             <Tabs
-              label="Agrupar gráfico"
+              label={t('Agrupar gráfico')}
               options={Object.keys(GROUPS)}
               value={group}
               onChange={setGroup}
@@ -217,20 +237,22 @@ function Report({ id }) {
           <div className="rp-chart">
             <DonutChart
               items={items}
-              ariaLabel={`Distribuição de ingressos ${group.toLowerCase()}: ${items
-                .map((i) => `${i.label} ${i.share}%`)
-                .join(', ')}`}
+              ariaLabel={t(DESCRICAO_GRAFICO[group], {
+                itens: items.map((i) => `${t(i.label)} ${i.share}%`).join(', '),
+              })}
             >
-              <small>Total</small>
+              <small>{t('Total')}</small>
               <strong>{fmt(report.sold)}</strong>
-              <small>ingressos</small>
+              <small>{t('ingressos')}</small>
             </DonutChart>
             <ul className="rp-legend">
               {items.map((item) => (
                 <li key={item.label}>
                   <i style={{ background: item.color }} aria-hidden="true" />
-                  <span>{item.label}</span>
-                  <strong>{fmt(item.value)} un.</strong>
+                  <span>{t(item.label)}</span>
+                  <strong>
+                    {fmt(item.value)} {t('un.')}
+                  </strong>
                   <em>({item.share}%)</em>
                 </li>
               ))}
@@ -242,11 +264,13 @@ function Report({ id }) {
       <section className="rp-card rp-table-card" aria-labelledby="rp-table">
         <header className="rp-table-head">
           <div>
-            <h2 id="rp-table">Detalhamento de Lotes e Transações Recentes do Evento</h2>
-            <p>Auditoria contábil e status de transferências processadas para {event.title}</p>
+            <h2 id="rp-table">{t('Detalhamento de Lotes e Transações Recentes do Evento')}</h2>
+            <p>
+              {t('Auditoria contábil e status de transferências processadas para')} {event.title}
+            </p>
           </div>
           <label className="rp-rows">
-            Linhas por página:
+            {t('Linhas por página:')}
             <select
               value={pageSize}
               onChange={(e) => {
@@ -264,43 +288,45 @@ function Report({ id }) {
           <table className="rp-table">
             <thead>
               <tr>
-                <th>ID Transação / Lote</th>
-                <th>Setor / Categoria</th>
-                <th>Data & Hora</th>
-                <th className="center">Qtd. Ingressos</th>
-                <th className="right">Valor Total</th>
-                <th className="center">Status</th>
-                <th className="center">Ações</th>
+                <th>{t('ID Transação / Lote')}</th>
+                <th>{t('Setor / Categoria')}</th>
+                <th>{t('Data & Hora')}</th>
+                <th className="center">{t('Qtd. Ingressos')}</th>
+                <th className="right">{t('Valor Total')}</th>
+                <th className="center">{t('Status')}</th>
+                <th className="center">{t('Ações')}</th>
               </tr>
             </thead>
             <tbody>
-              {visible.map((t) => (
-                <tr key={t.id}>
+              {visible.map((tk) => (
+                <tr key={tk.id}>
                   <td>
-                    <code>{t.id}</code>
+                    <code>{tk.id}</code>
                   </td>
                   <td>
-                    <strong>{t.sector}</strong>
-                    <small>{t.detail}</small>
+                    <strong>{tk.sector}</strong>
+                    <small>{tk.detail}</small>
                   </td>
                   <td>
-                    {t.date} <span className="muted">{t.time}</span>
+                    {tk.date} <span className="muted">{tk.time}</span>
                   </td>
                   <td className="center">
-                    <strong>{t.qty} un.</strong>
+                    <strong>
+                      {tk.qty} {t('un.')}
+                    </strong>
                   </td>
                   <td className="right">
-                    <strong>{money(t.total)}</strong>
+                    <strong>{money(tk.total)}</strong>
                   </td>
                   <td className="center">
-                    <Badge>{t.status}</Badge>
+                    <Badge>{tk.status}</Badge>
                   </td>
                   <td className="center">
                     <button
                       type="button"
                       className="icon-action"
-                      aria-label={`Ver detalhes da transação ${t.id}`}
-                      onClick={() => setSelected(t)}
+                      aria-label={t('Ver detalhes da transação {id}', { id: tk.id })}
+                      onClick={() => setSelected(tk)}
                     >
                       <Icon name="eye" size={18} />
                     </button>
@@ -310,35 +336,36 @@ function Report({ id }) {
             </tbody>
           </table>
         </div>
-        {!rows.length && <Empty>Nenhuma transação corresponde à busca.</Empty>}
+        {!rows.length && <Empty>{t('Nenhuma transação corresponde à busca.')}</Empty>}
         <Pagination page={current} pageSize={pageSize} total={rows.length} onPage={setPage} />
       </section>
 
       {selected && (
-        <Modal title="Detalhes da transação" onClose={() => setSelected(null)}>
+        <Modal title={t('Detalhes da transação')} onClose={() => setSelected(null)}>
           <dl className="rp-detail">
-            <dt>ID</dt>
+            <dt>{t('ID')}</dt>
             <dd>{selected.id}</dd>
-            <dt>Setor</dt>
+            <dt>{t('Setor')}</dt>
             <dd>
               {selected.sector} · {selected.detail}
             </dd>
-            <dt>Data e hora</dt>
+            <dt>{t('Data e hora')}</dt>
             <dd>
-              {selected.date} às {selected.time}
+              {selected.date} {t('às')} {selected.time}
             </dd>
-            <dt>Ingressos</dt>
+            <dt>{t('Ingressos')}</dt>
             <dd>
-              {selected.qty} un. · {money(selected.total)}
+              {selected.qty} {t('un. ·')} {money(selected.total)}
             </dd>
-            <dt>Status</dt>
+            <dt>{t('Status')}</dt>
             <dd>
-              <Badge>{selected.status}</Badge>
+              <Badge>{t(selected.status)}</Badge>
             </dd>
           </dl>
           <p className="muted">
-            Registro fictício para demonstrar a consulta de transações. Não existe cobrança
-            associada.
+            {t(
+              'Registro fictício para demonstrar a consulta de transações. Não existe cobrança associada.',
+            )}
           </p>
         </Modal>
       )}

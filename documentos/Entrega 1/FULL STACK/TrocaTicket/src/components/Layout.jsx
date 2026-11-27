@@ -4,6 +4,7 @@ import { useStore } from '../context/Store';
 import Navbar from './Navbar';
 import AvisoAprovacao from './AvisoAprovacao';
 import { inicioDoPerfil } from '../data/perfis';
+import { t, useIdioma } from '../i18n';
 
 export default function Layout({ darkMode, toggleTheme }) {
   const { pathname } = useLocation();
@@ -29,9 +30,9 @@ export default function Layout({ darkMode, toggleTheme }) {
           ? 'app-shell hero-shell'
           : 'app-shell';
 
+  useIdioma(); // o header, o rodapé e as telas acompanham o idioma escolhido
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = 'TrocaTicket — Eventos & ingressos';
   }, [pathname]);
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function Layout({ darkMode, toggleTheme }) {
   return (
     <div className={shellClass}>
       <a className="skip-link" href="#conteudo">
-        Pular para o conteúdo
+        {t('Pular para o conteúdo')}
       </a>
 
       {/* Componente Navbar modularizado e controlado pelo perfil na sessão */}
@@ -75,10 +76,9 @@ export default function Layout({ darkMode, toggleTheme }) {
       <AvisoAprovacao />
 
       {isDemoMode && pathname !== '/perfis' && (
-        <aside className="demo-strip" aria-label="Modo demonstração">
+        <aside className="demo-strip" aria-label={t('Modo demonstração')}>
           <span>
-            <i aria-hidden="true" /> Ambiente de demonstração · dados fictícios salvos neste
-            navegador
+            <i aria-hidden="true" /> {t('Ambiente de demonstração · dados fictícios salvos neste navegador')}
           </span>
           <button
             onClick={() => {
@@ -86,7 +86,7 @@ export default function Layout({ darkMode, toggleTheme }) {
               navigate('/perfis');
             }}
           >
-            Trocar perfil ↗
+            {t('Trocar perfil ↗')}
           </button>
         </aside>
       )}
@@ -97,12 +97,12 @@ export default function Layout({ darkMode, toggleTheme }) {
 
       <footer>
         <span>
-          © 2026 <strong>TrocaTicket.</strong> Todos os direitos reservados.
+          © 2026 <strong>{t('TrocaTicket.')}</strong> {t('Todos os direitos reservados.')}
         </span>
-        <nav aria-label="Links institucionais">
-          <Link to="/termos">Termos de Uso</Link>
-          <Link to="/privacidade">Política de Privacidade</Link>
-          <Link to="/ajuda">Ajuda & Suporte</Link>
+        <nav aria-label={t('Links institucionais')}>
+          <Link to="/termos">{t('Termos de Uso')}</Link>
+          <Link to="/privacidade">{t('Política de Privacidade')}</Link>
+          <Link to="/ajuda">{t('Ajuda & Suporte')}</Link>
         </nav>
       </footer>
     </div>

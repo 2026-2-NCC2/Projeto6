@@ -11,12 +11,12 @@ import {
   ingressosAtivos,
   notificacoesLidas,
   notificacoesNaoLidas,
-  plural,
   primeiroNome,
   progressoPerfil,
   proximoIngresso,
   rotuloDias,
 } from '../utils/painelUsuario';
+import { t, tn } from '../i18n';
 
 const SLIDE_SECONDS = 10;
 const TITULO_CARROSSEL = 'Eventos que você provavelmente vai gostar';
@@ -38,19 +38,19 @@ function EventCarousel({ events, loading }) {
 
   if (!total) {
     return (
-      <section className="uh-car uh-car-empty" aria-label={TITULO_CARROSSEL}>
+      <section className="uh-car uh-car-empty" aria-label={t(TITULO_CARROSSEL)}>
         <div className="uh-car-top">
-          <span className="uh-k">{TITULO_CARROSSEL}</span>
+          <span className="uh-k">{t(TITULO_CARROSSEL)}</span>
         </div>
         <div className="uh-car-msg" role="status">
           {loading ? (
-            <b>Carregando sugestões…</b>
+            <b>{t('Carregando sugestões…')}</b>
           ) : (
             <>
-              <b>Nenhum evento à venda agora</b>
-              <span>Quando houver eventos publicados, as sugestões aparecem aqui.</span>
+              <b>{t('Nenhum evento à venda agora')}</b>
+              <span>{t('Quando houver eventos publicados, as sugestões aparecem aqui.')}</span>
               <Link to="/eventos" className="uh-go">
-                Ver catálogo
+                {t('Ver catálogo')}
               </Link>
             </>
           )}
@@ -63,24 +63,24 @@ function EventCarousel({ events, loading }) {
   const event = events[index % total];
 
   return (
-    <section className="uh-car" aria-roledescription="carrossel" aria-label={TITULO_CARROSSEL}>
+    <section className="uh-car" aria-roledescription="carrossel" aria-label={t(TITULO_CARROSSEL)}>
       <div className="uh-car-top">
-        <span className="uh-k">{TITULO_CARROSSEL}</span>
+        <span className="uh-k">{t(TITULO_CARROSSEL)}</span>
         <div className="uh-nav">
-          <button type="button" aria-label="Evento anterior" onClick={() => go(index - 1)}>
+          <button type="button" aria-label={t('Evento anterior')} onClick={() => go(index - 1)}>
             ‹
           </button>
           {total > 1 && (
             <button
               type="button"
-              aria-label={paused ? 'Retomar carrossel' : 'Pausar carrossel'}
+              aria-label={paused ? t('Retomar carrossel') : t('Pausar carrossel')}
               aria-pressed={paused}
               onClick={() => setPaused((valor) => !valor)}
             >
               {paused ? '▶' : '❚❚'}
             </button>
           )}
-          <button type="button" aria-label="Próximo evento" onClick={() => go(index + 1)}>
+          <button type="button" aria-label={t('Próximo evento')} onClick={() => go(index + 1)}>
             ›
           </button>
         </div>
@@ -94,13 +94,15 @@ function EventCarousel({ events, loading }) {
         <img src={event.image} alt="" decoding="async" />
         <span className="uh-tx">
           {Number(event.price) > 0 && (
-            <span className="uh-price">A partir de {currency(Number(event.price))}</span>
+            <span className="uh-price">
+              {t('A partir de')} {currency(Number(event.price))}
+            </span>
           )}
           <b>{event.title}</b>
           <span>
-            {event.date} · {event.location}
+            {t(event.date)} · {event.location}
           </span>
-          <span className="uh-go">Ver ingressos</span>
+          <span className="uh-go">{t('Ver ingressos')}</span>
         </span>
       </Link>
       <div className="uh-bar" aria-hidden="true">
@@ -189,37 +191,40 @@ export default function UserHome() {
           <div className="uh-two">
             <div>
               <p className="hero-badge">
-                <span /> Troca e compra segura de ingressos
+                <span /> {t('Troca e compra segura de ingressos')}
               </p>
               <h1 id="uh-title">
                 {nome ? (
                   <>
-                    Boas-vindas de volta, <em>{nome}</em>!
+                    {t('Boas-vindas de volta,')} <em>{nome}</em>!
                   </>
                 ) : (
-                  'Boas-vindas de volta!'
+                  t('Boas-vindas de volta!')
                 )}
               </h1>
               <p className="hero-description">
-                Gerencie seus ingressos, explore novos eventos e acompanhe suas trocas ativas na
-                plataforma.
+                {t(
+                  'Gerencie seus ingressos, explore novos eventos e acompanhe suas trocas ativas na plataforma.',
+                )}
               </p>
               <div className="hero-actions">
                 <Link to="/eventos" className="button primary">
-                  Procurar eventos <Icon name="arrow" size={18} />
+                  {t('Procurar eventos')} <Icon name="arrow" size={18} />
                 </Link>
               </div>
             </div>
             <EventCarousel events={events} loading={state.loading} />
           </div>
 
-          <h2 className="sr-only">Resumo da sua conta</h2>
+          <h2 className="sr-only">{t('Resumo da sua conta')}</h2>
           <div className="uh-strip">
             <Link to="/favoritos" className="uh-card">
-              <span className="uh-k">Favoritos</span>
+              <span className="uh-k">{t('Favoritos')}</span>
               {alerts.length ? (
                 <>
-                  <span className="uh-big">{plural(alerts.length, 'novidade', 'novidades')}</span>
+                  <span className="uh-big">
+                    {tn(alerts.length, '{n} novidade', '{n} novidades')}
+                  </span>
                   {alerts.slice(0, 2).map(({ e, text }) => (
                     <span key={e.id} className="uh-sub">
                       {e.title}: {text}
@@ -229,7 +234,7 @@ export default function UserHome() {
               ) : favoriteEvents.length ? (
                 <>
                   <span className="uh-big">
-                    {plural(favoriteEvents.length, 'evento', 'eventos')}
+                    {tn(favoriteEvents.length, '{n} evento', '{n} eventos')}
                   </span>
                   <span className="uh-thumbs">
                     {favoriteEvents.slice(0, 3).map((e) => (
@@ -239,88 +244,100 @@ export default function UserHome() {
                 </>
               ) : (
                 <>
-                  <span className="uh-big">Nenhum favorito ainda</span>
-                  <span className="uh-sub">Favorite eventos para receber alertas de preço.</span>
+                  <span className="uh-big">{t('Nenhum favorito ainda')}</span>
+                  <span className="uh-sub">
+                    {t('Favorite eventos para receber alertas de preço.')}
+                  </span>
                 </>
               )}
-              <span className="uh-go">Ver favoritos</span>
+              <span className="uh-go">{t('Ver favoritos')}</span>
             </Link>
 
             <Link to="/comunidade" className="uh-card">
-              <span className="uh-k">Troca-Papo</span>
+              <span className="uh-k">{t('Troca-Papo')}</span>
               {conta ? (
                 conversas.loading ? (
                   <span className="uh-sub" role="status">
-                    Carregando conversas…
+                    {t('Carregando conversas…')}
                   </span>
                 ) : conversas.error ? (
                   <>
-                    <span className="uh-big">Conversas</span>
+                    <span className="uh-big">{t('Conversas')}</span>
                     <span className="uh-sub">{conversas.error}</span>
                   </>
                 ) : ultimaMensagem ? (
                   <>
                     <span className="uh-big">
-                      {plural(mensagensDeOutros.length, 'mensagem', 'mensagens')} no mural
+                      {tn(
+                        mensagensDeOutros.length,
+                        '{n} mensagem no mural',
+                        '{n} mensagens no mural',
+                      )}
                     </span>
                     <span className="uh-sub uh-clamp">
-                      {primeiroNome(ultimaMensagem.name) || 'Alguém'}: “{ultimaMensagem.text}”
+                      {primeiroNome(ultimaMensagem.name) || t('Alguém')}: “{ultimaMensagem.text}”
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="uh-big">Nenhuma conversa ainda</span>
-                    <span className="uh-sub">Puxe assunto, tire dúvidas e combine trocas.</span>
+                    <span className="uh-big">{t('Nenhuma conversa ainda')}</span>
+                    <span className="uh-sub">
+                      {t('Puxe assunto, tire dúvidas e combine trocas.')}
+                    </span>
                   </>
                 )
               ) : notificacoesDemo.length ? (
                 <>
                   <span className="uh-big">
-                    {plural(notificacoesDemo.length, 'notificação nova', 'notificações novas')}
+                    {tn(notificacoesDemo.length, '{n} notificação nova', '{n} notificações novas')}
                   </span>
                   <span className="uh-sub uh-clamp">{notificacoesDemo[0].texto}</span>
                 </>
               ) : (
                 <>
-                  <span className="uh-big">Tudo em dia</span>
-                  <span className="uh-sub">Nenhuma notificação nova no Troca-Papo.</span>
+                  <span className="uh-big">{t('Tudo em dia')}</span>
+                  <span className="uh-sub">{t('Nenhuma notificação nova no Troca-Papo.')}</span>
                 </>
               )}
-              <span className="uh-go">Entrar no Troca-Papo</span>
+              <span className="uh-go">{t('Entrar no Troca-Papo')}</span>
             </Link>
 
             <Link to="/perfil" className="uh-card">
               <span className="uh-k">
-                {percentual < 100 ? 'Complete seu perfil' : 'Seu perfil'}
+                {percentual < 100 ? t('Complete seu perfil') : t('Seu perfil')}
               </span>
               <span className="uh-big">
-                {percentual < 100 ? `${percentual}%` : 'Perfil completo'}
+                {percentual < 100 ? `${percentual}%` : t('Perfil completo')}
               </span>
               <span className="uh-pbar" aria-hidden="true">
                 <i style={{ width: `${percentual}%` }} />
               </span>
               <span className="uh-sub">
                 {percentual < 100
-                  ? 'Complete seus dados para trocar com mais segurança.'
-                  : 'Seus dados estão prontos para trocas seguras.'}
+                  ? t('Complete seus dados para trocar com mais segurança.')
+                  : t('Seus dados estão prontos para trocas seguras.')}
               </span>
-              <span className="uh-go">{percentual < 100 ? 'Completar perfil' : 'Ver perfil'}</span>
+              <span className="uh-go">
+                {percentual < 100 ? t('Completar perfil') : t('Ver perfil')}
+              </span>
             </Link>
 
             <Link to={ativos.length ? '/ingressos' : '/eventos'} className="uh-card">
-              <span className="uh-k">{proximo ? 'Seu próximo evento' : 'Meus ingressos'}</span>
+              <span className="uh-k">
+                {proximo ? t('Seu próximo evento') : t('Meus ingressos')}
+              </span>
               {conta && ingressosConta.loading ? (
                 <span className="uh-sub" role="status">
-                  Carregando ingressos…
+                  {t('Carregando ingressos…')}
                 </span>
               ) : conta && ingressosConta.error ? (
                 <>
-                  <span className="uh-big">Ingressos</span>
+                  <span className="uh-big">{t('Ingressos')}</span>
                   <span className="uh-sub">{ingressosConta.error}</span>
                 </>
               ) : proximo ? (
                 <>
-                  <span className="uh-big">{rotuloDias(proximo.dias)}</span>
+                  <span className="uh-big">{t(rotuloDias(proximo.dias))}</span>
                   <span className="uh-sub">
                     {proximo.eventTitle} · {dataCurta(proximo.date)}
                   </span>
@@ -328,7 +345,7 @@ export default function UserHome() {
               ) : ativos.length ? (
                 <>
                   <span className="uh-big">
-                    {plural(ativos.length, 'ingresso reservado', 'ingressos reservados')}
+                    {tn(ativos.length, '{n} ingresso reservado', '{n} ingressos reservados')}
                   </span>
                   <span className="uh-chips">
                     {ativos.slice(0, 2).map((ingresso) => (
@@ -338,22 +355,24 @@ export default function UserHome() {
                 </>
               ) : (
                 <>
-                  <span className="uh-big">Nenhum ingresso ainda</span>
-                  <span className="uh-sub">Escolha um evento e garanta seu lugar.</span>
+                  <span className="uh-big">{t('Nenhum ingresso ainda')}</span>
+                  <span className="uh-sub">{t('Escolha um evento e garanta seu lugar.')}</span>
                 </>
               )}
               <span className="uh-go">
-                {ativos.length ? 'Abrir meus ingressos' : 'Procurar eventos'}
+                {ativos.length ? t('Abrir meus ingressos') : t('Procurar eventos')}
               </span>
             </Link>
           </div>
         </div>
       </section>
-      <EventList state={state} title="Eventos em destaque" />
+      <EventList state={state} title={t('Eventos em destaque')} />
       <PapoBanner
-        eyebrow="Troca-Papo"
-        title="Dúvidas sobre uma troca?"
-        text="Converse com outros fãs, veja dicas de segurança e descubra quem está trocando ingressos para os seus eventos favoritos."
+        eyebrow={t('Troca-Papo')}
+        title={t('Dúvidas sobre uma troca?')}
+        text={t(
+          'Converse com outros fãs, veja dicas de segurança e descubra quem está trocando ingressos para os seus eventos favoritos.',
+        )}
       />
     </div>
   );

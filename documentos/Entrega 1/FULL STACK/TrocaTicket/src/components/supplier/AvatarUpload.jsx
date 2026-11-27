@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import Icon from './Icon';
 import { initialsOf } from '../../utils/format';
+import { t } from '../../i18n';
 
 const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp'];
 
@@ -36,9 +37,9 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
     <div className="sp-avatar-upload">
       <div className="sp-avatar-wrap">
         <div className="avatar large">
-          {photo ? <img src={photo} alt={`Foto de ${name || 'perfil'}`} /> : initialsOf(name)}
+          {photo ? <img src={photo} alt={name ? t('Foto de {nome}', { nome: name }) : t('Foto de perfil')} /> : initialsOf(name)}
         </div>
-        <button type="button" className="sp-avatar-camera" onClick={openPicker} aria-label="Escolher foto de perfil" disabled={disabled}>
+        <button type="button" className="sp-avatar-camera" onClick={openPicker} aria-label={t('Escolher foto de perfil')} disabled={disabled}>
           <Icon name="camera" size={14} />
         </button>
       </div>
@@ -46,7 +47,7 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
         {children}
         <div className="actions">
           <button type="button" className="button dark sp-small-button" onClick={openPicker} disabled={disabled}>
-            <Icon name="upload" size={14} /> {photo ? 'Trocar foto' : 'Enviar nova foto'}
+            <Icon name="upload" size={14} /> {photo ? t('Trocar foto') : t('Enviar nova foto')}
           </button>
           {photo && (
             <button
@@ -58,7 +59,7 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
                 onChange('');
               }}
             >
-              Remover foto
+              {t('Remover foto')}
             </button>
           )}
         </div>
@@ -67,14 +68,15 @@ export default function AvatarUpload({ name, photo, onChange, maxMB = 2, childre
           className="sp-hidden-input"
           type="file"
           tabIndex={-1}
+          aria-label={t('Foto de perfil')}
           accept={ACCEPTED.join(',')}
           disabled={disabled}
           onChange={pick}
         />
-        <p className="sp-hint">Formatos recomendados: PNG, JPG ou WEBP (máx. {maxMB} MB)</p>
+        <p className="sp-hint">{t('Formatos recomendados: PNG, JPG ou WEBP (máx.')} {maxMB} {t('MB)')}</p>
         {error && (
           <p role="alert" className="field-error">
-            {error}
+            {t(error)}
           </p>
         )}
       </div>

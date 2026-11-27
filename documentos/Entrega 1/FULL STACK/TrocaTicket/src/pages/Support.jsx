@@ -11,6 +11,7 @@ import {
   listarAtendimentos,
   responderAtendimento,
 } from '../services/portaria';
+import { t } from '../i18n';
 
 // Atendimento (etapa 5): a conta de usuário abre solicitações ligadas a um pedido ou denuncia um
 // anúncio; a organização do evento responde e muda a situação. Desde a etapa 6, a administração
@@ -18,9 +19,11 @@ import {
 // modo: 'usuario' (quem abre), 'organizador' (do evento) ou 'admin' (administração).
 
 function autorDaMensagem(mensagem, equipe) {
-  if (mensagem.author === 'organizacao') return `Organização do evento (${mensagem.authorName})`;
-  if (mensagem.author === 'administracao') return `Administração (${mensagem.authorName})`;
-  return equipe ? mensagem.authorName : 'Você';
+  const { authorName } = mensagem;
+  if (mensagem.author === 'organizacao')
+    return t('Organização do evento ({authorName})', { authorName });
+  if (mensagem.author === 'administracao') return t('Administração ({authorName})', { authorName });
+  return equipe ? authorName : t('Você');
 }
 
 function Conversa({ item, modo, gravacao, aoAtualizar }) {
@@ -52,14 +55,19 @@ function Conversa({ item, modo, gravacao, aoAtualizar }) {
     <li className="support-thread">
       <div className="support-thread-head">
         <h3>{item.subject}</h3>
-        <Badge tone={tom}>{rotulo}</Badge>
+        <Badge tone={tom}>{t(rotulo)}</Badge>
       </div>
       <p className="muted">
         {item.eventTitle} ·{' '}
-        {item.orderId ? `Pedido nº ${item.orderId}` : `Anúncio nº ${item.listingId}`}
-        {equipe && ` · aberto por ${item.requesterName}`}
+        {item.orderId
+          ? t('Pedido nº {orderId}', { orderId: item.orderId })
+          : t('Anúncio nº {listingId}', { listingId: item.listingId })}
+        {equipe && t(' · aberto por {requesterName}', { requesterName: item.requesterName })}
       </p>
-      <ol className="support-messages" aria-label={`Mensagens de "${item.subject}"`}>
+      <ol
+        className="support-messages"
+        aria-label={t('Mensagens de "{subject}"', { subject: item.subject })}
+      >
         {item.messages.map((mensagem) => (
           <li
             key={mensagem.id}
@@ -82,10 +90,10 @@ function Conversa({ item, modo, gravacao, aoAtualizar }) {
         <form className="support-reply" onSubmit={responder}>
           <label htmlFor={idTexto}>
             {modo === 'admin'
-              ? 'Resposta da administração'
+              ? t('Resposta da administração')
               : modo === 'organizador'
-                ? 'Resposta da organização'
-                : 'Responder'}
+                ? t('Resposta da organização')
+                : t('Responder')}
           </label>
           <textarea
             id={idTexto}
@@ -97,7 +105,7 @@ function Conversa({ item, modo, gravacao, aoAtualizar }) {
           />
           {item.canChangeStatus && (
             <>
-              <label htmlFor={`situacao-${item.id}`}>Situação</label>
+              <label htmlFor={`situacao-${item.id}`}>{t('Situação')}</label>
               <select
                 id={`situacao-${item.id}`}
                 value={situacao}
@@ -105,7 +113,7 @@ function Conversa({ item, modo, gravacao, aoAtualizar }) {
               >
                 {Object.entries(SITUACAO_ATENDIMENTO).map(([valor, [nome]]) => (
                   <option key={valor} value={valor}>
-                    {nome}
+                    {t(nome)}
                   </option>
                 ))}
               </select>
@@ -113,15 +121,17 @@ function Conversa({ item, modo, gravacao, aoAtualizar }) {
           )}
           {erro && (
             <p role="alert" className="field-error">
-              {erro}
+              {t(erro)}
             </p>
           )}
           <button type="submit" className="button primary" disabled={Boolean(gravacao.ocupado)}>
-            {equipe ? 'Enviar resposta' : 'Enviar mensagem'}
+            {equipe ? t('Enviar resposta') : t('Enviar mensagem')}
           </button>
         </form>
       ) : (
-        <p className="muted">Atendimento encerrado. Se precisar, abra uma nova solicitação.</p>
+        <p className="muted">
+          {t('Atendimento encerrado. Se precisar, abra uma nova solicitação.')}
+        </p>
       )}
     </li>
   );
@@ -133,7 +143,7 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
   const [tipo, setTipo] = useState(inicialAnuncio ? 'anuncio' : 'pedido');
   const [pedido, setPedido] = useState(params.get('pedido') || '');
   const [anuncio, setAnuncio] = useState(inicialAnuncio);
-  const [assunto, setAssunto] = useState(inicialAnuncio ? 'Denúncia de anúncio' : '');
+  const [assunto, setAssunto] = useState(inicialAnuncio ? t('Denúncia de anúncio') : '');
   const [mensagem, setMensagem] = useState('');
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
@@ -162,33 +172,33 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
   }
 
   return (
-    <Panel title="Abrir solicitação">
+    <Panel title={t('Abrir solicitação')}>
       <form className="support-form" onSubmit={enviar}>
-        <label htmlFor="atendimento-tipo">Sobre</label>
+        <label htmlFor="atendimento-tipo">{t('Sobre')}</label>
         <select id="atendimento-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-          <option value="pedido">Um pedido meu</option>
-          <option value="anuncio">Um anúncio de revenda (denúncia ou dúvida)</option>
+          <option value="pedido">{t('Um pedido meu')}</option>
+          <option value="anuncio">{t('Um anúncio de revenda (denúncia ou dúvida)')}</option>
         </select>
         {tipo === 'pedido' ? (
           <>
-            <label htmlFor="atendimento-pedido">Pedido</label>
+            <label htmlFor="atendimento-pedido">{t('Pedido')}</label>
             <select
               id="atendimento-pedido"
               required
               value={pedido}
               onChange={(e) => setPedido(e.target.value)}
             >
-              <option value="">Selecione um pedido</option>
+              <option value="">{t('Selecione um pedido')}</option>
               {pedidos.map((item) => (
                 <option key={item.id} value={item.id}>
-                  Pedido nº {item.id} · {item.eventTitle} · {money(item.total)}
+                  {t('Pedido nº')} {item.id} · {item.eventTitle} · {money(item.total)}
                 </option>
               ))}
             </select>
           </>
         ) : (
           <>
-            <label htmlFor="atendimento-anuncio">Número do anúncio</label>
+            <label htmlFor="atendimento-anuncio">{t('Número do anúncio')}</label>
             <input
               id="atendimento-anuncio"
               type="number"
@@ -200,7 +210,7 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
             />
           </>
         )}
-        <label htmlFor="atendimento-assunto">Assunto</label>
+        <label htmlFor="atendimento-assunto">{t('Assunto')}</label>
         <input
           id="atendimento-assunto"
           required
@@ -209,7 +219,7 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
           value={assunto}
           onChange={(e) => setAssunto(e.target.value)}
         />
-        <label htmlFor="atendimento-mensagem">Mensagem</label>
+        <label htmlFor="atendimento-mensagem">{t('Mensagem')}</label>
         <textarea
           id="atendimento-mensagem"
           required
@@ -219,16 +229,16 @@ function NovaSolicitacao({ pedidos, gravacao, aoCriar }) {
           onChange={(e) => setMensagem(e.target.value)}
         />
         <p className="muted">
-          Não envie documentos, dados de pagamento ou informações pessoais reais.
+          {t('Não envie documentos, dados de pagamento ou informações pessoais reais.')}
         </p>
         {erro && (
           <p role="alert" className="field-error">
-            {erro}
+            {t(erro)}
           </p>
         )}
-        {aviso && <p role="status">{aviso}</p>}
+        {aviso && <p role="status">{t(aviso)}</p>}
         <button type="submit" className="button primary" disabled={Boolean(gravacao.ocupado)}>
-          Enviar solicitação
+          {t('Enviar solicitação')}
         </button>
       </form>
     </Panel>
@@ -268,23 +278,23 @@ function Atendimentos({ modo }) {
     <div className={equipe ? '' : 'support-layout'}>
       {!equipe && <NovaSolicitacao pedidos={pedidos} gravacao={gravacao} aoCriar={atualizarItem} />}
       <Panel
-        title={equipe ? 'Solicitações recebidas' : 'Suas solicitações'}
+        title={equipe ? t('Solicitações recebidas') : t('Suas solicitações')}
         action={
           <button
             type="button"
             className="button outline tiny"
             onClick={() => setTentativa((n) => n + 1)}
           >
-            Atualizar
+            {t('Atualizar')}
           </button>
         }
       >
         {erro && (
           <p role="alert" className="api-error">
-            {erro}
+            {t(erro)}
           </p>
         )}
-        {!itens && !erro && <p role="status">Carregando atendimentos…</p>}
+        {!itens && !erro && <p role="status">{t('Carregando atendimentos…')}</p>}
         {itens &&
           (itens.length ? (
             <ul className="support-list">
@@ -301,10 +311,10 @@ function Atendimentos({ modo }) {
           ) : (
             <p>
               {modo === 'admin'
-                ? 'Nenhuma solicitação na plataforma.'
+                ? t('Nenhuma solicitação na plataforma.')
                 : modo === 'organizador'
-                  ? 'Nenhuma solicitação sobre os seus eventos.'
-                  : 'Você ainda não abriu nenhuma solicitação.'}
+                  ? t('Nenhuma solicitação sobre os seus eventos.')
+                  : t('Você ainda não abriu nenhuma solicitação.')}
             </p>
           ))}
       </Panel>
@@ -319,26 +329,30 @@ export default function Support() {
   return (
     <div className="workspace">
       <PageTitle
-        title={modo === 'usuario' ? 'Atendimento' : 'Atendimentos'}
+        title={modo === 'usuario' ? t('Atendimento') : t('Atendimentos')}
         subtitle={
           modo === 'admin'
-            ? 'Todas as solicitações e denúncias da plataforma. A administração responde e muda a situação.'
+            ? t(
+                'Todas as solicitações e denúncias da plataforma. A administração responde e muda a situação.',
+              )
             : modo === 'organizador'
-              ? 'Solicitações e denúncias sobre os seus eventos. Responda e atualize a situação.'
-              : 'Fale com a organização do evento sobre um pedido ou denuncie um anúncio de revenda. A administração também acompanha.'
+              ? t('Solicitações e denúncias sobre os seus eventos. Responda e atualize a situação.')
+              : t(
+                  'Fale com a organização do evento sobre um pedido ou denuncie um anúncio de revenda. A administração também acompanha.',
+                )
         }
       >
         {modo === 'admin' ? (
           <Link className="button outline" to="/admin">
-            Painel geral
+            {t('Painel geral')}
           </Link>
         ) : modo === 'organizador' ? (
           <Link className="button outline" to="/organizador/portaria">
-            Portaria
+            {t('Portaria')}
           </Link>
         ) : (
           <Link className="button outline" to="/pedidos">
-            Meus pedidos
+            {t('Meus pedidos')}
           </Link>
         )}
       </PageTitle>
@@ -346,11 +360,14 @@ export default function Support() {
         <Atendimentos modo={modo} />
       ) : (
         <Empty
-          title="Entre com uma conta de usuário, de organizador ou de administração para usar o atendimento."
+          title={t(
+            'Entre com uma conta de usuário, de organizador ou de administração para usar o atendimento.',
+          )}
           heading="h2"
         >
-          O atendimento guarda as mensagens no banco de dados; o modo demonstração não tem
-          atendimento.
+          {t(
+            'O atendimento guarda as mensagens no banco de dados; o modo demonstração não tem atendimento.',
+          )}
         </Empty>
       )}
     </div>

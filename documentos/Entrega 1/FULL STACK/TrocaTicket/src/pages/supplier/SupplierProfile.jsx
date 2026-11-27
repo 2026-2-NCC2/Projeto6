@@ -15,6 +15,7 @@ import {
   supplierNotificationOptions,
 } from '../../data/supplier';
 import { maskCep, maskCnpj, maskPhone, onlyDigits } from '../../utils/masks';
+import { localeAtual, t } from '../../i18n';
 
 const EMPTY_PASSWORD = { current: '', next: '', confirm: '' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -154,7 +155,7 @@ export default function SupplierProfile() {
       document.getElementById(first)?.focus();
       return;
     }
-    const lastSync = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const lastSync = new Date().toLocaleTimeString(localeAtual(), { hour: '2-digit', minute: '2-digit' });
     const next_profile = { ...form, lastSync };
     const supplierId = Number(data.supplierProfile?.id);
     let sessionSynced = true;
@@ -206,11 +207,11 @@ export default function SupplierProfile() {
   return (
     <div className="workspace narrow sp-page sp-form">
       <PageTitle
-        title="Configurações & Perfil"
-        subtitle="Gerencie seus dados pessoais, foto, credenciais de acesso corporativo e parâmetros de comunicação."
+        title={t('Configurações & Perfil')}
+        subtitle={t('Gerencie seus dados pessoais, foto, credenciais de acesso corporativo e parâmetros de comunicação.')}
       >
         <button type="button" className="button outline sp-small-button" onClick={() => setHistory(true)}>
-          <Icon name="history" size={14} /> Histórico de acesso
+          <Icon name="history" size={14} /> {t('Histórico de acesso')}
         </button>
       </PageTitle>
 
@@ -225,15 +226,15 @@ export default function SupplierProfile() {
             <h2 className="sp-profile-name">{form.name}</h2>
           </AvatarUpload>
         </Panel>
-        {apiError && <p className="api-error" role="alert">{apiError}</p>}
+        {apiError && <p className="api-error" role="alert">{t(apiError)}</p>}
 
         <Panel
-          title={<PanelTitle icon="user">Informações pessoais & contato</PanelTitle>}
-          subtitle="Estes dados aparecem nos contratos, ordens de serviço e credenciais dos eventos."
+          title={<PanelTitle icon="user">{t('Informações pessoais & contato')}</PanelTitle>}
+          subtitle={t('Estes dados aparecem nos contratos, ordens de serviço e credenciais dos eventos.')}
         >
           <div className="sp-form-grid">
             <FormInput
-              label="Nome completo"
+              label={t('Nome completo')}
               name="sp-name"
               required
               autoComplete="name"
@@ -242,7 +243,7 @@ export default function SupplierProfile() {
               onChange={set('name')}
             />
             <FormSelect
-              label="Tipo de perfil"
+              label={t('Tipo de perfil')}
               name="sp-role"
               options={['Fornecedor']}
               value="Fornecedor"
@@ -250,18 +251,18 @@ export default function SupplierProfile() {
               onChange={() => {}}
             />
             <FormInput
-              label="E-mail corporativo"
+              label={t('E-mail corporativo')}
               name="sp-email"
               type="email"
               required
               autoComplete="email"
-              aside={form.emailVerified ? <span className="sp-verified">✓ Verificado</span> : null}
+              aside={form.emailVerified ? <span className="sp-verified">{t('✓ Verificado')}</span> : null}
               value={form.email}
               error={errors['sp-email']}
               onChange={(value) => setForm((old) => ({ ...old, email: value, emailVerified: false }))}
             />
             <FormInput
-              label="Telefone / WhatsApp"
+              label={t('Telefone / WhatsApp')}
               name="sp-phone"
               type="tel"
               required
@@ -276,32 +277,32 @@ export default function SupplierProfile() {
         </Panel>
 
         <Panel
-          title={<PanelTitle icon="building">Dados da empresa</PanelTitle>}
-          subtitle="Informações exibidas aos organizadores quando você envia uma proposta."
+          title={<PanelTitle icon="building">{t('Dados da empresa')}</PanelTitle>}
+          subtitle={t('Informações exibidas aos organizadores quando você envia uma proposta.')}
         >
           <div className="sp-form-grid">
             <FormInput
-              label="Razão social"
+              label={t('Razão social')}
               name="sp-legalName"
               required
               value={form.legalName}
               error={errors['sp-legalName']}
               onChange={set('legalName')}
             />
-            <FormInput label="Nome fantasia" name="sp-tradeName" value={form.tradeName} onChange={set('tradeName')} />
+            <FormInput label={t('Nome fantasia')} name="sp-tradeName" value={form.tradeName} onChange={set('tradeName')} />
             <FormInput
-              label="CNPJ"
+              label={t('CNPJ')}
               name="sp-document"
               mask={maskCnpj}
               value={form.document}
               readOnly
-              aside={<span className="sp-locked">Bloqueado para edição</span>}
+              aside={<span className="sp-locked">{t('Bloqueado para edição')}</span>}
             />
             <FormSelect
-              label="Categoria principal"
+              label={t('Categoria principal')}
               name="sp-category"
               required
-              placeholder="Selecione…"
+              placeholder={t('Selecione…')}
               options={supplierCategories}
               value={form.category}
               error={errors['sp-category']}
@@ -309,20 +310,20 @@ export default function SupplierProfile() {
             />
             <FormInput
               className="span-2"
-              label="Site"
+              label={t('Site')}
               name="sp-website"
               type="url"
-              placeholder="www.suaempresa.com.br"
+              placeholder={t('www.suaempresa.com.br')}
               value={form.website}
               error={errors['sp-website']}
               onChange={set('website')}
             />
             <FormTextArea
               className="span-2"
-              label="Sobre a empresa"
+              label={t('Sobre a empresa')}
               name="sp-description"
               maxLength={300}
-              hint="Resuma serviços, estrutura e diferenciais."
+              hint={t('Resuma serviços, estrutura e diferenciais.')}
               value={form.description}
               onChange={set('description')}
             />
@@ -330,13 +331,13 @@ export default function SupplierProfile() {
         </Panel>
 
         <Panel
-          title={<PanelTitle icon="pin">Endereço</PanelTitle>}
-          subtitle="Local de operação, usado para calcular logística e frete."
+          title={<PanelTitle icon="pin">{t('Endereço')}</PanelTitle>}
+          subtitle={t('Local de operação, usado para calcular logística e frete.')}
         >
           <div className="sp-form-grid cols-6">
             <FormInput
               className="span-2"
-              label="CEP"
+              label={t('CEP')}
               name="sp-zip"
               inputMode="numeric"
               autoComplete="postal-code"
@@ -348,30 +349,30 @@ export default function SupplierProfile() {
             />
             <FormInput
               className="span-3"
-              label="Logradouro"
+              label={t('Logradouro')}
               name="sp-street"
               autoComplete="address-line1"
               value={form.address.street}
               onChange={setAddress('street')}
             />
-            <FormInput label="Número" name="sp-number" value={form.address.number} onChange={setAddress('number')} />
+            <FormInput label={t('Número')} name="sp-number" value={form.address.number} onChange={setAddress('number')} />
             <FormInput
               className="span-3"
-              label="Complemento"
+              label={t('Complemento')}
               name="sp-complement"
               value={form.address.complement}
               onChange={setAddress('complement')}
             />
             <FormInput
               className="span-3"
-              label="Bairro"
+              label={t('Bairro')}
               name="sp-district"
               value={form.address.district}
               onChange={setAddress('district')}
             />
             <FormInput
               className="span-4"
-              label="Cidade"
+              label={t('Cidade')}
               name="sp-city"
               required
               autoComplete="address-level2"
@@ -381,10 +382,10 @@ export default function SupplierProfile() {
             />
             <FormSelect
               className="span-2"
-              label="Estado"
+              label={t('Estado')}
               name="sp-state"
               required
-              placeholder="UF"
+              placeholder={t('UF')}
               options={brazilStates}
               value={form.address.state}
               error={errors['sp-state']}
@@ -394,9 +395,9 @@ export default function SupplierProfile() {
         </Panel>
 
         <Panel
-          title={<PanelTitle icon="shield">Segurança da conta & credenciais</PanelTitle>}
-          subtitle="Preencha apenas se quiser trocar a senha. A autenticação real depende do backend."
-          action={          <small className="muted">As alterações de senha são validadas pelo servidor.</small>}
+          title={<PanelTitle icon="shield">{t('Segurança da conta & credenciais')}</PanelTitle>}
+          subtitle={t('Preencha apenas se quiser trocar a senha. A autenticação real depende do backend.')}
+          action={          <small className="muted">{t('As alterações de senha são validadas pelo servidor.')}</small>}
         >
           <PasswordSection values={password} onChange={setPassword} errors={errors} />
           <div className="sp-security-card">
@@ -404,8 +405,8 @@ export default function SupplierProfile() {
               <Icon name="shield-check" size={18} />
             </span>
             <div>
-              <strong>Autenticação de 2 fatores (2FA)</strong>
-              <small>Preferência registrada; a verificação por aplicativo ainda não está implementada.</small>
+              <strong>{t('Autenticação de 2 fatores (2FA)')}</strong>
+              <small>{t('Preferência registrada; a verificação por aplicativo ainda não está implementada.')}</small>
             </div>
             <button
               type="button"
@@ -415,21 +416,21 @@ export default function SupplierProfile() {
               onClick={() => set('twoFactor')(!form.twoFactor)}
             >
               <StatusPill tone={form.twoFactor ? 'green' : 'gray'} dot={false}>
-                {form.twoFactor ? 'Ativado' : 'Desativado'}
+                {form.twoFactor ? t('Ativado') : t('Desativado')}
               </StatusPill>
             </button>
           </div>
         </Panel>
 
         <Panel
-          title={<PanelTitle icon="settings">Opções & preferências do sistema</PanelTitle>}
-          subtitle="Configure os canais de recebimento de relatórios e notificações de eventos."
+          title={<PanelTitle icon="settings">{t('Opções & preferências do sistema')}</PanelTitle>}
+          subtitle={t('Configure os canais de recebimento de relatórios e notificações de eventos.')}
         >
           {supplierNotificationOptions.map((option) => (
             <PreferenceItem
               key={option.key}
-              title={option.title}
-              description={option.description}
+              title={t(option.title)}
+              description={t(option.description)}
               checked={!!form.notifications[option.key]}
               onChange={setNotification(option.key)}
             />
@@ -439,36 +440,36 @@ export default function SupplierProfile() {
         <div className="sp-form-footer">
           <p role="status">
             {dirty ? (
-              'Você tem alterações não salvas.'
+              t('Você tem alterações não salvas.')
             ) : (
               <>
-                <Icon name="check" size={14} /> Última sincronização do perfil hoje às {form.lastSync}.
+                <Icon name="check" size={14} /> {t('Última sincronização do perfil hoje às')} {form.lastSync}.
               </>
             )}
           </p>
           <div className="actions end">
             <button className="button outline" type="button" onClick={cancel} disabled={!dirty}>
-              Cancelar
+              {t('Cancelar')}
             </button>
             <button className="button dark" disabled={!dirty || saving || photoBusy}>
-              {saving ? 'Salvando…' : null}
+              {saving ? t('Salvando…') : null}
               {!saving && <Icon name="check" size={14} />}
-              {!saving && ' Salvar alterações'}
+              {!saving && t(' Salvar alterações')}
             </button>
           </div>
         </div>
       </form>
 
       {history && (
-        <Modal title="Histórico de acesso" onClose={() => setHistory(false)}>
+        <Modal title={t('Histórico de acesso')} onClose={() => setHistory(false)}>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Quando</th>
-                  <th>Dispositivo</th>
-                  <th>Local</th>
-                  <th>Situação</th>
+                  <th>{t('Quando')}</th>
+                  <th>{t('Dispositivo')}</th>
+                  <th>{t('Local')}</th>
+                  <th>{t('Situação')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -485,7 +486,7 @@ export default function SupplierProfile() {
               </tbody>
             </table>
           </div>
-          <p className="muted">Este histórico é demonstrativo e não corresponde a sessões reais.</p>
+          <p className="muted">{t('Este histórico é demonstrativo e não corresponde a sessões reais.')}</p>
         </Modal>
       )}
     </div>

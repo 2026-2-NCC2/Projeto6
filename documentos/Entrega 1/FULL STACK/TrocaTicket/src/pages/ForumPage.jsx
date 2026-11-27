@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useStore } from '../context/Store';
 import { Community } from './Participant';
+import { t } from '../i18n';
 
 /**
  * O fórum permanece isolado em iframe, mas recebe a identidade ativa do site.
@@ -59,27 +60,30 @@ export default function ForumPage() {
   }
 
   return (
-    <iframe
-      ref={frame}
-      className="forum-frame"
-      src="/forum/index.html"
-      title="Troca-Papo — fórum da comunidade TrocaTicket"
-      loading="eager"
-      referrerPolicy="strict-origin-when-cross-origin"
-      onLoad={() => {
-        enviarIdentidade();
-        const dark = (() => {
-          try {
-            return localStorage.getItem('trocaticket-theme') === 'dark';
-          } catch {
-            return false;
-          }
-        })();
-        frame.current?.contentWindow?.postMessage(
-          { type: 'TROCATICKET_SET_THEME', dark },
-          window.location.origin,
-        );
-      }}
-    />
+    <>
+      <h1 className="sr-only">{t('Troca-Papo — fórum da comunidade TrocaTicket')}</h1>
+      <iframe
+        ref={frame}
+        className="forum-frame"
+        src="/forum/index.html"
+        title={t('Troca-Papo — fórum da comunidade TrocaTicket')}
+        loading="eager"
+        referrerPolicy="strict-origin-when-cross-origin"
+        onLoad={() => {
+          enviarIdentidade();
+          const dark = (() => {
+            try {
+              return localStorage.getItem('trocaticket-theme') === 'dark';
+            } catch {
+              return false;
+            }
+          })();
+          frame.current?.contentWindow?.postMessage(
+            { type: 'TROCATICKET_SET_THEME', dark },
+            window.location.origin,
+          );
+        }}
+      />
+    </>
   );
 }

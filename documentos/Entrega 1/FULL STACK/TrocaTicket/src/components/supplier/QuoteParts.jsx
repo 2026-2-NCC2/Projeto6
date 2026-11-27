@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { dateLabel, money } from '../UI';
 import Icon from './Icon';
 import { Tag, StatusPill } from './common';
+import { t } from '../../i18n';
 
 /* Peças da tela de cotação (nova proposta). */
 
@@ -19,17 +20,17 @@ export function DemandCard({ event, active }) {
       aria-current={active ? 'true' : undefined}
     >
       <div className="sp-demand-head">
-        <StatusPill tone={tone}>{win.pill}</StatusPill>
-        {active && <Tag tone="blue">ATIVO</Tag>}
+        <StatusPill tone={tone}>{t(win.pill)}</StatusPill>
+        {active && <Tag tone="blue">{t('ATIVO')}</Tag>}
       </div>
       <h3>
-        {event.title} — {event.subtitle}
+        {event.title} — {t(event.subtitle)}
       </h3>
       <div className="sp-demand-foot">
         <span>
           <Icon name="calendar" size={12} /> {dateLabel(event.date)}
         </span>
-        <b className={tone}>{win.note}</b>
+        <b className={tone}>{t(win.note)}</b>
       </div>
     </Link>
   );
@@ -37,8 +38,8 @@ export function DemandCard({ event, active }) {
 
 export function OrganizerCard({ name, city, reliability }) {
   return (
-    <section className="sp-organizer" aria-label="Organizadora responsável">
-      <small>ORGANIZADORA RESPONSÁVEL</small>
+    <section className="sp-organizer" aria-label={t('Organizadora responsável')}>
+      <small>{t('ORGANIZADORA RESPONSÁVEL')}</small>
       <div>
         <span className="sp-organizer-icon">
           <Icon name="building" size={20} />
@@ -46,7 +47,7 @@ export function OrganizerCard({ name, city, reliability }) {
         <div>
           <strong>{name}</strong>
           <span>
-            {city} · {reliability}
+            {city} · {t(reliability)}
           </span>
         </div>
       </div>
@@ -57,14 +58,14 @@ export function OrganizerCard({ name, city, reliability }) {
 // Arquivos do briefing. onOpen(doc) decide o que fazer ao clicar.
 export function BriefingPanel({ docs, onOpen }) {
   return (
-    <section className="sp-briefing" aria-label="Detalhes e briefing do evento">
+    <section className="sp-briefing" aria-label={t('Detalhes e briefing do evento')}>
       <div className="sp-briefing-head">
-        <small>EVENTO: DETALHES & BRIEFING</small>
+        <small>{t('EVENTO: DETALHES & BRIEFING')}</small>
         <button type="button" className="sp-link-button" onClick={() => onOpen(null)}>
-          Ver todos
+          {t('Ver todos')}
         </button>
       </div>
-      <p>Documentação técnica fornecida pelo contratante para formulação da proposta:</p>
+      <p>{t('Documentação técnica fornecida pelo contratante para formulação da proposta:')}</p>
       <div className="sp-docs">
         {docs.map((doc) => (
           <button type="button" key={doc.name} className="sp-doc" onClick={() => onOpen(doc)}>
@@ -94,11 +95,11 @@ export function QuoteItemsTable({
       <table>
         <thead>
           <tr>
-            <th>Item / Especificação técnica</th>
-            <th>Quantidade</th>
-            <th>Unidade</th>
-            <th>Valor unitário de referência</th>
-            <th>Proposta do fornecedor (R$)</th>
+            <th>{t('Item / Especificação técnica')}</th>
+            <th>{t('Quantidade')}</th>
+            <th>{t('Unidade')}</th>
+            <th>{t('Valor unitário de referência')}</th>
+            <th>{t('Proposta do fornecedor (R$)')}</th>
           </tr>
         </thead>
         <tbody>
@@ -118,13 +119,13 @@ export function QuoteItemsTable({
                     min="1"
                     step="1"
                     disabled={disabled}
-                    aria-label={`Quantidade de ${item.name}`}
+                    aria-label={t('Quantidade de {name}', { name: item.name })}
                     value={quantities[i] ?? item.qty}
                     onChange={(event) => onQuantity(i, event.target.value)}
                   />
                 ) : item.qty}
               </td>
-              <td>{item.unit}</td>
+              <td>{t(item.unit)}</td>
               <td className="num muted-cell">{money(item.ref)}</td>
               <td>
                 <input
@@ -135,7 +136,7 @@ export function QuoteItemsTable({
                   min="0.01"
                   step="0.01"
                   disabled={disabled}
-                  aria-label={`Valor unitário proposto para ${item.name}`}
+                  aria-label={t('Valor unitário proposto para {name}', { name: item.name })}
                   aria-invalid={invalid.includes(i)}
                   value={prices[i]}
                   onChange={(event) => onPrice(i, event.target.value)}
@@ -154,17 +155,17 @@ export function QuoteFooter({ total, withinCeiling, children }) {
   return (
     <div className="sp-quote-footer">
       <span className="sp-quote-currency" aria-hidden="true">
-        R$
+        {t('R$')}
       </span>
       <div className="sp-quote-total">
-        <small>TOTAL PROPOSTO DA COTAÇÃO</small>
+        <small>{t('TOTAL PROPOSTO DA COTAÇÃO')}</small>
         <strong>{money(total)}</strong>
       </div>
       {withinCeiling === null ? (
-        <span className="sp-ceiling">Sem teto de orçamento informado</span>
+        <span className="sp-ceiling">{t('Sem teto de orçamento informado')}</span>
       ) : (
         <span className={`sp-ceiling ${withinCeiling ? 'ok' : 'over'}`}>
-          {withinCeiling ? 'Dentro do teto' : 'Acima do teto sugerido'}
+          {withinCeiling ? t('Dentro do teto') : t('Acima do teto sugerido')}
         </span>
       )}
       <div className="sp-quote-actions">{children}</div>

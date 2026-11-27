@@ -28,6 +28,7 @@ import {
   money,
   DownloadButton,
 } from '../components/UI';
+import { t, tn } from '../i18n';
 
 
 //comentario so pra merge
@@ -65,18 +66,18 @@ export function Organizer({ list = false }) {
   return (
     <div className="workspace">
       <PageTitle
-        title={list ? 'Meus Eventos' : 'Vamos criar experiências memoráveis?'}
-        subtitle="Seus eventos, parceiros e próximos passos em um só lugar."
+        title={list ? t('Meus Eventos') : t('Vamos criar experiências memoráveis?')}
+        subtitle={t('Seus eventos, parceiros e próximos passos em um só lugar.')}
       >
         <Link className="button blue-button" to="/organizador/novo">
-          + Novo evento
+          {t('+ Novo evento')}
         </Link>
       </PageTitle>
       {loadError && (
         <div className="api-error" role="alert">
-          <span>Não foi possível carregar os eventos do banco: {loadError}</span>
+          <span>{t('Não foi possível carregar os eventos do banco:')} {t(loadError)}</span>
           <button type="button" className="button outline tiny" onClick={() => setReloadEvents((value) => value + 1)}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       )}
@@ -100,27 +101,27 @@ export function Organizer({ list = false }) {
               ['Parceiros', isAuthenticated ? data.events.reduce((sum, event) => sum + (event.suppliers?.length || 0), 0) : suppliers.length, 'Rede de fornecedores'],
             ].map(([label, value, note]) => (
               <div className="metric" key={label}>
-                <span>{label}</span>
+                <span>{t(label)}</span>
                 <strong>{value}</strong>
-                <small>{note}</small>
+                <small>{t(note)}</small>
               </div>
             ))}
           </div>
           <div className="section-row">
             <h2>
-              Meus Eventos <Badge>Painel ativo</Badge>
+              {t('Meus Eventos')} <Badge>{t('Painel ativo')}</Badge>
             </h2>
             <Tabs options={['Grade', 'Lista']} value={view} onChange={setView} />
           </div>
           <div className="filter-bar">
             <input
-              aria-label="Buscar meus eventos"
-              placeholder="Buscar evento…"
+              aria-label={t('Buscar meus eventos')}
+              placeholder={t('Buscar evento…')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
             <select
-              aria-label="Status do evento"
+              aria-label={t('Status do evento')}
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
@@ -133,7 +134,7 @@ export function Organizer({ list = false }) {
                 'Publicado',
                 'Cancelado',
               ].map((s) => (
-                <option key={s}>{s}</option>
+                <option value={s} key={s}>{t(s)}</option>
               ))}
             </select>
           </div>
@@ -151,8 +152,8 @@ export function Organizer({ list = false }) {
           </div>
           {!events.length && <Empty />}
           <Panel
-            title="Agenda de eventos"
-            subtitle="Acompanhe as próximas datas do seu planejamento."
+            title={t('Agenda de eventos')}
+            subtitle={t('Acompanhe as próximas datas do seu planejamento.')}
           >
             <div className="agenda-grid">
               {data.events
@@ -167,7 +168,7 @@ export function Organizer({ list = false }) {
                     <Badge>{dateLabel(event.date)}</Badge>
                     <h3>{event.title}</h3>
                     <p>{event.location}</p>
-                    <small>{event.suppliers?.length || 0} fornecedores vinculados</small>
+                    <small>{event.suppliers?.length || 0} {t('fornecedores vinculados')}</small>
                   </Link>
                 ))}
             </div>
@@ -175,22 +176,22 @@ export function Organizer({ list = false }) {
         </div>
         <aside>
           <Panel
-            title={isAuthenticated ? 'Fornecedores cadastrados' : 'Últimos Fornecedores'}
-            subtitle={isAuthenticated ? 'Vincule fornecedores reais aos seus eventos.' : 'Contratos recentes e contatos rápidos'}
-            action={<Link className="text-link" to="/organizador/fornecedores">Ver todos</Link>}
+            title={isAuthenticated ? t('Fornecedores cadastrados') : t('Últimos Fornecedores')}
+            subtitle={isAuthenticated ? t('Vincule fornecedores reais aos seus eventos.') : t('Contratos recentes e contatos rápidos')}
+            action={<Link className="text-link" to="/organizador/fornecedores">{t('Ver todos')}</Link>}
           >
             {!isAuthenticated && suppliers.map((s) => (
               <Link className="supplier-row" to="/organizador/fornecedores" key={s.id}>
                 <img src={s.image} alt="" />
-                <div><strong>{s.name}</strong><small>{s.category}</small><Badge>{s.status}</Badge></div>
+                <div><strong>{s.name}</strong><small>{t(s.category)}</small><Badge>{t(s.status)}</Badge></div>
               </Link>
             ))}
             <Link className="button outline full" to="/organizador/fornecedores">
-              Gerenciar fornecedores →
+              {t('Gerenciar fornecedores →')}
             </Link>
           </Panel>
           <div className="info-note">
-            Tudo pronto para o próximo evento? Comece pelo planejamento e reúna seus fornecedores.
+            {t('Tudo pronto para o próximo evento? Comece pelo planejamento e reúna seus fornecedores.')}
           </div>
         </aside>
       </div>
@@ -257,25 +258,25 @@ export function EventEditor() {
   }, [existing]);
 
   if (id && !existing && eventLoading) {
-    return <div className="workspace"><p role="status">Carregando evento…</p></div>;
+    return <div className="workspace"><p role="status">{t('Carregando evento…')}</p></div>;
   }
   if (id && !existing && eventLoadError) {
     return (
       <div className="workspace">
         <div className="api-error" role="alert">
-          <span>Não foi possível carregar o evento: {eventLoadError}</span>
+          <span>{t('Não foi possível carregar o evento:')} {t(eventLoadError)}</span>
           <button type="button" className="button outline" onClick={() => {
             setEventLoadError('');
             setEventLoading(true);
             setEventReload((value) => value + 1);
           }}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       </div>
     );
   }
-  if (id && !existing) return <NotFound title="Evento não encontrado" />;
+  if (id && !existing) return <NotFound title={t('Evento não encontrado')} />;
 
   function field(name, value) {
     setForm((old) => ({ ...old, [name]: value }));
@@ -356,14 +357,14 @@ export function EventEditor() {
   return (
     <div className="workspace event-editor-page">
       <PageTitle
-        title={id ? 'Editar evento' : 'Criar evento'}
-        subtitle="Cadastre o essencial agora. Você poderá revisar fornecedores e custos na próxima etapa."
+        title={id ? t('Editar evento') : t('Criar evento')}
+        subtitle={t('Cadastre o essencial agora. Você poderá revisar fornecedores e custos na próxima etapa.')}
       >
         <button type="button" className="button outline" onClick={() => setPreview(true)}>
-          ◉ Pré-visualizar
+          {t('◉ Pré-visualizar')}
         </button>
       </PageTitle>
-      <div className="event-editor-hint"><span aria-hidden="true">✓</span> Eventos com uma conta de organizador são salvos no banco de dados; a demonstração usa este navegador. Campos com * são obrigatórios.</div>
+      <div className="event-editor-hint"><span aria-hidden="true">✓</span> {t('Eventos com uma conta de organizador são salvos no banco de dados; a demonstração usa este navegador. Campos com * são obrigatórios.')}</div>
       <form
         onSubmit={(e) => { e.preventDefault(); save(true); }}
         noValidate
@@ -374,32 +375,32 @@ export function EventEditor() {
               <section className="event-form-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">1</span>
-                  <div><h2>Informações do evento</h2><p>Como o evento será apresentado aos usuários.</p></div>
+                  <div><h2>{t('Informações do evento')}</h2><p>{t('Como o evento será apresentado aos usuários.')}</p></div>
                 </div>
                 <Field
-                  label="Nome do evento *"
+                  label={t('Nome do evento *')}
                   name="title"
-                  placeholder="Ex.: Festival de Música de Verão"
+                  placeholder={t('Ex.: Festival de Música de Verão')}
                   value={form.title}
                   onChange={(e) => field('title', e.target.value)}
                   error={errors.title}
                 />
                 <div className="form-grid">
-                  <Field label="Categoria *" name="category">
+                  <Field label={t('Categoria *')} name="category">
                     <select id="category" value={form.category} onChange={(e) => field('category', e.target.value)}>
-                      {['Show / Cultura', 'Corporativo', 'Workshop', 'Gastronomia', 'Esporte', 'Feira / Exposição', 'Outro'].map((x) => <option key={x}>{x}</option>)}
+                      {['Show / Cultura', 'Corporativo', 'Workshop', 'Gastronomia', 'Esporte', 'Feira / Exposição', 'Outro'].map((x) => <option value={x} key={x}>{t(x)}</option>)}
                     </select>
                   </Field>
-                  <Field label="Formato *" name="format">
+                  <Field label={t('Formato *')} name="format">
                     <select id="format" value={form.format} onChange={(e) => field('format', e.target.value)}>
-                      {['Presencial', 'Online', 'Híbrido'].map((x) => <option key={x}>{x}</option>)}
+                      {['Presencial', 'Online', 'Híbrido'].map((x) => <option value={x} key={x}>{t(x)}</option>)}
                     </select>
                   </Field>
                 </div>
                 <Field
-                  label={form.format === 'Online' ? 'Link ou plataforma do evento *' : form.format === 'Híbrido' ? 'Local presencial ou link de acesso *' : 'Local do evento *'}
+                  label={form.format === 'Online' ? t('Link ou plataforma do evento *') : form.format === 'Híbrido' ? t('Local presencial ou link de acesso *') : t('Local do evento *')}
                   name="location"
-                  placeholder={form.format === 'Presencial' ? 'Espaço, endereço, cidade e estado' : 'Endereço ou link para participação'}
+                  placeholder={form.format === 'Presencial' ? t('Espaço, endereço, cidade e estado') : t('Endereço ou link para participação')}
                   value={form.location}
                   onChange={(e) => field('location', e.target.value)}
                   error={errors.location}
@@ -408,68 +409,68 @@ export function EventEditor() {
               <section className="event-form-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">2</span>
-                  <div><h2>Data, horário e capacidade</h2><p>Ajude usuários e fornecedores a se planejarem.</p></div>
+                  <div><h2>{t('Data, horário e capacidade')}</h2><p>{t('Ajude usuários e fornecedores a se planejarem.')}</p></div>
                 </div>
                 <div className="form-grid event-date-grid">
-                  <Field label="Data de início *" name="date" type="date" value={form.date} onChange={(e) => field('date', e.target.value)} />
-                  <Field label="Horário de início *" name="time" type="time" value={form.time} onChange={(e) => field('time', e.target.value)} />
-                  <Field label="Data de término *" name="endDate" type="date" value={form.endDate} onChange={(e) => field('endDate', e.target.value)} error={errors.endDate} />
-                  <Field label="Horário de término *" name="endTime" type="time" value={form.endTime} onChange={(e) => field('endTime', e.target.value)} />
+                  <Field label={t('Data de início *')} name="date" type="date" value={form.date} onChange={(e) => field('date', e.target.value)} />
+                  <Field label={t('Horário de início *')} name="time" type="time" value={form.time} onChange={(e) => field('time', e.target.value)} />
+                  <Field label={t('Data de término *')} name="endDate" type="date" value={form.endDate} onChange={(e) => field('endDate', e.target.value)} error={errors.endDate} />
+                  <Field label={t('Horário de término *')} name="endTime" type="time" value={form.endTime} onChange={(e) => field('endTime', e.target.value)} />
                 </div>
                 <div className="form-grid">
-                  <Field label="Público estimado" name="capacity" type="number" min="1" placeholder="Ex.: 500 pessoas" value={form.capacity} onChange={(e) => field('capacity', e.target.value)} error={errors.capacity} />
-                  <Field label="Preço base do ingresso (R$) *" name="price" type="number" min="0" step="0.01" value={form.price} onChange={(e) => field('price', e.target.value)} error={errors.price} />
+                  <Field label={t('Público estimado')} name="capacity" type="number" min="1" placeholder={t('Ex.: 500 pessoas')} value={form.capacity} onChange={(e) => field('capacity', e.target.value)} error={errors.capacity} />
+                  <Field label={t('Preço base do ingresso (R$) *')} name="price" type="number" min="0" step="0.01" value={form.price} onChange={(e) => field('price', e.target.value)} error={errors.price} />
                 </div>
-                <p className="event-field-note">Se o evento for gratuito, mantenha o preço em R$ 0,00. A capacidade é opcional e pode ser preenchida quando definida.</p>
+                <p className="event-field-note">{t('Se o evento for gratuito, mantenha o preço em R$ 0,00. A capacidade é opcional e pode ser preenchida quando definida.')}</p>
               </section>
               <section className="event-form-section event-description-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">3</span>
-                  <div><h2>Descrição</h2><p>Conte o que o público precisa saber.</p></div>
+                  <div><h2>{t('Descrição')}</h2><p>{t('Conte o que o público precisa saber.')}</p></div>
                 </div>
-                <Field label="Descrição do evento" name="description">
-                  <textarea id="description" maxLength={1000} rows={4} placeholder="Descreva a programação, atrações e informações importantes..." value={form.description} onChange={(e) => field('description', e.target.value)} />
+                <Field label={t('Descrição do evento')} name="description">
+                  <textarea id="description" maxLength={1000} rows={4} placeholder={t('Descreva a programação, atrações e informações importantes...')} value={form.description} onChange={(e) => field('description', e.target.value)} />
                 </Field>
-                <div className="event-character-count">{form.description.length}/1000 caracteres</div>
+                <div className="event-character-count">{form.description.length}{t('/1000 caracteres')}</div>
               </section>
             </div>
             <aside className="event-editor-side">
               <section className="event-form-section">
                 <div className="event-section-heading">
                   <span className="event-section-number">4</span>
-                  <div><h2>Imagem de capa</h2><p>Uma imagem ajuda a identificar seu evento.</p></div>
+                  <div><h2>{t('Imagem de capa')}</h2><p>{t('Uma imagem ajuda a identificar seu evento.')}</p></div>
                 </div>
                 <label className="cover-upload event-cover-upload">
-                  <img src={form.image} alt="Prévia da capa do evento" />
-                  <span>↑ Escolher imagem de capa</span>
-                  <small>JPG, PNG ou WEBP · máximo de 2 MB</small>
+                  <img src={form.image} alt={t('Prévia da capa do evento')} />
+                  <span>{t('↑ Escolher imagem de capa')}</span>
+                  <small>{t('JPG, PNG ou WEBP · máximo de 2 MB')}</small>
                   <input type="file" accept="image/png,image/jpeg,image/webp" onChange={upload} />
                 </label>
                 {errors.image && <p className="field-error">{errors.image}</p>}
-                <button type="button" className="button outline event-remove-cover" onClick={() => field('image', '/images/asset-5.jpg')}>Restaurar capa padrão</button>
+                <button type="button" className="button outline event-remove-cover" onClick={() => field('image', '/images/asset-5.jpg')}>{t('Restaurar capa padrão')}</button>
               </section>
               <div className="event-next-step-card">
                 <span className="event-next-step-icon">↗</span>
-                <h3>Próxima etapa: fornecedores e custos</h3>
-                <p>Depois de salvar, você poderá selecionar parceiros e revisar os valores estimados do evento.</p>
+                <h3>{t('Próxima etapa: fornecedores e custos')}</h3>
+                <p>{t('Depois de salvar, você poderá selecionar parceiros e revisar os valores estimados do evento.')}</p>
               </div>
             </aside>
           </div>
           <div className="form-footer event-editor-footer">
-            <Link className="button outline" to="/organizador">Cancelar</Link>
-            <button type="button" className="button outline" disabled={saving} onClick={() => save(false)}>{saving ? 'Salvando…' : 'Salvar rascunho'}</button>
-            <button type="submit" className="button blue-button" disabled={saving}>{saving ? 'Salvando…' : 'Continuar para custos →'}</button>
+            <Link className="button outline" to="/organizador">{t('Cancelar')}</Link>
+            <button type="button" className="button outline" disabled={saving} onClick={() => save(false)}>{saving ? t('Salvando…') : t('Salvar rascunho')}</button>
+            <button type="submit" className="button blue-button" disabled={saving}>{saving ? t('Salvando…') : t('Continuar para custos →')}</button>
           </div>
         </Panel>
       </form>
       {preview && (
-        <Modal title="Prévia do evento" onClose={() => setPreview(false)}>
-          <img className="modal-cover" src={form.image} alt="Capa do evento" />
-          <p className="eyebrow purple">{form.category} · {form.format}</p>
-          <h2>{form.title || 'Nome do evento'}</h2>
-          <p>{form.description || 'A descrição do evento aparecerá aqui.'}</p>
-          <p>{dateLabel(form.date)} · {form.time} · {form.location || 'Local a definir'}</p>
-          <strong>{Number(form.price) === 0 ? 'Entrada gratuita' : `${money(form.price)} / ingresso`}</strong>
+        <Modal title={t('Prévia do evento')} onClose={() => setPreview(false)}>
+          <img className="modal-cover" src={form.image} alt={t('Capa do evento')} />
+          <p className="eyebrow purple">{t(form.category)} · {t(form.format)}</p>
+          <h2>{form.title || t('Nome do evento')}</h2>
+          <p>{form.description || t('A descrição do evento aparecerá aqui.')}</p>
+          <p>{dateLabel(form.date)} · {form.time} · {form.location || t('Local a definir')}</p>
+          <strong>{Number(form.price) === 0 ? t('Entrada gratuita') : t('{v1} / ingresso', { v1: money(form.price) })}</strong>
         </Modal>
       )}
     </div>
@@ -548,20 +549,20 @@ export function Consolidation() {
   }, [id, isDatabaseEvent, organizerId]);
 
   if (!event) {
-    if (eventLoading) return <div className="workspace"><p role="status">Carregando evento do banco de dados…</p></div>;
+    if (eventLoading) return <div className="workspace"><p role="status">{t('Carregando evento do banco de dados…')}</p></div>;
     if (eventLoadError) {
       return (
         <div className="workspace">
           <div className="api-error" role="alert">
-            <span>Não foi possível carregar o evento: {eventLoadError}</span>
+            <span>{t('Não foi possível carregar o evento:')} {t(eventLoadError)}</span>
             <button type="button" className="button outline tiny" onClick={() => setEventRetry((value) => value + 1)}>
-              Tentar novamente
+              {t('Tentar novamente')}
             </button>
           </div>
         </div>
       );
     }
-    return <NotFound title="Evento não encontrado" />;
+    return <NotFound title={t('Evento não encontrado')} />;
   }
 
   const selected = suppliers.filter((supplier) => (event.suppliers || []).includes(supplier.id));
@@ -640,8 +641,8 @@ export function Consolidation() {
   return (
     <div className="workspace consolidation-workspace">
       <PageTitle
-        title="Consolidar evento"
-        subtitle="Confira parceiros, orçamento e dados principais antes de publicar."
+        title={t('Consolidar evento')}
+        subtitle={t('Confira parceiros, orçamento e dados principais antes de publicar.')}
       >
         <DownloadButton
           name="custos-evento.csv"
@@ -655,7 +656,7 @@ export function Consolidation() {
           ]}
         />
         <Link className="button outline" to={`/organizador/eventos/${id}/editar`}>
-          Editar evento
+          {t('Editar evento')}
         </Link>
       </PageTitle>
 
@@ -664,18 +665,18 @@ export function Consolidation() {
           <img src={event.image} alt="" />
           <div className="consolidation-event-copy">
             <div className="consolidation-tags">
-              <Badge>{event.category}</Badge>
-              <Badge>{event.format || 'Formato não definido'}</Badge>
+              <Badge>{t(event.category)}</Badge>
+              <Badge>{event.format || t('Formato não definido')}</Badge>
             </div>
             <h2>{event.title}</h2>
-            <p>{event.id} <span aria-hidden="true">·</span> {event.status}</p>
+            <p>{event.id} <span aria-hidden="true">·</span> {t(event.status)}</p>
           </div>
         </div>
         <div className="consolidation-facts">
-          <div><span>Data e horário</span><strong>{dateLabel(event.date)} · {event.time || 'A definir'}</strong></div>
-          <div><span>Local</span><strong>{event.location || 'A definir'}</strong></div>
-          <div><span>Capacidade</span><strong>{event.capacity ? `${event.capacity} pessoas` : 'Não definida'}</strong></div>
-          <div><span>Custos de propostas aprovadas</span><strong>{money(total)}</strong></div>
+          <div><span>{t('Data e horário')}</span><strong>{dateLabel(event.date)} · {event.time || t('A definir')}</strong></div>
+          <div><span>{t('Local')}</span><strong>{event.location || t('A definir')}</strong></div>
+          <div><span>{t('Capacidade')}</span><strong>{event.capacity ? t('{capacity} pessoas', { capacity: event.capacity }) : t('Não definida')}</strong></div>
+          <div><span>{t('Custos de propostas aprovadas')}</span><strong>{money(total)}</strong></div>
         </div>
       </section>
 
@@ -683,32 +684,32 @@ export function Consolidation() {
         <section className="panel consolidation-partners">
           <div className="consolidation-section-heading">
             <div>
-              <h2>{isDatabaseEvent ? 'Propostas recebidas' : 'Parceiros contratados'}</h2>
-              <p>{partnerCount} {partnerCount === 1 ? 'fornecedor' : 'fornecedores'}</p>
+              <h2>{isDatabaseEvent ? t('Propostas recebidas') : t('Parceiros contratados')}</h2>
+              <p>{tn(partnerCount, '{n} fornecedor', '{n} fornecedores')}</p>
             </div>
-            <Link className="text-link" to={`/organizador/fornecedores?evento=${encodeURIComponent(id)}`}>Gerenciar</Link>
+            <Link className="text-link" to={`/organizador/fornecedores?evento=${encodeURIComponent(id)}`}>{t('Gerenciar')}</Link>
           </div>
           <div className="consolidation-status-summary">
-            <div><strong>{confirmedCount}</strong><span>{isDatabaseEvent ? 'Aprovadas' : 'Confirmados'}</span></div>
-            <div><strong>{pendingCount}</strong><span>Pendentes</span></div>
-            <div><strong>{progress}%</strong><span>Concluído</span></div>
+            <div><strong>{confirmedCount}</strong><span>{isDatabaseEvent ? t('Aprovadas') : t('Confirmados')}</span></div>
+            <div><strong>{pendingCount}</strong><span>{t('Pendentes')}</span></div>
+            <div><strong>{progress}%</strong><span>{t('Concluído')}</span></div>
           </div>
           {proposalError && (
             <div className="api-error" role="alert">
-              <span>{proposalError}</span>
+              <span>{t(proposalError)}</span>
               <button type="button" className="button outline tiny" onClick={() => setProposalRetry((value) => value + 1)}>
-                Tentar novamente
+                {t('Tentar novamente')}
               </button>
             </div>
           )}
-          {proposalLoading && <p role="status">Carregando propostas recebidas…</p>}
+          {proposalLoading && <p role="status">{t('Carregando propostas recebidas…')}</p>}
           {isDatabaseEvent && linkedSuppliers.length > 0 && (
             <div className="consolidation-linked-suppliers">
-              <h3>Fornecedores vinculados</h3>
+              <h3>{t('Fornecedores vinculados')}</h3>
               {linkedSuppliers.map((supplier) => (
                 <div className="consolidation-linked-supplier" key={supplier.id}>
-                  <span><strong>{supplier.name}</strong><small>{supplier.category || 'Categoria não informada'}</small></span>
-                  <Badge tone="blue">Vinculado</Badge>
+                  <span><strong>{supplier.name}</strong><small>{t(supplier.category || 'Categoria não informada')}</small></span>
+                  <Badge tone="blue">{t('Vinculado')}</Badge>
                 </div>
               ))}
             </div>
@@ -719,9 +720,9 @@ export function Consolidation() {
                 <div className="consolidation-partner" key={proposal.id}>
                   <div className="consolidation-partner-info">
                     <strong>{proposal.supplierName}</strong>
-                    <span>{proposal.category || 'Categoria não informada'} · #{proposal.protocol || proposal.id}</span>
+                    <span>{t(proposal.category || 'Categoria não informada')} · #{proposal.protocol || proposal.id}</span>
                     {proposal.items?.length > 0 && (
-                      <small>{proposal.items.map((item) => `${item.qty} ${item.unit} ${item.name}`).join(' · ')}</small>
+                      <small>{proposal.items.map((item) => `${item.qty} ${t(item.unit)} ${item.name}`).join(' · ')}</small>
                     )}
                   </div>
                   <div className="consolidation-partner-end">
@@ -729,10 +730,10 @@ export function Consolidation() {
                     {proposal.status === 'Em análise' ? (
                       <div className="actions">
                         <button className="button tiny outline" onClick={() => setProposalStatus(proposal, 'Não selecionada')}>
-                          Recusar
+                          {t('Recusar')}
                         </button>
                         <button className="button tiny blue-button" onClick={() => setProposalStatus(proposal, 'Aprovada')}>
-                          Aprovar
+                          {t('Aprovar')}
                         </button>
                       </div>
                     ) : <Badge tone={proposal.status === 'Aprovada' ? 'green' : 'red'}>{proposal.status}</Badge>}
@@ -748,7 +749,7 @@ export function Consolidation() {
                   <div className="consolidation-partner" key={supplier.id}>
                     <div className="consolidation-partner-info">
                       <strong>{supplier.name}</strong>
-                      <span>{supplier.category}</span>
+                      <span>{t(supplier.category)}</span>
                     </div>
                     <div className="consolidation-partner-end">
                       <strong>{money(supplier.price)}</strong>
@@ -759,18 +760,18 @@ export function Consolidation() {
                             change({ confirmations: [...confirmations, supplier.id] });
                             notify('Confirmação simulada registrada.');
                           }}
-                        >Confirmar</button>
-                      ) : <Badge>Confirmado</Badge>}
+                        >{t('Confirmar')}</button>
+                      ) : <Badge>{t('Confirmado')}</Badge>}
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <Empty title={isDatabaseEvent ? 'Nenhuma proposta recebida' : 'Nenhum parceiro vinculado'}>
+            <Empty title={isDatabaseEvent ? t('Nenhuma proposta recebida') : t('Nenhum parceiro vinculado')}>
               {isDatabaseEvent
-                ? 'Fornecedores poderão enviar propostas quando o evento estiver publicado.'
-                : 'Você pode adicionar fornecedores antes de publicar o evento.'}
+                ? t('Fornecedores poderão enviar propostas quando o evento estiver publicado.')
+                : t('Você pode adicionar fornecedores antes de publicar o evento.')}
             </Empty>
           )}
         </section>
@@ -778,35 +779,35 @@ export function Consolidation() {
         <section className="panel consolidation-readiness">
           <div className="consolidation-section-heading">
             <div>
-              <h2>Resumo para publicação</h2>
-              <p>Uma última conferência antes de disponibilizar o evento.</p>
+              <h2>{t('Resumo para publicação')}</h2>
+              <p>{t('Uma última conferência antes de disponibilizar o evento.')}</p>
             </div>
             <Badge tone={isPublished ? 'green' : isCancelled ? 'red' : pendingCount ? 'amber' : 'blue'}>
-              {isCancelled ? 'Cancelado' : isPublished ? 'Publicado' : pendingCount ? 'Pendente' : 'Pronto para publicar'}
+              {isCancelled ? t('Cancelado') : isPublished ? t('Publicado') : pendingCount ? t('Pendente') : t('Pronto para publicar')}
             </Badge>
           </div>
-          <div className="consolidation-progress-label"><span>Etapa de consolidação</span><strong>{progress}%</strong></div>
-          <progress value={progress} max="100" aria-label="Progresso da consolidação" />
+          <div className="consolidation-progress-label"><span>{t('Etapa de consolidação')}</span><strong>{progress}%</strong></div>
+          <progress value={progress} max="100" aria-label={t('Progresso da consolidação')} />
           <div className="consolidation-budget">
-            <div><span>Receita bruta estimada (lotação completa)</span><strong>{estimatedRevenue === null ? 'Defina a capacidade' : money(estimatedRevenue)}</strong></div>
-            <div><span>Custos dos fornecedores</span><strong>{money(total)}</strong></div>
-            <div><span>Preço mínimo por ingresso para cobrir fornecedores</span><strong>{minimumTicketPrice === null ? 'Defina a capacidade' : money(minimumTicketPrice)}</strong></div>
-            <div className="consolidation-budget-total"><span>Saldo bruto estimado</span><strong>{estimatedResult === null ? 'Defina a capacidade' : money(estimatedResult)}</strong></div>
+            <div><span>{t('Receita bruta estimada (lotação completa)')}</span><strong>{estimatedRevenue === null ? t('Defina a capacidade') : money(estimatedRevenue)}</strong></div>
+            <div><span>{t('Custos dos fornecedores')}</span><strong>{money(total)}</strong></div>
+            <div><span>{t('Preço mínimo por ingresso para cobrir fornecedores')}</span><strong>{minimumTicketPrice === null ? t('Defina a capacidade') : money(minimumTicketPrice)}</strong></div>
+            <div className="consolidation-budget-total"><span>{t('Saldo bruto estimado')}</span><strong>{estimatedResult === null ? t('Defina a capacidade') : money(estimatedResult)}</strong></div>
           </div>
-          <p className="muted">Estimativa considera lotação completa e somente propostas aprovadas; não inclui impostos, taxas ou demais despesas.</p>
+          <p className="muted">{t('Estimativa considera lotação completa e somente propostas aprovadas; não inclui impostos, taxas ou demais despesas.')}</p>
           <p className="consolidation-guidance">
             {isCancelled
-              ? `Evento cancelado${event.cancelReason ? `. Motivo: ${event.cancelReason}` : ''}.`
+              ? (event.cancelReason ? t('Evento cancelado. Motivo: {motivo}.', { motivo: event.cancelReason }) : t('Evento cancelado.'))
               : pendingCount
-              ? `${pendingCount} proposta${pendingCount === 1 ? '' : 's'} aguardam análise.`
+              ? pendingCount === 1 ? t('1 proposta aguarda análise.') : t('{pendingCount} propostas aguardam análise.', { pendingCount })
               : isPublished
                 ? isDatabaseEvent
-                  ? 'Este evento já está publicado no catálogo.'
-                  : 'Este evento já está publicado no catálogo da demonstração.'
-                : 'Os dados e parceiros estão prontos para a publicação do evento.'}
+                  ? t('Este evento já está publicado no catálogo.')
+                  : t('Este evento já está publicado no catálogo da demonstração.')
+                : t('Os dados e parceiros estão prontos para a publicação do evento.')}
           </p>
           <div className="consolidation-actions">
-            <button className="button danger-outline" onClick={() => setModal(true)} disabled={isCancelled}>Cancelar evento</button>
+            <button className="button danger-outline" onClick={() => setModal(true)} disabled={isCancelled}>{t('Cancelar evento')}</button>
             <button
               className="button blue-button"
               disabled={pendingCount > 0 || isPublished || isCancelled}
@@ -815,7 +816,7 @@ export function Consolidation() {
                   notify('Evento publicado no catálogo.');
                 }
               }}
-            >{isPublished ? 'Evento publicado' : 'Consolidar e publicar'}</button>
+            >{isPublished ? t('Evento publicado') : t('Consolidar e publicar')}</button>
           </div>
         </section>
       </div>
@@ -823,13 +824,13 @@ export function Consolidation() {
       {allEvents.length > 1 && (
         <section className="consolidation-switcher">
           <div className="consolidation-section-heading">
-            <div><h2>Outros eventos</h2><p>Troque de evento sem voltar ao painel.</p></div>
-            <Link className="text-link" to="/organizador/eventos">Ver todos</Link>
+            <div><h2>{t('Outros eventos')}</h2><p>{t('Troque de evento sem voltar ao painel.')}</p></div>
+            <Link className="text-link" to="/organizador/eventos">{t('Ver todos')}</Link>
           </div>
           <div className="consolidation-event-list">
             {allEvents.filter((item) => item.id !== id).map((item) => (
               <Link className="consolidation-event-option" key={item.id} to={`/organizador/eventos/${item.id}/consolidar`}>
-                <span><strong>{item.title}</strong><small>{dateLabel(item.date)} · {item.location || 'Local a definir'}</small></span>
+                <span><strong>{item.title}</strong><small>{dateLabel(item.date)} · {item.location || t('Local a definir')}</small></span>
                 <strong>{money(item.price || 0)}</strong>
                 <span aria-hidden="true">→</span>
               </Link>
@@ -857,16 +858,16 @@ export function Consolidation() {
         />
       )}
       {modal && !isDatabaseEvent && (
-        <Modal title="Cancelar este evento?" onClose={() => setModal(false)}>
-          <p>O evento ficará marcado como cancelado. Você ainda poderá consultar os dados posteriormente.</p>
+        <Modal title={t('Cancelar este evento?')} onClose={() => setModal(false)}>
+          <p>{t('O evento ficará marcado como cancelado. Você ainda poderá consultar os dados posteriormente.')}</p>
           <div className="actions">
-            <button className="button outline" onClick={() => setModal(false)}>Voltar</button>
+            <button className="button outline" onClick={() => setModal(false)}>{t('Voltar')}</button>
             <button className="button danger" onClick={async () => {
               if (await change({ status: 'Cancelado' })) {
                 setModal(false);
                 notify('Evento cancelado.');
               }
-            }}>Confirmar cancelamento</button>
+            }}>{t('Confirmar cancelamento')}</button>
           </div>
         </Modal>
       )}
@@ -946,7 +947,7 @@ export function Suppliers() {
   );
   const categories = [...new Set(rows.map((supplier) => supplier.category).filter(Boolean))];
   const filtered = rows.filter((supplier) => {
-    const text = `${supplier.name} ${supplier.category}`.toLowerCase();
+    const text = `${supplier.name} ${t(supplier.category)}`.toLowerCase();
     const matchesQuery = text.includes(query.trim().toLowerCase());
     const matchesCategory = category === 'Todas as categorias' || supplier.category === category;
     const supplierStatus = linkedIds.has(String(supplier.id)) ? 'Vinculado' : 'Disponível';
@@ -997,19 +998,19 @@ export function Suppliers() {
   return (
     <div className="workspace supplier-directory">
       <PageTitle
-        title="Fornecedores"
+        title={t('Fornecedores')}
         subtitle={databaseOrganizer
-          ? 'Selecione um evento e vincule fornecedores cadastrados à sua organização.'
-          : 'Encontre parceiros para os seus eventos e consulte os valores de referência.'}
+          ? t('Selecione um evento e vincule fornecedores cadastrados à sua organização.')
+          : t('Encontre parceiros para os seus eventos e consulte os valores de referência.')}
       >
-        {!event && <Link className="button blue-button" to="/organizador/novo">Criar evento</Link>}
+        {!event && <Link className="button blue-button" to="/organizador/novo">{t('Criar evento')}</Link>}
       </PageTitle>
 
       {event && (
         <label className="supplier-event-select">
-          Vincular fornecedores ao evento
+          {t('Vincular fornecedores ao evento')}
           <select
-            aria-label="Evento para vincular fornecedores"
+            aria-label={t('Evento para vincular fornecedores')}
             value={eventId}
             onChange={(e) => setSearchParams({ evento: e.target.value })}
           >
@@ -1019,54 +1020,56 @@ export function Suppliers() {
           </select>
         </label>
       )}
-      {loading && <p role="status">Carregando fornecedores e eventos do banco…</p>}
-      {loadingLinks && <p role="status">Carregando vínculos do evento…</p>}
+      {loading && <p role="status">{t('Carregando fornecedores e eventos do banco…')}</p>}
+      {loadingLinks && <p role="status">{t('Carregando vínculos do evento…')}</p>}
       {loadError && (
         <div className="api-error" role="alert">
-          <span>Não foi possível concluir a operação: {loadError}</span>
+          <span>{t('Não foi possível concluir a operação:')} {t(loadError)}</span>
           <button type="button" className="button outline tiny" onClick={() => setRetry((value) => value + 1)}>
-            Tentar novamente
+            {t('Tentar novamente')}
           </button>
         </div>
       )}
       {!data.events.length && !loading && (
-        <Empty title="Crie um evento antes de vincular fornecedores">
-          <Link className="button blue-button" to="/organizador/novo">Criar evento</Link>
+        <Empty title={t('Crie um evento antes de vincular fornecedores')}>
+          <Link className="button blue-button" to="/organizador/novo">{t('Criar evento')}</Link>
         </Empty>
       )}
 
-      <section className="supplier-toolbar" aria-label="Filtros de fornecedores">
+      <section className="supplier-toolbar" aria-label={t('Filtros de fornecedores')}>
         <label className="supplier-search">
-          <span className="sr-only">Buscar fornecedores</span>
+          <span className="sr-only">{t('Buscar fornecedores')}</span>
           <span aria-hidden="true">⌕</span>
           <input
-            aria-label="Buscar por fornecedor ou categoria"
-            placeholder="Buscar fornecedor ou serviço..."
+            aria-label={t('Buscar por fornecedor ou categoria')}
+            placeholder={t('Buscar fornecedor ou serviço...')}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
           {query && (
-            <button type="button" className="supplier-clear-search" onClick={() => setQuery('')} aria-label="Limpar busca">
+            <button type="button" className="supplier-clear-search" onClick={() => setQuery('')} aria-label={t('Limpar busca')}>
               ×
             </button>
           )}
         </label>
         <label className="supplier-filter">
-          <span className="sr-only">Filtrar por categoria</span>
+          <span className="sr-only">{t('Filtrar por categoria')}</span>
           <select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option>Todas as categorias</option>
-            {categories.map((item) => <option key={item}>{item}</option>)}
+            <option value="Todas as categorias">{t('Todas as categorias')}</option>
+            {categories.map((item) => <option key={item} value={item}>{t(item)}</option>)}
           </select>
         </label>
         <label className="supplier-filter supplier-status-filter">
-          <span className="sr-only">Filtrar por status</span>
+          <span className="sr-only">{t('Filtrar por status')}</span>
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option>Todos os status</option>
+            <option value="Todos os status">{t('Todos os status')}</option>
             {(databaseOrganizer
               ? ['Disponível', 'Vinculado']
               : [...new Set([...suppliers.map((supplier) => supplier.status), 'Disponível', 'Vinculado'])]
             ).map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {t(item)}
+              </option>
             ))}
           </select>
         </label>
@@ -1076,29 +1079,29 @@ export function Suppliers() {
             className="supplier-reset"
             onClick={() => { setQuery(''); setCategory('Todas as categorias'); setStatus('Todos os status'); }}
           >
-            Limpar filtros
+            {t('Limpar filtros')}
           </button>
         )}
       </section>
 
       <div className="supplier-results-line">
-        <span><strong>{filtered.length}</strong> {filtered.length === 1 ? 'fornecedor encontrado' : 'fornecedores encontrados'}</span>
+        <span><strong>{filtered.length}</strong> {filtered.length === 1 ? t('fornecedor encontrado') : t('fornecedores encontrados')}</span>
         <span className="supplier-results-hint">{databaseOrganizer
-          ? event ? `Evento: ${event.title}` : 'Selecione ou crie um evento.'
-          : 'Valores de referência sujeitos a confirmação com o parceiro.'}</span>
+          ? event ? t('Evento: {title}', { title: event.title }) : t('Selecione ou crie um evento.')
+          : t('Valores de referência sujeitos a confirmação com o parceiro.')}</span>
       </div>
 
-      <section className="supplier-table-card" aria-label="Lista de fornecedores">
+      <section className="supplier-table-card" aria-label={t('Lista de fornecedores')}>
         {filtered.length && !loading ? (
           <div className="supplier-table-scroll">
             <table className="supplier-table">
               <thead>
                 <tr>
-                  <th scope="col">Fornecedor</th>
-                  <th scope="col">Categoria</th>
-                  <th scope="col">Valor de referência</th>
-                  <th scope="col">Status</th>
-                  <th scope="col"><span className="sr-only">Ações</span></th>
+                  <th scope="col">{t('Fornecedor')}</th>
+                  <th scope="col">{t('Categoria')}</th>
+                  <th scope="col">{t('Valor de referência')}</th>
+                  <th scope="col">{t('Status')}</th>
+                  <th scope="col"><span className="sr-only">{t('Ações')}</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -1110,33 +1113,33 @@ export function Suppliers() {
                         <span className="supplier-name-copy">
                           <strong>{supplier.name}</strong>
                           <small>{supplier.productCount !== undefined
-                            ? `${supplier.productCount} itens ativos no catálogo`
-                            : 'Parceiro para eventos'}</small>
+                            ? t('{productCount} itens ativos no catálogo', { productCount: supplier.productCount })
+                            : t('Parceiro para eventos')}</small>
                         </span>
                       </div>
                     </td>
-                    <td><span className="supplier-category">{supplier.category}</span></td>
+                    <td><span className="supplier-category">{t(supplier.category)}</span></td>
                     <td><strong className="supplier-price">
-                      {supplier.price === null || supplier.price === undefined ? 'Sem preço de referência' : money(supplier.price)}
+                      {supplier.price === null || supplier.price === undefined ? t('Sem preço de referência') : money(supplier.price)}
                     </strong></td>
                     <td>
                       <span className={`supplier-status ${linkedIds.has(String(supplier.id)) ? 'is-confirmed' : 'is-pending'}`}>
-                        <span aria-hidden="true" />{linkedIds.has(String(supplier.id)) ? 'Vinculado' : 'Disponível'}
+                        <span aria-hidden="true" />{linkedIds.has(String(supplier.id)) ? t('Vinculado') : t('Disponível')}
                       </span>
                     </td>
                     <td>
                       <div className="supplier-row-actions">
                         <button type="button" className="button outline supplier-details-button" onClick={() => setSelected(supplier)}>
-                          Detalhes
+                          {t('Detalhes')}
                         </button>
                         <button
                           type="button"
                           className={`button ${linkedIds.has(String(supplier.id)) ? 'outline' : 'blue-button'} supplier-link-button`}
                           disabled={!canLink || linkingId === supplier.id}
                           onClick={() => toggleLink(supplier)}
-                          title={event ? `${linkedIds.has(String(supplier.id)) ? 'Remover vínculo de' : 'Vincular'} ${supplier.name} ${linkedIds.has(String(supplier.id)) ? 'do' : 'ao'} evento ${event.title}` : 'Crie um evento para vincular fornecedores'}
+                          title={event ? (linkedIds.has(String(supplier.id)) ? t('Remover vínculo de {name} do evento {title}', { name: supplier.name, title: event.title }) : t('Vincular {name} ao evento {title}', { name: supplier.name, title: event.title })) : t('Crie um evento para vincular fornecedores')}
                         >
-                          {linkingId === supplier.id ? 'Salvando…' : linkedIds.has(String(supplier.id)) ? 'Remover' : 'Vincular'}
+                          {linkingId === supplier.id ? t('Salvando…') : linkedIds.has(String(supplier.id)) ? t('Remover') : t('Vincular')}
                         </button>
                       </div>
                     </td>
@@ -1148,12 +1151,12 @@ export function Suppliers() {
         ) : !loading && (
           <div className="supplier-empty">
             <span className="supplier-empty-icon" aria-hidden="true">⌕</span>
-            <strong>Nenhum fornecedor encontrado</strong>
+            <strong>{t('Nenhum fornecedor encontrado')}</strong>
             <p>{databaseOrganizer && !rows.length
-              ? 'Nenhum fornecedor possui cadastro ativo no banco.'
-              : 'Tente mudar a busca ou remover algum filtro.'}</p>
+              ? t('Nenhum fornecedor possui cadastro ativo no banco.')
+              : t('Tente mudar a busca ou remover algum filtro.')}</p>
             <button type="button" className="button outline" onClick={() => { setQuery(''); setCategory('Todas as categorias'); setStatus('Todos os status'); }}>
-              Limpar filtros
+              {t('Limpar filtros')}
             </button>
           </div>
         )}
@@ -1164,15 +1167,15 @@ export function Suppliers() {
           <div className="supplier-detail-modal">
             <span className="supplier-initials supplier-modal-initials" aria-hidden="true">{initials(selected.name)}</span>
             <div>
-              <p className="muted">{selected.category}</p>
+              <p className="muted">{t(selected.category)}</p>
               <p className="supplier-modal-price">
                 {selected.price === null || selected.price === undefined
-                  ? 'Sem preço de referência'
+                  ? t('Sem preço de referência')
                   : money(selected.price)}{' '}
-                <span>valor de referência</span>
+                <span>{t('valor de referência')}</span>
               </p>
-              <section aria-label="Itens ativos do fornecedor">
-                <h3>Itens do catálogo</h3>
+              <section aria-label={t('Itens ativos do fornecedor')}>
+                <h3>{t('Itens do catálogo')}</h3>
                 {selected.products?.length ? (
                   <ul className="supplier-product-list">
                     {selected.products.map((product) => (
@@ -1180,7 +1183,7 @@ export function Suppliers() {
                         <span>
                           <strong>{product.name}</strong>
                           <small>
-                            {product.category} · {product.unit}
+                            {t(product.category)} · {t(product.unit)}
                           </small>
                           {product.description && <small>{product.description}</small>}
                         </span>
@@ -1189,19 +1192,19 @@ export function Suppliers() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="muted">Este fornecedor ainda não cadastrou itens ativos.</p>
+                  <p className="muted">{t('Este fornecedor ainda não cadastrou itens ativos.')}</p>
                 )}
               </section>
-              <p className="muted">Confirme disponibilidade, escopo do serviço e orçamento diretamente com o parceiro antes de fechar a contratação.</p>
+              <p className="muted">{t('Confirme disponibilidade, escopo do serviço e orçamento diretamente com o parceiro antes de fechar a contratação.')}</p>
               <div className="supplier-modal-actions">
-                <button type="button" className="button outline" onClick={() => setSelected(null)}>Fechar</button>
+                <button type="button" className="button outline" onClick={() => setSelected(null)}>{t('Fechar')}</button>
                 <button
                   type="button"
                   className={`button ${linkedIds.has(String(selected.id)) ? 'outline' : 'blue-button'}`}
                   disabled={!canLink || linkingId === selected.id}
                   onClick={() => toggleLink(selected)}
                 >
-                  {linkedIds.has(String(selected.id)) ? 'Remover do evento' : 'Vincular ao evento'}
+                  {linkedIds.has(String(selected.id)) ? t('Remover do evento') : t('Vincular ao evento')}
                 </button>
               </div>
             </div>

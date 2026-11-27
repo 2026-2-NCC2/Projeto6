@@ -5,6 +5,8 @@ import { inicioDoPerfil, nomeDoPerfil, normalizarPerfil } from '../data/perfis';
 import { initialsOf } from '../utils/format';
 import { encerrarSessao } from '../services/api';
 import DemoSwitcher from './DemoSwitcher';
+import SeletorIdioma from './SeletorIdioma';
+import { t } from '../i18n';
 
 // Menus de cada perfil. A página inicial de cada um fica no logotipo (inicioDoPerfil),
 // por isso não há item "Início".
@@ -50,9 +52,10 @@ export const menuAdminConta = [
 const FOLGA_MENU = 12;
 
 // Recolhe o menu no botão ☰ quando os itens não cabem numa linha entre o logotipo e as
-// ferramentas (em qualquer largura acima de 850 px, para qualquer perfil e texto). Mede o
-// texto dos links: no modo recolhido o menu fica invisível, mas continua medível (CSS
-// .is-compact em layout.css), então a decisão vale também ao aumentar a janela.
+// ferramentas (em qualquer largura acima de 850 px, para qualquer perfil, texto e idioma).
+// Mede a caixa dos links, com o preenchimento da "pílula" do link ativo: no modo recolhido o
+// menu fica invisível, mas continua medível (CSS .is-compact em layout.css), então a decisão
+// vale também ao aumentar a janela.
 function useMenuCompacto(headerRef, navRef, ativo) {
   const [compacto, setCompacto] = useState(false);
   useLayoutEffect(() => {
@@ -62,18 +65,14 @@ function useMenuCompacto(headerRef, navRef, ativo) {
       setCompacto(false);
       return undefined;
     }
-    const texto = (elemento) => {
-      const faixa = document.createRange();
-      faixa.selectNodeContents(elemento);
-      return faixa.getBoundingClientRect();
-    };
     function medir() {
       if (nav.classList.contains('is-open')) return; // aberto (em coluna): mantém a decisão
       const links = [...nav.querySelectorAll('a')].filter((link) => link.offsetWidth > 0);
       const marca = header.querySelector('.brand');
       const ferramentas = header.querySelector('.header-tools');
       if (!links.length || !marca || !ferramentas) return;
-      const largura = texto(links[links.length - 1]).right - texto(links[0]).left;
+      const largura =
+        links[links.length - 1].getBoundingClientRect().right - links[0].getBoundingClientRect().left;
       const espaco = ferramentas.getBoundingClientRect().left - marca.getBoundingClientRect().right;
       setCompacto(largura + 2 * FOLGA_MENU > espaco);
     }
@@ -151,7 +150,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
   // Caminho da página de perfil (para fornecedor é /fornecedor/perfil; para participante e outros é /perfil)
   const profileUrl = activeRole === 'fornecedor' ? '/fornecedor/perfil' : '/perfil';
-  const roleLabel = nomeDoPerfil(activeRole);
+  const roleLabel = t(nomeDoPerfil(activeRole));
 
   const userName = supplier
     ? supplierName.toUpperCase()
@@ -162,7 +161,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
   ) : supplier ? (
     initialsOf(supplierName)
   ) : data?.profile?.photo ? (
-    <img src={data.profile.photo} alt={data?.profile?.name || 'Foto de perfil'} />
+    <img src={data.profile.photo} alt={data?.profile?.name || t('Foto de perfil')} />
   ) : (
     initialsOf(data?.profile?.name || 'CM')
   );
@@ -172,7 +171,8 @@ export default function Navbar({ darkMode, toggleTheme }) {
   const compacto = useMenuCompacto(
     headerRef,
     navRef,
-    isPublicView ? '' : itensMenu.map(([label]) => label).join('|'),
+    // Os rótulos traduzidos entram na assinatura: trocar o idioma mede o menu de novo.
+    isPublicView ? '' : itensMenu.map(([label]) => t(label)).join('|'),
   );
 
   return (
@@ -185,35 +185,36 @@ export default function Navbar({ darkMode, toggleTheme }) {
       <Link
         className="brand"
         to={isPublicView ? '/' : inicioDoPerfil(activeRole)}
-        aria-label="TrocaTicket Eventos & Ingressos, página inicial"
+        aria-label={t('TrocaTicket Eventos & Ingressos, página inicial')}
       >
         <img src="/images/logo.png" alt="" />
         <span>
-          TrocaTicket <small>EVENTOS & INGRESSOS</small>
+          {t('TrocaTicket')} <small>{t('EVENTOS & INGRESSOS')}</small>
         </span>
       </Link>
 
       {isPublicView ? (
         /* Navegação para visitantes sem perfil na sessão */
-        <nav className="public-navigation" aria-label="Navegação principal">
+        <nav className="public-navigation" aria-label={t('Navegação principal')}>
           <Link to="/perfis" className="demo-link">
-            <span className="nav-long">Explorar </span>demo
+            <span className="nav-long">{t('Explorar')} </span>{t('demo')}
           </Link>
           <Link className="login-link" to="/entrar">
-            Entrar
+            {t('Entrar')}
           </Link>
+          <SeletorIdioma />
           <button
             type="button"
             className="theme-toggle"
-            aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
-            title={darkMode ? 'Modo claro' : 'Modo escuro'}
+            aria-label={darkMode ? t('Ativar modo claro') : t('Ativar modo escuro')}
+            title={darkMode ? t('Modo claro') : t('Modo escuro')}
             aria-pressed={darkMode}
             onClick={toggleTheme}
           >
             <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
           </button>
           <Link className="header-cta" to="/cadastro">
-            Criar conta ↗
+            {t('Criar conta ↗')}
           </Link>
         </nav>
       ) : (
@@ -221,7 +222,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
         <>
           <button
             className="menu-toggle"
-            aria-label="Abrir menu"
+            aria-label={t('Abrir menu')}
             aria-expanded={menu}
             onClick={() => setMenu(!menu)}
           >
@@ -231,16 +232,16 @@ export default function Navbar({ darkMode, toggleTheme }) {
           <nav
             ref={navRef}
             className={`app-navigation ${menu ? 'is-open' : ''}`}
-            aria-label="Navegação principal"
+            aria-label={t('Navegação principal')}
           >
             {itensMenu.map(([label, to]) => (
               <NavLink end key={to} to={to}>
-                {label}
+                {t(label)}
               </NavLink>
             ))}
             {/* No celular o cartão do perfil some do header; o acesso fica no menu. */}
             <NavLink end className="nav-mobile-only" to={profileUrl}>
-              Meu perfil
+              {t('Meu perfil')}
             </NavLink>
           </nav>
 
@@ -249,18 +250,19 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
             <button
               className="notification-button"
-              aria-label="Notificações"
+              aria-label={t('Notificações')}
               aria-expanded={notifications}
               onClick={() => setNotifications(!notifications)}
             >
               ♧<i />
             </button>
 
+            <SeletorIdioma />
             <button
               type="button"
               className="theme-toggle"
-              aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
-              title={darkMode ? 'Modo claro' : 'Modo escuro'}
+              aria-label={darkMode ? t('Ativar modo claro') : t('Ativar modo escuro')}
+              title={darkMode ? t('Modo claro') : t('Modo escuro')}
               aria-pressed={darkMode}
               onClick={toggleTheme}
             >
@@ -271,7 +273,7 @@ export default function Navbar({ darkMode, toggleTheme }) {
             <Link
               className="user-chip"
               to={profileUrl}
-              title={`Abrir perfil de ${roleLabel}`}
+              title={t('Abrir perfil de {roleLabel}', { roleLabel: roleLabel })}
             >
               <span className="avatar small">{userAvatar}</span>
               <span>
@@ -284,12 +286,12 @@ export default function Navbar({ darkMode, toggleTheme }) {
             <button
               type="button"
               className="logout-button"
-              aria-label="Sair da conta"
-              title="Sair da conta"
+              aria-label={t('Sair da conta')}
+              title={t('Sair da conta')}
               onClick={handleLogout}
             >
               <span aria-hidden="true">↳</span>
-              <span className="logout-text">Sair</span>
+              <span className="logout-text">{t('Sair')}</span>
             </button>
           </div>
         </>
@@ -297,17 +299,17 @@ export default function Navbar({ darkMode, toggleTheme }) {
 
       {notifications && !isPublicView && (
         <div className="notification-popover">
-          <strong>Central de notificações</strong>
+          <strong>{t('Central de notificações')}</strong>
           <p>
             {isAuthenticated
-              ? 'Você não tem notificações novas.'
-              : 'Seu ambiente de demonstração está pronto.'}
+              ? t('Você não tem notificações novas.')
+              : t('Seu ambiente de demonstração está pronto.')}
           </p>
           <Link
             to={inicioDoPerfil(activeRole)}
             onClick={() => setNotifications(false)}
           >
-            Ir para meu painel →
+            {t('Ir para meu painel →')}
           </Link>
         </div>
       )}

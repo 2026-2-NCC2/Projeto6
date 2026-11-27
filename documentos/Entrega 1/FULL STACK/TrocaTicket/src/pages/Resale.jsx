@@ -4,6 +4,7 @@ import { Badge, Empty, PageTitle, Panel, money } from '../components/UI';
 import { useStore } from '../context/Store';
 import { criarChave, request } from '../services/orders';
 import { getParticipantTickets } from '../services/tickets';
+import { localeAtual, t } from '../i18n';
 
 const situacoes = {
   active: 'Disponível', reserved: 'Reservado', sold: 'Vendido', cancelled: 'Cancelado',
@@ -62,9 +63,9 @@ function useRepasses(carregar) {
 
 function Estado({ estado }) {
   if (estado.erro) return <div role="alert" className="api-error">{estado.erro}
-    <button className="button outline tiny" onClick={estado.atualizar}>Atualizar</button>
+    <button className="button outline tiny" onClick={estado.atualizar}>{t('Atualizar')}</button>
   </div>;
-  if (!estado.dados) return <p role="status">Carregando repasses…</p>;
+  if (!estado.dados) return <p role="status">{t('Carregando repasses…')}</p>;
   return null;
 }
 
@@ -74,13 +75,13 @@ function ItemFila({ item, estado }) {
       <span className="resale-item-text">
         <strong>{item.eventTitle}</strong>
         <small>
-          {item.type} · {situacoes[item.status] || item.status}
-          {item.status === 'queued' && item.position != null && ` · Posição ${item.position}`}
+          {t(item.type)} · {situacoes[item.status] || item.status}
+          {item.status === 'queued' && item.position != null && t(' · Posição {position}', { position: item.position })}
         </small>
       </span>
       {item.status === 'queued' && <button className="button outline tiny" disabled={estado.ocupado}
-        onClick={() => estado.gravar(`/fila/${item.id}`, {}, 'DELETE')}>Sair da fila</button>}
-      {item.status === 'reserved' && <Link className="button primary tiny" to="/pedidos">Abrir reserva</Link>}
+        onClick={() => estado.gravar(`/fila/${item.id}`, {}, 'DELETE')}>{t('Sair da fila')}</button>}
+      {item.status === 'reserved' && <Link className="button primary tiny" to="/pedidos">{t('Abrir reserva')}</Link>}
     </li>
   );
 }
@@ -99,33 +100,33 @@ export function EventResale({ eventId, userId }) {
   const visiveis = dados?.anuncios.filter((item) => item.type === tipo && item.status === 'active') || [];
   const meia = tipo === 'Meia-entrada';
   return (
-    <Panel title="Revenda e fila de espera">
+    <Panel title={t('Revenda e fila de espera')}>
       <Estado estado={estado} />
       {dados && <>
-        <label htmlFor="tipo-repasse">Tipo de ingresso para repasse</label>
+        <label htmlFor="tipo-repasse">{t('Tipo de ingresso para repasse')}</label>
         <select id="tipo-repasse" value={tipo} onChange={(e) => { setTipo(e.target.value); setDeclarou(false); }}>
-          <option>Inteira</option><option>Meia-entrada</option>
+          <option value="Inteira">{t('Inteira')}</option><option value="Meia-entrada">{t('Meia-entrada')}</option>
         </select>
         {meia && <label className="checkbox"><input type="checkbox" checked={declarou}
-          onChange={(e) => setDeclarou(e.target.checked)} />Declaro ter direito à meia-entrada neste repasse.</label>}
-        {visiveis.length ? <ul className="resale-list" aria-label="Anúncios de revenda">{visiveis.map((item) =>
+          onChange={(e) => setDeclarou(e.target.checked)} />{t('Declaro ter direito à meia-entrada neste repasse.')}</label>}
+        {visiveis.length ? <ul className="resale-list" aria-label={t('Anúncios de revenda')}>{visiveis.map((item) =>
           <li key={item.id} className="resale-item">
             <span className="resale-item-text"><strong>{money(item.priceCents / 100)}</strong>
-              <small>{item.type} · revenda</small></span>
+              <small>{t(item.type)} {t('· revenda')}</small></span>
             <button className="button primary tiny" disabled={ocupado || item.sellerId === userId || (meia && !declarou)}
               onClick={async () => {
                 if (await gravar(`/anuncios/${item.id}/reservar`, { halfDeclaration: meia && declarou })) navigate('/pedidos');
-              }}>{item.sellerId === userId ? 'Seu anúncio' : 'Reservar repasse'}</button>
+              }}>{item.sellerId === userId ? t('Seu anúncio') : t('Reservar repasse')}</button>
             {item.sellerId !== userId && <Link className="text-link" to={`/atendimento?anuncio=${item.id}`}
-              aria-label={`Denunciar o anúncio nº ${item.id}`}>Denunciar</Link>}
-          </li>)}</ul> : <p>Nenhum anúncio disponível para este tipo de ingresso.</p>}
-        {inscritos.length ? <ul className="resale-list" aria-label="Sua fila de espera">{inscritos.map((item) =>
+              aria-label={t('Denunciar o anúncio nº {id}', { id: item.id })}>{t('Denunciar')}</Link>}
+          </li>)}</ul> : <p>{t('Nenhum anúncio disponível para este tipo de ingresso.')}</p>}
+        {inscritos.length ? <ul className="resale-list" aria-label={t('Sua fila de espera')}>{inscritos.map((item) =>
           <ItemFila key={item.id} estado={estado} item={item} />)}</ul> :
           <button className="button outline" disabled={ocupado || (meia && !declarou)}
             onClick={() => gravar('/fila', { eventId, type: tipo, halfDeclaration: meia && declarou })}>
-            Entrar na fila de repasse
+            {t('Entrar na fila de repasse')}
           </button>}
-        <p className="muted">Quando chegar sua vez, a reserva aparece em Meus pedidos para pagamento simulado.</p>
+        <p className="muted">{t('Quando chegar sua vez, a reserva aparece em Meus pedidos para pagamento simulado.')}</p>
       </>}
     </Panel>
   );
@@ -146,35 +147,35 @@ function Oferta({ ingressos, estado }) {
       : await estado.gravar('/anuncios', { ticketId: ingresso.id, priceCents: Math.round(Number(preco) * 100) });
     if (ok) { setId(''); setEmail(''); setPreco(''); }
   }
-  return <Panel title="Repassar um ingresso">
-    {!ingressos.length ? <p>Nenhum ingresso disponível para revenda ou transferência.</p> :
+  return <Panel title={t('Repassar um ingresso')}>
+    {!ingressos.length ? <p>{t('Nenhum ingresso disponível para revenda ou transferência.')}</p> :
       <form className="form-grid" onSubmit={enviar}>
-        <label>Ingresso
+        <label>{t('Ingresso')}
           <select value={id} required onChange={(e) => {
             setId(e.target.value); setPreco(''); setEmail('');
-            setModo(Number(ingressos.find((t) => String(t.id) === e.target.value)?.price) > 0 ? 'revenda' : 'gratuito');
+            setModo(Number(ingressos.find((tk) => String(tk.id) === e.target.value)?.price) > 0 ? 'revenda' : 'gratuito');
           }}>
-            <option value="">Selecione um ingresso</option>
-            {ingressos.map((t) => <option key={t.id} value={t.id}>{t.eventTitle} · {t.type} · {t.code}</option>)}
+            <option value="">{t('Selecione um ingresso')}</option>
+            {ingressos.map((tk) => <option key={tk.id} value={tk.id}>{tk.eventTitle} · {tk.type} · {tk.code}</option>)}
           </select>
         </label>
         {ingresso && <>
-          <label>Forma de repasse
+          <label>{t('Forma de repasse')}
             <select value={modo} onChange={(e) => setModo(e.target.value)}>
-              {Number(ingresso.price) > 0 && <option value="revenda">Revenda</option>}
-              <option value="gratuito">Transferência gratuita</option>
+              {Number(ingresso.price) > 0 && <option value="revenda">{t('Revenda')}</option>}
+              <option value="gratuito">{t('Transferência gratuita')}</option>
             </select>
           </label>
           {gratuito ? <>
-            <label>E-mail de quem vai receber<input type="email" required value={email}
+            <label>{t('E-mail de quem vai receber')}<input type="email" required value={email}
               onChange={(e) => setEmail(e.target.value)} /></label>
-            <p>A pessoa deve entrar na própria conta e aceitar o convite.</p>
-          </> : <label>Preço de revenda (até {money(ingresso.price)})
+            <p>{t('A pessoa deve entrar na própria conta e aceitar o convite.')}</p>
+          </> : <label>{t('Preço de revenda (até')} {money(ingresso.price)})
             <input type="number" min="0.01" step="0.01" max={ingresso.price} required value={preco}
               onChange={(e) => setPreco(e.target.value)} />
           </label>}
           <button type="submit" disabled={estado.ocupado} className="button primary">
-            {gratuito ? 'Enviar convite de transferência' : 'Publicar anúncio'}
+            {gratuito ? t('Enviar convite de transferência') : t('Publicar anúncio')}
           </button>
         </>}
       </form>}
@@ -194,48 +195,48 @@ function Carteira({ usuarioId }) {
     ...(dados?.anuncios || []).filter((a) => ['active', 'reserved'].includes(a.status)).map((a) => a.ticketId),
     ...(dados?.convites || []).filter((c) => c.status === 'pending').map((c) => c.ticketId),
   ]);
-  const disponiveis = dados?.ingressos.filter((t) => t.statusCode === 'A' && !t.availableForExchange && !bloqueados.has(t.id)) || [];
+  const disponiveis = dados?.ingressos.filter((tk) => tk.statusCode === 'A' && !tk.availableForExchange && !bloqueados.has(tk.id)) || [];
   return <div className="workspace">
-    <PageTitle title="Repasses e transferências">
-      <Link className="button outline" to="/ingressos">Meus ingressos</Link>
-      <Link className="button outline" to="/pedidos">Meus pedidos</Link>
+    <PageTitle title={t('Repasses e transferências')}>
+      <Link className="button outline" to="/ingressos">{t('Meus ingressos')}</Link>
+      <Link className="button outline" to="/pedidos">{t('Meus pedidos')}</Link>
     </PageTitle>
     <Estado estado={estado} />
     {dados && <>
       <Oferta ingressos={disponiveis} estado={estado} />
-      <Panel title="Meus anúncios">{dados.anuncios.length ? <ul className="resale-list">{dados.anuncios.map((a) =>
+      <Panel title={t('Meus anúncios')}>{dados.anuncios.length ? <ul className="resale-list">{dados.anuncios.map((a) =>
         <li key={a.id} className="resale-item">
           <span className="resale-item-text"><strong>{a.eventTitle}</strong>
             <small>{a.type} · {money(a.priceCents / 100)}</small></span>
           <Badge>{situacoes[a.status] || a.status}</Badge>
           {a.status === 'active' && <button className="button outline" disabled={ocupado}
-            onClick={() => gravar(`/anuncios/${a.id}`, {}, 'DELETE')}>Retirar anúncio</button>}
-        </li>)}</ul> : <p>Nenhum anúncio em aberto.</p>}</Panel>
-      <Panel title="Minhas filas de espera">{dados.fila.length ? <ul className="resale-list">{dados.fila.map((item) =>
-        <ItemFila key={item.id} estado={estado} item={item} />)}</ul> : <p>Você ainda não entrou em uma fila.</p>}</Panel>
-      <Panel title="Convites de transferência">
+            onClick={() => gravar(`/anuncios/${a.id}`, {}, 'DELETE')}>{t('Retirar anúncio')}</button>}
+        </li>)}</ul> : <p>{t('Nenhum anúncio em aberto.')}</p>}</Panel>
+      <Panel title={t('Minhas filas de espera')}>{dados.fila.length ? <ul className="resale-list">{dados.fila.map((item) =>
+        <ItemFila key={item.id} estado={estado} item={item} />)}</ul> : <p>{t('Você ainda não entrou em uma fila.')}</p>}</Panel>
+      <Panel title={t('Convites de transferência')}>
         {dados.convites.length ? <ul className="resale-list">{dados.convites.map((c) => {
           const recebido = c.toUserId === usuarioId;
           return <li key={c.id} className="resale-item">
             <span className="resale-item-text">
               <strong>{c.eventTitle}</strong>
-              <small>{recebido ? `Convite recebido de ${c.fromName}` : `Convite enviado para ${c.toName}`} · {c.type}</small>
-              {c.status === 'pending' && <small>Vence em {new Date(c.expiresAt).toLocaleString('pt-BR')}</small>}
+              <small>{recebido ? t('Convite recebido de {fromName}', { fromName: c.fromName }) : t('Convite enviado para {toName}', { toName: c.toName })} · {c.type}</small>
+              {c.status === 'pending' && <small>{t('Vence em')} {new Date(c.expiresAt).toLocaleString(localeAtual())}</small>}
               {c.status === 'pending' && recebido &&
-                <small>Ao aceitar gratuitamente, seu teto para revenda passa a zero.</small>}
+                <small>{t('Ao aceitar gratuitamente, seu teto para revenda passa a zero.')}</small>}
             </span>
             <Badge>{situacoes[c.status] || c.status}</Badge>
             {c.status === 'pending' && <span className="resale-item-actions">
               {recebido ? <>
                 <button className="button primary" disabled={ocupado}
-                  onClick={() => gravar(`/transferencias/${c.id}/aceitar`)}>Aceitar transferência gratuita</button>
+                  onClick={() => gravar(`/transferencias/${c.id}/aceitar`)}>{t('Aceitar transferência gratuita')}</button>
                 <button className="button outline" disabled={ocupado}
-                  onClick={() => gravar(`/transferencias/${c.id}/recusar`)}>Recusar convite</button>
+                  onClick={() => gravar(`/transferencias/${c.id}/recusar`)}>{t('Recusar convite')}</button>
               </> : <button className="button outline" disabled={ocupado}
-                onClick={() => gravar(`/transferencias/${c.id}/cancelar`)}>Cancelar convite</button>}
+                onClick={() => gravar(`/transferencias/${c.id}/cancelar`)}>{t('Cancelar convite')}</button>}
             </span>}
           </li>;
-        })}</ul> : <p>Nenhum convite nesta conta.</p>}
+        })}</ul> : <p>{t('Nenhum convite nesta conta.')}</p>}
       </Panel>
     </>}
   </div>;
@@ -244,7 +245,12 @@ function Carteira({ usuarioId }) {
 export default function Resale() {
   const { data, role, isAuthenticated } = useStore();
   if (!isAuthenticated || role !== 'comprador') {
-    return <div className="workspace"><Empty title="Entre com uma conta de usuário para gerenciar repasses." /></div>;
+    return (
+      <div className="workspace">
+        <PageTitle title={t('Repasses e transferências')} />
+        <Empty heading="h2" title={t('Entre com uma conta de usuário para gerenciar repasses.')} />
+      </div>
+    );
   }
   return <Carteira usuarioId={Number(data.profile.id)} />;
 }

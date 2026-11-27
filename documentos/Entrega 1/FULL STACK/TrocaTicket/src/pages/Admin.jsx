@@ -6,6 +6,7 @@ import { Badge, DownloadButton, Empty, PageTitle, Panel, dateLabel, money } from
 import Pagination from '../components/Pagination';
 import { Icon } from '../components/Icons';
 import EventCard from '../components/EventCard';
+import { formatarNumero, localeAtual, t, tn } from '../i18n';
 
 // Tabela de lotes (dados de demonstração).
 const lots = [
@@ -22,7 +23,7 @@ const SORTS = {
   Nome: (a, b) => a.title.localeCompare(b.title),
   Vendas: (a, b) => b.report.sold - a.report.sold,
 };
-const fmt = (n) => n.toLocaleString('pt-BR');
+const fmt = (n) => n.toLocaleString(localeAtual());
 const asEvent = (event) => ({ ...event, report: eventReports[event.id] });
 
 export default function Admin() {
@@ -33,7 +34,7 @@ export default function Admin() {
   const [minOccupancy, setMinOccupancy] = useState(0);
   const [page, setPage] = useState(1);
   const [updatedAt] = useState(() =>
-    new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    new Date().toLocaleTimeString(localeAtual(), { hour: '2-digit', minute: '2-digit' }),
   );
 
   const all = opportunities.map(asEvent);
@@ -58,20 +59,20 @@ export default function Admin() {
   return (
     <div className="workspace admin-home">
       <PageTitle
-        title="Painel Geral"
-        subtitle="Visão consolidada dos eventos e relatórios de demonstração."
+        title={t('Painel Geral')}
+        subtitle={t('Visão consolidada dos eventos e relatórios de demonstração.')}
       >
         <Link className="button primary" to="/admin/moderacao">
-          Moderar cadastros <span aria-hidden="true">→</span>
+          {t('Moderar cadastros')} <span aria-hidden="true">→</span>
         </Link>
       </PageTitle>
-      <section className="ah-search" aria-label="Pesquisa de eventos">
+      <section className="ah-search" aria-label={t('Pesquisa de eventos')}>
         <div className="ah-search-row">
           <label className="search-box wide">
             <Icon name="search" size={18} />
             <input
-              aria-label="Buscar eventos"
-              placeholder="Buscar por evento, artista ou código..."
+              aria-label={t('Buscar eventos')}
+              placeholder={t('Buscar por evento, artista ou código...')}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -81,20 +82,22 @@ export default function Admin() {
           </label>
           <div className="ah-filters">
             <label>
-              Status:
+              {t('Status:')}
               <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value="Todos">Todos os Eventos ({all.length})</option>
+                <option value="Todos">
+                  {t('Todos os eventos')} ({all.length})
+                </option>
                 {Object.keys(STATUS_TONE).map((s) => (
-                  <option key={s}>{s}</option>
+                  <option value={s} key={s}>{t(s)}</option>
                 ))}
               </select>
             </label>
             <label>
-              Ordenar:
+              {t('Ordenar:')}
               <select value={sort} onChange={(e) => setSort(e.target.value)}>
                 {Object.keys(SORTS).map((s) => (
                   <option key={s} value={s}>
-                    {s === 'Data' ? 'Data do Evento' : s === 'Nome' ? 'Nome' : 'Mais vendidos'}
+                    {s === 'Data' ? t('Data do Evento') : s === 'Nome' ? t('Nome') : t('Mais vendidos')}
                   </option>
                 ))}
               </select>
@@ -105,21 +108,21 @@ export default function Admin() {
               aria-expanded={more}
               onClick={() => setMore(!more)}
             >
-              <Icon name="filter" size={16} /> Mais Filtros
+              <Icon name="filter" size={16} /> {t('Mais Filtros')}
             </button>
           </div>
         </div>
         {more && (
           <div className="ah-more">
             <label>
-              Ocupação mínima:
+              {t('Ocupação mínima:')}
               <select
                 value={minOccupancy}
                 onChange={(e) => setMinOccupancy(Number(e.target.value))}
               >
-                <option value={0}>Qualquer</option>
-                <option value={80}>A partir de 80%</option>
-                <option value={90}>A partir de 90%</option>
+                <option value={0}>{t('Qualquer')}</option>
+                <option value={80}>{t('A partir de 80%')}</option>
+                <option value={90}>{t('A partir de 90%')}</option>
               </select>
             </label>
             <button
@@ -131,33 +134,33 @@ export default function Admin() {
                 setQuery('');
               }}
             >
-              Limpar filtros
+              {t('Limpar filtros')}
             </button>
           </div>
         )}
         <div className="ah-summary">
           <span>
-            Eventos em destaque: <strong>{active} ativos</strong>
+            {t('Eventos em destaque:')} <strong>{active} {t('ativos')}</strong>
           </span>
           <i aria-hidden="true" />
           <span>
-            Relatórios em auditoria:{' '}
+            {t('Relatórios em auditoria:')}{' '}
             <strong className="amber">
-              {auditing} pendente{auditing === 1 ? '' : 's'}
+              {tn(auditing, '{n} pendente', '{n} pendentes')}
             </strong>
           </span>
-          <span className="ah-updated">Última atualização: Hoje às {updatedAt}</span>
+          <span className="ah-updated">{t('Última atualização: Hoje às')} {updatedAt}</span>
         </div>
       </section>
 
       <div className="ah-heading">
-        <h2>Grade de Eventos</h2>
+        <h2>{t('Grade de Eventos')}</h2>
         <span className="ah-count">
-          {events.length} {events.length === 1 ? 'Evento' : 'Eventos'}
+          {events.length} {events.length === 1 ? t('Evento') : t('Eventos')}
         </span>
       </div>
       <p className="ah-lead">
-        Selecione um evento para acessar relatórios gerenciais e auditorias.
+        {t('Selecione um evento para acessar relatórios gerenciais e auditorias.')}
       </p>
 
       <div className="ah-grid">
@@ -169,41 +172,41 @@ export default function Admin() {
               event={event}
               variant="admin"
               metrics={{
-                tag: `EVENTO ${ROMAN[i]}`,
+                tag: t('EVENTO {numero}', { numero: ROMAN[i] }),
                 status: r.status,
                 statusTone: STATUS_TONE[r.status],
                 city: r.city.split(',')[0],
                 rows: [
                   { label: 'Organizador', value: event.organizer },
                   { label: 'Ingressos vendidos', value: fmt(r.sold), tone: 'ah-pill' },
-                  { label: 'Ocupação', value: `${String(r.occupancy).replace('.', ',')}%`, tone: 'green' },
+                  { label: 'Ocupação', value: `${formatarNumero(r.occupancy)}%`, tone: 'green' },
                   { label: 'Faturamento bruto', value: money(r.revenue) },
                 ],
                 highlightText: (
                   <>
                     <Icon name="chart" size={18} />
                     <span>
-                      {fmt(r.exchanges)} trocas · {r.conversion} de conversão
+                      {fmt(r.exchanges)} {t('trocas ·')} {r.conversion} {t('de conversão')}
                     </span>
-                    <Link to={`/admin/relatorios/${event.id}`}>Ver painel</Link>
+                    <Link to={`/admin/relatorios/${event.id}`}>{t('Ver painel')}</Link>
                   </>
                 ),
               }}
               actions={
                 <Link className="ah-cta" to={`/admin/relatorios/${event.id}`}>
-                  Visão e Relatórios ↗
+                  {t('Visão e Relatórios ↗')}
                 </Link>
               }
             />
           );
         })}
       </div>
-      {!events.length && <Empty>Nenhum evento corresponde aos filtros selecionados.</Empty>}
+      {!events.length && <Empty>{t('Nenhum evento corresponde aos filtros selecionados.')}</Empty>}
 
       <Panel
         className="ah-table"
-        title="Lista Consolidada de Relatórios Recentes e Lotes"
-        subtitle="Histórico de validação e transferências demonstrativas."
+        title={t('Lista Consolidada de Relatórios Recentes e Lotes')}
+        subtitle={t('Histórico de validação e transferências demonstrativas.')}
         action={
           <DownloadButton
             name="relatorio-geral.csv"
@@ -215,13 +218,13 @@ export default function Admin() {
           <table>
             <thead>
               <tr>
-                <th>ID do lote</th>
-                <th>Evento / artista</th>
-                <th>Data prevista</th>
-                <th>Emitidos</th>
-                <th>Trocas concluídas</th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>{t('ID do lote')}</th>
+                <th>{t('Evento / artista')}</th>
+                <th>{t('Data prevista')}</th>
+                <th>{t('Emitidos')}</th>
+                <th>{t('Trocas concluídas')}</th>
+                <th>{t('Status')}</th>
+                <th>{t('Ações')}</th>
               </tr>
             </thead>
             <tbody>
@@ -244,7 +247,7 @@ export default function Admin() {
                     </td>
                     <td>
                       <Link className="text-link" to={`/admin/relatorios/${event.id}`}>
-                        Ver →
+                        {t('Ver →')}
                       </Link>
                     </td>
                   </tr>
@@ -259,7 +262,7 @@ export default function Admin() {
           pageSize={4}
           total={filteredLots.length}
           onPage={setPage}
-          summary={(from, to, total) => `${total} registros · página ${current} de ${pages}`}
+          summary={(from, to, total) => t('{total} registros · página {current} de {pages}', { total, current, pages })}
         />
       </Panel>
     </div>

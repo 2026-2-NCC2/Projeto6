@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../context/Store';
 import { minhaAprovacao } from '../services/admin';
+import { t } from '../i18n';
 
 // Etapa 6: contas de organizador e fornecedor esperam a aprovação da administração e contas
 // recusadas só consultam. O aviso diz o que está liberado e deixa conferir a situação de novo.
@@ -55,30 +56,36 @@ export default function AvisoAprovacao() {
 
   const liberado =
     role === 'organizador'
-      ? 'completar o perfil e preparar eventos como rascunho'
+      ? t('completar o perfil e preparar eventos como rascunho')
       : role === 'fornecedor'
-        ? 'completar o perfil e consultar as oportunidades'
-        : 'consultar os seus dados';
+        ? t('completar o perfil e consultar as oportunidades')
+        : t('consultar os seus dados');
 
   return (
     <aside
       className={`approval-strip ${recusada ? 'rejected' : 'pending'}`}
-      aria-label="Situação da conta"
+      aria-label={t('Situação da conta')}
     >
       <div>
         <strong>
           {pendente
-            ? 'Conta aguardando aprovação da administração'
-            : 'Conta recusada pela administração'}
+            ? t('Conta aguardando aprovação da administração')
+            : t('Conta recusada pela administração')}
         </strong>
         <p>
           {pendente
-            ? `Enquanto isso, você pode ${liberado}. Publicar, vender e negociar ficam liberados depois da aprovação.`
-            : `Motivo: ${motivo || 'não informado'}. Você ainda consulta os seus dados, mas as ações que gravam ficam bloqueadas.`}
+            ? t(
+                'Enquanto isso, você pode {liberado}. Publicar, vender e negociar ficam liberados depois da aprovação.',
+                { liberado: liberado },
+              )
+            : t(
+                'Motivo: {v1}. Você ainda consulta os seus dados, mas as ações que gravam ficam bloqueadas.',
+                { v1: motivo || t('não informado') },
+              )}
         </p>
         {erro && (
           <p role="alert" className="field-error">
-            {erro}
+            {t(erro)}
           </p>
         )}
       </div>
@@ -88,7 +95,7 @@ export default function AvisoAprovacao() {
         onClick={verificar}
         disabled={verificando}
       >
-        {verificando ? 'Verificando…' : 'Verificar situação'}
+        {verificando ? t('Verificando…') : t('Verificar situação')}
       </button>
     </aside>
   );
