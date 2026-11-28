@@ -4,39 +4,46 @@ Site navegável baseado nas 21 telas únicas exportadas do Figma. Inclui áreas 
 
 ## Abrir com um clique
 
+O passo a passo completo, para quem acabou de receber o projeto (Windows, macOS e Linux, com solução dos problemas mais comuns), está em [COMO-RODAR.md](COMO-RODAR.md).
+
 Com o Node.js 22.12+ instalado e o MySQL ligado, dê dois cliques em `Iniciar-TrocaTicket.cmd` (Windows) ou `Iniciar-TrocaTicket.command` (Mac), ou rode `npm start` nesta pasta. O iniciador (`scripts/iniciar.mjs`, adaptado da TrocaTicket 2.0) faz o seguinte:
 
 - instala as dependências que faltarem;
-- na primeira vez, pergunta a conexão do MySQL e a guarda em `server/.env` (ignorado pelo Git) só depois de ela funcionar;
+- lê a configuração do mesmo jeito que a API (`server/.env`, com as variáveis de ambiente por cima) e mostra de onde veio cada valor; na primeira vez, pergunta a conexão do MySQL e a guarda em `server/.env` (ignorado pelo Git) só depois de ela funcionar;
 - prepara o banco com `server/scripts/preparar-banco.js`: cria o banco e aplica o script base e as migrações se ele não existir, ou só confere as migrações num banco existente, sem apagar dados;
-- sobe a API (porta 3000) e o site (porta 5173) e abre o navegador.
+- sobe a API (porta `PORT`, padrão 3000) e o site (porta 5173) e abre o navegador.
 
-Enter encerra os dois. Use `configurar` para refazer a conexão; os registros ficam em `logs/`. Os passos abaixo continuam valendo para quem prefere abrir tudo manualmente.
+Enter encerra os dois. Use `configurar` para refazer a conexão; os registros ficam em `logs/`.
 
-## Abrir no VS Code
+## Configuração local
 
-1. Extraia o ZIP e abra a pasta **TrocaTicket** no VS Code (Arquivo → Abrir Pasta).
-2. Instale o Node.js LTS 22.12 ou superior, com npm, e configure o MySQL.
-3. Crie o banco executando, nesta ordem: `documentos/Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql`, `server/MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql`, `server/MIGRACAO_SESSAO_LOGIN.sql`, `server/MIGRACAO_PEDIDOS_PAGAMENTOS.sql`, `server/MIGRACAO_REPASSE.sql`, `server/MIGRACAO_PORTARIA_ATENDIMENTO.sql` e `server/MIGRACAO_ADMINISTRACAO.sql`. As migrações podem ser reaplicadas sem apagar dados; a última consulta de cada uma deve voltar vazia. O iniciador faz esse passo sozinho.
-4. Copie `server/.env.example` para `server/.env` e preencha `DB_HOST`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`.
-5. Em um terminal, instale e inicie a API:
+A conexão com o MySQL e a porta da API ficam só em `server/.env` (copie `server/.env.example`). O arquivo é lido por `server/config.js`, de qualquer pasta em que o terminal esteja, pela API, pelo preparo do banco, pelo `criar-admin`, pelos testes e pelo iniciador. Variável de ambiente não vazia vale mais que o arquivo; a API avisa ao iniciar quando isso acontece. Ao subir, a API mostra o arquivo lido, o MySQL de destino (endereço, porta e banco, nunca usuário nem senha) e se o banco respondeu. A porta do MySQL vai em `DB_PORT`. Depois de mudar o arquivo, reinicie a API.
+
+## Abrir à mão (dois terminais)
+
+1. Instale o Node.js LTS 22.12 ou superior, com npm, e ligue o MySQL.
+2. Copie `server/.env.example` para `server/.env` e preencha `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`.
+3. Nesta pasta, instale as dependências e prepare o banco (cria o banco, aplica `documentos/Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql` e as migrações de `server/`, sem apagar dados):
 
 ```sh
-cd server
-npm install
+npm ci
+npm --prefix server ci
+npm run preparar-banco
+```
+
+4. Ainda nesta pasta, inicie a API num terminal e o site em outro:
+
+```sh
+npm run api
+```
+
+```sh
 npm run dev
 ```
 
-6. Em outro terminal, dentro da pasta que contém o `package.json` do front-end:
+Abra `http://127.0.0.1:5173`. O site chama a API na porta 3000 do mesmo endereço em que foi aberto (`localhost` ou `127.0.0.1`), para que o cookie de sessão funcione; para outro endereço ou outra porta, defina `VITE_API_URL` no ambiente do Vite (o iniciador faz isso sozinho quando `PORT` não é 3000). A API aceita, por padrão, o site nas portas 5173 e 4173; para outro endereço do site, liste-o em `CORS_ORIGINS` no `server/.env`. Use **Explorar demo** para acessar as telas sem persistência no banco. Para cadastrar eventos no MySQL, entre com uma conta de organizador cadastrada na API.
 
-```sh
-npm install
-npm run dev
-```
-
-Abra o endereço exibido pelo Vite. O site chama a API na porta 3000 do mesmo endereço em que foi aberto (`localhost` ou `127.0.0.1`), para que o cookie de sessão funcione; para outro endereço, defina `VITE_API_URL` no ambiente do Vite. A API aceita, por padrão, o site nas portas 5173 e 4173; para outro endereço do site, liste-o em `CORS_ORIGINS` no `server/.env`. Use **Explorar demo** para acessar as telas sem persistência no banco. Para cadastrar eventos no MySQL, entre com uma conta de organizador cadastrada na API.
-
-No PowerShell, caso a execução de `npm.ps1` esteja bloqueada, use `npm.cmd install` e `npm.cmd run dev`.
+Para preparar o banco pelo Workbench, a ordem dos arquivos e os cuidados estão na seção 6 do [COMO-RODAR.md](COMO-RODAR.md). No PowerShell, caso a execução de `npm.ps1` esteja bloqueada, use `npm.cmd` no lugar de `npm`.
 
 Também é possível usar `pnpm install --frozen-lockfile` e `pnpm dev`, aproveitando o lockfile incluído.
 

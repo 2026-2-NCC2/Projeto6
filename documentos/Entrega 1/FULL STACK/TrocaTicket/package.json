@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "start": "node scripts/iniciar.mjs",
+    "api": "npm --prefix server start",
+    "preparar-banco": "npm --prefix server run preparar-banco",
     "test": "npm run test:front && npm --prefix server test",
     "test:front": "node --test \"src/tests/*.test.js\"",
     "criar-admin": "npm --prefix server run criar-admin",

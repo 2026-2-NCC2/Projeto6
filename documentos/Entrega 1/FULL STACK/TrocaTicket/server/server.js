@@ -1,4 +1,17 @@
-require('dotenv').config();
+// Lê server/.env de qualquer pasta (server/config.js). Executada direto, a API para logo com uma
+// mensagem clara se a configuração for inválida, em vez de cair num valor padrão sem avisar.
+const config = require('./config');
+config.carregar();
+if (require.main === module) {
+  try {
+    config.configBanco();
+    config.portaApi();
+  } catch (erro) {
+    if (!(erro instanceof config.ErroConfiguracao)) throw erro;
+    console.error(`Configuração inválida (${config.ARQUIVO_ENV}):\n${erro.message}`);
+    process.exit(1);
+  }
+}
 
 const express = require('express');
 const cors = require('cors');
@@ -8,7 +21,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.portaApi();
 
 // Garante que o diretório de uploads exista no projeto
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -2166,10 +2179,47 @@ app.post('/api/logout', async (req, res) => {
     pedidos.registrarRotas(app);
 
     // Abre a porta só quando executado diretamente (node server.js); os testes importam o app.
+    // O Express 5 chama esta função também quando a porta falha: antes, a mensagem de sucesso
+    // aparecia mesmo com a porta ocupada, e o site continuava falando com a API antiga.
     if (require.main === module) {
-      app.listen(PORT, () => {
-        console.log(`Servidor rodando na porta ${PORT}`);
+      app.listen(PORT, (erro) => {
+        if (erro) {
+          console.error(
+            erro.code === 'EADDRINUSE'
+              ? `A porta ${PORT} já está em uso. Provavelmente há outra API aberta (uma janela antiga do TrocaTicket, ` +
+                  'outra pasta ou outra versão do projeto). Enquanto ela estiver aberta, o site continua falando com ela. ' +
+                  'Feche-a e inicie esta API de novo.'
+              : `Não foi possível abrir a porta ${PORT}: ${erro.message}`,
+          );
+          process.exit(1);
+        }
+        console.log(`API do TrocaTicket rodando em http://127.0.0.1:${PORT}/api`);
+        for (const linha of config.descrever()) console.log(linha);
+        conferirBanco();
       });
+    }
+
+    // Diagnóstico ao iniciar: a API continua no ar mesmo sem banco (o MySQL pode ligar depois).
+    async function conferirBanco() {
+      const alvo = config.configBanco();
+      try {
+        const [[{ versao }]] = await db.query('SELECT VERSION() AS versao');
+        const [tabelas] = await db.query(
+          `SELECT table_name AS nome FROM information_schema.tables
+            WHERE table_schema = DATABASE() AND table_name IN ('usuario', 'sessao', 'aprovacao_conta')`,
+        );
+        if (tabelas.length < 3) {
+          console.warn(
+            `Banco ${alvo.database} conectado (${versao}), mas faltam tabelas do projeto. ` +
+              'Prepare o banco com o iniciador ou com "npm run preparar-banco".',
+          );
+        } else {
+          console.log(`Banco conectado: ${alvo.database} em ${alvo.host}:${alvo.port} (${versao}).`);
+        }
+      } catch (erro) {
+        console.error(`Sem acesso ao banco: ${config.explicarErroBanco(erro, alvo)}`);
+        console.error('A API continua aberta, mas login e dados falham até o banco responder. Se corrigir server/.env, reinicie a API.');
+      }
     }
 
     module.exports = app;

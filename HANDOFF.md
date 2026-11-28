@@ -1,6 +1,26 @@
 # Continuidade da integração
 
-## Situação em 27/11/2026 — etapa 8 concluída
+## Situação em 28/11/2026 — configuração local corrigida (commit local, não publicado)
+
+A branch `integracao-site-2.0` foi publicada no GitHub por um colega em `71d9139` (etapas 1 a 8). Sobre ela há um commit novo, **só local**, com a correção da configuração local. Ele não foi publicado: não houve push nem merge. O usuário recebeu o ZIP acumulado com o bundle e vai confirmar o próximo passo.
+
+O que o commit resolve, com detalhes e testes na primeira seção de CHECKPOINT.md:
+- **O problema:** a porta do MySQL em `server/.env` era ignorada em vários caminhos:
+  - API aberta fora da pasta `server`;
+  - variável `DB_PORT` no ambiente, que só valia na execução à mão;
+  - uma API antiga presa na porta 3000, com a nova anunciando "Servidor rodando";
+  - erro de digitação na porta;
+  - versões `main`, `integracao-main-miguel` e Entrega 2, cujo `db.js` não passa a porta.
+- **A fonte única:** agora é `server/config.js`. Ele lê `server/.env` de qualquer pasta, com a mesma prioridade para todos (variável de ambiente não vazia > `server/.env` > padrão). A API mostra ao subir o arquivo lido, o MySQL de destino e se o banco respondeu.
+- **O guia:** `documentos/Entrega 1/FULL STACK/TrocaTicket/COMO-RODAR.md` é o passo a passo para quem recebe o projeto.
+
+Para retomar:
+1. Confira `git log -1` na branch `integracao-site-2.0`: o commit mais recente é o "Corrige a configuração local...", logo depois de `71d9139`. Se só existir `71d9139`, aplique o bundle do ZIP (`LEIA-PRIMEIRO.txt`).
+2. Teste com um MySQL ou MariaDB descartável numa porta diferente de 3306, como está no CHECKPOINT. Rode `npm test` na pasta do app; ele usa a conexão de `server/.env`.
+3. Ao mexer em configuração, use sempre `server/config.js`. Não volte a ler `process.env.DB_*` direto nem `require('dotenv').config()` sem caminho.
+4. Aguarde a confirmação do usuário antes de publicar (é um avanço rápido da branch já publicada) ou de começar outra tarefa. Não salve credenciais.
+
+## Situação em 27/11/2026 — etapa 8 concluída (publicada depois por um colega em 71d9139)
 
 Branch integracao-site-2.0, a partir de b477108. As etapas 4 (revenda, fila de espera e transferência com aceite), 5 (portaria e atendimento), 6 (administração ligada ao banco, aprovação de contas e cancelamento de evento com estorno), 7 (idiomas do site: português do Brasil, inglês, espanhol, francês, alemão e italiano) e 8 (ferramentas de acessibilidade: tamanho da letra, espaçamentos, alto contraste, fonte legível, destaque de links, tema do sistema e VLibras só ao clicar) da 2.0 estão concluídas e testadas. Detalhes, decisões e resultados estão nas primeiras seções de CHECKPOINT.md. Nada foi publicado e não houve merge.
 

@@ -1,5 +1,107 @@
 # Integração TrocaTicket
 
+## Configuração local: porta do MySQL, `server/.env` e inicialização (28/11/2026)
+
+Pedido do usuário: um colega pôs a porta certa do MySQL em `server/.env`, mas ao iniciar a aplicação ela parecia usar outra porta. A tarefa: diagnosticar com código e testes reais, corrigir o mínimo necessário, escrever um guia para quem recebe o projeto e entregar um ZIP. Escopo: configuração, conexão, inicialização local e documentação. Sem push, merge ou deploy; parar e aguardar a confirmação.
+
+Nenhum ZIP novo veio com o pedido. O trabalho partiu da branch `integracao-site-2.0` em `71d9139` (etapa 8, já publicada e igual ao GitHub). Ela contém o marco `3ae77de` (etapas 1 a 6) e as etapas 7 e 8, todas preservadas. A aplicação testada é `documentos/Entrega 1/FULL STACK/TrocaTicket`.
+
+**As três conexões**
+
+| Conexão | Como funcionava em `71d9139` |
+| --- | --- |
+| Navegador → site | Vite em `127.0.0.1:5173`. Pelo iniciador, com `--strictPort`. Com `npm run dev`, sem `--strictPort`. |
+| Site → API | `src/services/api.js` usa `VITE_API_URL` ou `http://<mesmo endereço>:3000/api`, com a porta 3000 fixa no código. |
+| API → MySQL | `server/db.js` e `server/server.js` usavam `require('dotenv').config()`, que procura o `.env` na pasta em que o terminal foi aberto. |
+
+**Como cada caminho lia a configuração (`71d9139`)**
+- O preparo do banco e o `criar-admin` liam `server/.env` pelo caminho absoluto.
+- O iniciador lia `server/.env` com um leitor próprio, passava `DB_*` à API e ao preparo por variáveis de ambiente (o arquivo vencia o sistema) e forçava `PORT=3000`.
+- Na execução à mão, a variável do sistema vencia o arquivo.
+- Os padrões também divergiam:
+  - API: host `localhost`, porta 3306, nenhum banco;
+  - preparo do banco: `127.0.0.1` e `trocaticket`.
+
+**Diagnóstico reproduzido.** Cópia de `71d9139`, MariaDB 10.11 descartável escutando só em `127.0.0.1:3307`, `server/.env` com `DB_PORT=3307`.
+
+| Cenário | Resultado |
+| --- | --- |
+| R1: iniciador | OK (conexão TCP do Node para `:3307`). |
+| R2: `cd server && npm start` | OK. |
+| R3: `node server/server.js` com o terminal na pasta do app | `injected env (0) from .env` e `ECONNREFUSED 127.0.0.1:3306`, mesmo com 3307 no arquivo. |
+| R3b: preparo do banco na mesma pasta do R3 | Funcionou: o preparo usava uma configuração e a API outra. |
+| R4: `DB_PORT=3306` no ambiente | À mão: 3306, falha. Pelo iniciador: 3307. Os dois caminhos discordavam. |
+| R5: API antiga ainda aberta na porta 3000 | A nova API imprimia "Servidor rodando na porta 3000" e saía com código 0 (o Express 5 passa o `EADDRINUSE` ao callback, que o ignorava). O site continuava falando com a API antiga e com a configuração antiga. |
+| R6: `db.js` da `main`, da `integracao-main-miguel` e da Entrega 2 | Não passa `port`: `DB_PORT=3307` vira `ECONNREFUSED 127.0.0.1:3306`. |
+| R8: `PORT=3001` em `server/.env` | O iniciador subia a API na 3000 assim mesmo. |
+| R9: porta 5173 ocupada | `npm run dev` ia em silêncio para a 5174, e a API recusava com 403 "Origem não permitida". |
+| R10: `DB_PORT=3307;` (erro de digitação) | `Number()` falhava e caía em 3306 sem aviso. O iniciador dizia "o MySQL está ligado nessa porta?" sem mostrar a porta. |
+
+Não há como saber qual desses caminhos o colega usou: não temos o log nem o comando dele. Todos produzem exatamente o sintoma relatado. O novo resumo da API mostra na hora qual é o caso.
+
+**Correção (menor mudança que resolve todos os casos acima)**
+- `server/config.js` (novo): fonte única.
+  - Lê `server/.env` pelo caminho do módulo, de qualquer pasta.
+  - Prioridade igual em todos os caminhos: variável de ambiente não vazia, depois `server/.env`, depois o padrão.
+  - Padrões únicos: `127.0.0.1`, `3306`, `trocaticket`, `3000`.
+  - Valida `DB_PORT`, `PORT`, `DB_HOST` (com porta junto) e `DB_NAME`, sem cair em padrão em silêncio.
+  - Faz um resumo sem usuário nem senha: arquivo lido, MySQL de destino, origem de cada valor, avisos de conflito com variável de ambiente, de `server/.env.txt` e de `.env` com `DB_*` na pasta do site.
+  - Explica as falhas de conexão sempre com o endereço e a porta tentados.
+- `server/db.js`, `server/server.js`, `server/scripts/preparar-banco.js`, `server/scripts/criar-admin.js` e `server/tests/apoio.js` usam `config.js`.
+  - A API para com mensagem clara se a configuração for inválida ou se a porta estiver ocupada (`EADDRINUSE`, código 1).
+  - Ao subir, a API mostra o resumo e testa o banco: "Banco conectado", "faltam tabelas" ou o motivo da falha.
+  - `SCRIPT_BANCO` passou a valer também no `server/.env`, com caminho relativo a `server/`.
+- `scripts/iniciar.mjs`:
+  - usa as mesmas regras, sem repassar `DB_*` nem `PORT` por variáveis de ambiente;
+  - honra `PORT` e avisa o site por `VITE_API_URL` quando a porta não é 3000;
+  - roda o preparo do banco no próprio processo, mostrando endereço, porta e banco;
+  - cria `server/.env` a partir do `.env.example` (com os comentários);
+  - no `configurar`, Enter mantém a senha atual;
+  - não guarda conexão que falhou.
+- `vite.config.js`: portas fixas com `strictPort` (5173 no dev, 4173 no preview).
+- `package.json`: atalhos `npm run api` e `npm run preparar-banco` na pasta do app.
+- `server/.env.example`: todas as variáveis usadas, com comentários curtos e a senha vazia. `DB_HOST=127.0.0.1` e `DB_NAME=trocaticket` vêm preenchidos; antes, o `DB_NAME` vazio fazia o iniciador perguntar tudo de novo.
+- Sem `.env.example` para o site: o site não precisa de configuração própria no caminho normal, e um `.env` na pasta do site confundiria com o da API. `VITE_API_URL` fica documentado para o caso raro de mudar a porta da API à mão.
+- `COMO-RODAR.md` (reescrito) e `README.md` (seções de execução).
+- `server/tests/config.test.js` (novo, 10 testes):
+  - prioridade, padrões, portas inválidas e resumo sem segredos;
+  - leitura de qualquer pasta;
+  - porta ocupada (sai com 1, sem dizer "rodando");
+  - `DB_PORT` inválida;
+  - API aberta de outra pasta mostrando o `server/.env` usado e o destino da conexão.
+- Não mudaram: o código do site (`src/`), as rotas da API, o banco, os SQL, a Entrega 2 e a `main`. O build de produção saiu idêntico ao de `71d9139` (mesmos hashes).
+
+**Testes executados (MariaDB 10.11 descartável na porta 3307, bancos e contas fictícios)**
+- **Cenários com a correção** (cópia do código corrigido, `server/.env` com `DB_PORT=3307`):
+  - F1, iniciador: preparou o banco do zero pelo procedimento oficial. Cadastro 201, login 200 e `/api/sessao` 200, com a conexão TCP da API em `:3307`.
+  - F2 e F3, à mão em `server/` e na pasta do app (`node server/server.js` e `npm run api`): todos em 3307. O F3 falhava antes.
+  - F4, `DB_PORT=3306` no ambiente: à mão e pelo iniciador usam o mesmo valor e mostram o aviso com os dois números.
+  - F5, API antiga aberta: a nova sai com código 1 e explica; o iniciador recusa.
+  - F8, `PORT=3001`: API em 3001, e o site serve `api.js` com `http://127.0.0.1:3001/api`. Login 200.
+  - F9, porta 5173 ocupada: `npm run dev` para com "Port 5173 is already in use".
+  - F10, `DB_PORT=3307;`: a API e o iniciador recusam com o motivo.
+  - Q1 a Q3, perguntas do iniciador: primeira vez com 3307 cria `server/.env` (permissão 600, com os comentários do exemplo); senha errada não guarda; `configurar` com Enter mantém a senha.
+- **Navegador (Chromium + Playwright), pelo `Iniciar-TrocaTicket.command` executado de verdade:**
+  - cadastro de conta fictícia, logout, login e Meu perfil, com nome e e-mail vindos do banco;
+  - chamadas: `POST http://127.0.0.1:3000/api/login -> 200`, `GET /api/usuarios/2 -> 200`, `GET /api/sessao -> 200` e outras;
+  - a conta e a sessão aparecem no banco `trocaticket_corrigido` da porta 3307.
+- **Contraprova:**
+  - com `DB_PORT=3399` (nada escutando), o iniciador recusa ("Nada respondeu em 127.0.0.1:3399");
+  - à mão, a API avisa e o login na tela mostra "Erro interno ao realizar login." (`POST /api/login -> 500`);
+  - de volta a 3307, só a API foi reiniciada, com o site aberto o tempo todo e sem build, e o login voltou (`-> 200`).
+- `npm run criar-admin` na pasta do app criou a conta de administração no banco da porta 3307. `navegador.py --fluxo regressao` passou com a pilha aberta pelo iniciador.
+- `npm test`: site 25/25; API 89/89 (79 anteriores e 10 novos), 0 falhas e 0 pulados. Os bancos temporários foram apagados no fim.
+- `npm run build`: passou, com o mesmo aviso antigo de tamanho do pacote. Prettier: os mesmos 51 arquivos antigos fora do padrão; nenhum novo.
+- **Não executado aqui:**
+  - `Iniciar-TrocaTicket.cmd` (Windows), só inspecionado: chama o mesmo `scripts/iniciar.mjs`;
+  - MySQL 8, que não está disponível neste ambiente (os testes desta tarefa foram em MariaDB 10.11).
+
+**Pendências e riscos**
+- A Entrega 2 (`documentos/Entrega 2/Full Stack/TrocaTicket/server/db.js`), a `main` e a `integracao-main-miguel` continuam sem passar a porta ao MySQL. Ficaram fora do escopo; quem rodar essas versões cai sempre na 3306.
+- As mensagens do site para "servidor fora do ar" citam `http://localhost:3000` mesmo com outra porta. Ficaram como estavam para não mexer nas traduções.
+- A API continua escutando em todas as interfaces (`app.listen(PORT)`), como antes.
+- Testar o `.cmd` num Windows real e repetir o teste com MySQL 8.
+
 ## Integração com a TrocaTicket 2.0 — etapa 8: ferramentas de acessibilidade (27/11/2026)
 
 Etapa iniciada com autorização do usuário ("pode ir para a proxima etapa pf") sobre o commit da etapa 7 (43f7a9b). Sobre o VLibras, o usuário escolheu "Incluir, só ao clicar": o script do governo só é baixado quando a pessoa clica em "Ativar VLibras". Houve interrupções por limite de uso; os arquivos ficaram no disco e o trabalho continuou do ponto em que parou. Nada foi publicado e não houve merge.

@@ -1,13 +1,10 @@
-require('dotenv').config();
-
+// Pool de conexões com o MySQL. A conexão vem de server/config.js, que lê server/.env de qualquer
+// pasta em que o terminal esteja (antes, o .env era procurado na pasta do terminal).
 const mysql = require('mysql2/promise');
+const { configBanco } = require('./config');
 
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    ...configBanco(),
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

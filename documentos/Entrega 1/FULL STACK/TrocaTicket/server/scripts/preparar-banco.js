@@ -6,17 +6,23 @@
 // - Banco existente com outras tabelas, mas sem as do TrocaTicket: recusa, sem alterar nada.
 // Nunca apaga tabelas nem dados. Usado pelo iniciador (scripts/iniciar.mjs) e pelos testes.
 //
-// Uso direto: node scripts/preparar-banco.js   (lê DB_HOST, DB_PORT, DB_USER, DB_PASSWORD e DB_NAME
-// do ambiente ou de server/.env)
+// Uso direto: npm run preparar-banco (na pasta do app ou em server/). Usa a mesma conexão da API:
+// server/config.js, que lê server/.env de qualquer pasta (variáveis de ambiente têm prioridade).
 
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 
 const RAIZ_SERVIDOR = path.resolve(__dirname, '..');
-const SCRIPT_BASE =
-  process.env.SCRIPT_BANCO ||
-  path.resolve(RAIZ_SERVIDOR, '../../../../Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql');
+const SCRIPT_PADRAO = path.resolve(
+  RAIZ_SERVIDOR,
+  '../../../../Entrega 2/PROJETOS EM BANCO DE DADOS/SCRIPT_BANCO_V2.sql',
+);
+// SCRIPT_BANCO (opcional) aponta outro SCRIPT_BANCO_V2.sql; caminho relativo vale a partir de server/.
+function caminhoScriptBase(valor = process.env.SCRIPT_BANCO) {
+  return valor ? path.resolve(RAIZ_SERVIDOR, valor) : SCRIPT_PADRAO;
+}
+const SCRIPT_BASE = caminhoScriptBase();
 const MIGRACOES = [
   'MIGRACAO_PERFIL_FORNECEDOR_FAVORITOS.sql',
   'MIGRACAO_SESSAO_LOGIN.sql',
@@ -60,7 +66,7 @@ async function aplicarArquivo(conexao, arquivo, log) {
   return ultimoResultado(resultado);
 }
 
-async function prepararBanco(config, { log = () => {} } = {}) {
+async function prepararBanco(config, { log = () => {}, scriptBase = caminhoScriptBase() } = {}) {
   const { host = '127.0.0.1', port = 3306, user, password = '', database } = config;
   if (!user) throw new Error('Informe o usuário do MySQL.');
   if (!nomeValido(database)) {
@@ -106,7 +112,7 @@ async function prepararBanco(config, { log = () => {} } = {}) {
             'Escolha outro nome de banco; nada foi alterado.',
         );
       }
-      await aplicarArquivo(conexao, SCRIPT_BASE, log);
+      await aplicarArquivo(conexao, scriptBase, log);
       baseAplicada = true;
     }
 
@@ -123,20 +129,24 @@ async function prepararBanco(config, { log = () => {} } = {}) {
   }
 }
 
-module.exports = { prepararBanco, nomeValido, semNomeFixo, versaoSuportada, SCRIPT_BASE };
+module.exports = { prepararBanco, nomeValido, semNomeFixo, versaoSuportada, caminhoScriptBase, SCRIPT_BASE };
 
 if (require.main === module) {
-  require('dotenv').config({ path: path.join(RAIZ_SERVIDOR, '.env'), quiet: true });
-  prepararBanco(
-    {
-      host: process.env.DB_HOST || '127.0.0.1',
-      port: process.env.DB_PORT,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME || 'trocaticket',
-    },
-    { log: (mensagem) => console.log(mensagem) },
-  )
+  const config = require('../config');
+  config.carregar();
+  let alvo;
+  try {
+    alvo = config.configBanco();
+  } catch (erro) {
+    console.error(`Configuração inválida (${config.ARQUIVO_ENV}):\n${erro.message}`);
+    process.exit(1);
+  }
+  if (!alvo.user) {
+    console.error(`DB_USER está vazio. Preencha ${config.ARQUIVO_ENV} (copie server/.env.example) ou use o iniciador.`);
+    process.exit(1);
+  }
+  console.log(`Preparando o banco ${alvo.database} em ${alvo.host}:${alvo.port} (configuração: ${config.ARQUIVO_ENV}).`);
+  prepararBanco(alvo, { log: (mensagem) => console.log(mensagem) })
     .then(({ versao, criado, baseAplicada }) => {
       console.log(
         `Banco pronto (${versao}). ${criado ? 'Banco criado. ' : ''}${
@@ -145,13 +155,7 @@ if (require.main === module) {
       );
     })
     .catch((error) => {
-      const mensagens = {
-        ER_ACCESS_DENIED_ERROR: 'Usuário ou senha do MySQL incorretos.',
-        ECONNREFUSED: 'Não foi possível conectar: o MySQL está ligado nessa porta?',
-        ENOTFOUND: 'Endereço do MySQL não encontrado.',
-        ER_DBACCESS_DENIED_ERROR: 'Este usuário do MySQL não tem permissão para esse banco.',
-      };
-      console.error(mensagens[error.code] || error.message);
+      console.error(error.code ? config.explicarErroBanco(error, alvo) : error.message);
       process.exitCode = 1;
     });
 }

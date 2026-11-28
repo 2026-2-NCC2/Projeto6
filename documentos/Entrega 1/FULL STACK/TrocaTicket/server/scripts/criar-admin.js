@@ -9,7 +9,6 @@
 // Para automação e testes: CRIAR_ADMIN_NOME, CRIAR_ADMIN_EMAIL e CRIAR_ADMIN_SENHA no ambiente.
 // A senha nunca é gravada em arquivo; no banco fica só o hash bcrypt.
 
-const path = require('path');
 const readline = require('readline');
 const bcrypt = require('bcrypt');
 const mysql = require('mysql2/promise');
@@ -99,14 +98,15 @@ function criarLeitor() {
 }
 
 async function principal() {
-  require('dotenv').config({ path: path.join(__dirname, '..', '.env'), quiet: true });
-  const configBanco = {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME || 'trocaticket',
-  };
+  // Mesma conexão da API (server/config.js lê server/.env de qualquer pasta).
+  const config = require('../config');
+  config.carregar();
+  let configBanco;
+  try {
+    configBanco = config.configBanco();
+  } catch (erro) {
+    throw new ErroAdmin(`Configuração inválida (${config.ARQUIVO_ENV}):\n${erro.message}`);
+  }
   if (!configBanco.user) {
     throw new ErroAdmin('Configure o banco antes (server/.env). O iniciador faz isso na primeira vez que roda.');
   }
@@ -134,7 +134,11 @@ module.exports = { criarAdministrador, validarDadosAdmin, ErroAdmin };
 
 if (require.main === module) {
   principal().catch((error) => {
-    console.error(error instanceof ErroAdmin ? error.message : `Não foi possível criar a conta: ${error.message}`);
+    if (error instanceof ErroAdmin) console.error(error.message);
+    else if (error.code) {
+      const config = require('../config');
+      console.error(`Não foi possível criar a conta: ${config.explicarErroBanco(error, config.configBanco())}`);
+    } else console.error(`Não foi possível criar a conta: ${error.message}`);
     process.exitCode = 1;
   });
 }

@@ -5,8 +5,9 @@
 // livre e apaga o banco no fim. Basta um MySQL local cujo usuário (DB_USER/DB_PASSWORD em
 // server/.env ou no ambiente) possa criar bancos. Sem isso, os testes de integração são pulados.
 
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '..', '.env'), quiet: true });
+// Mesma configuração da API: server/.env (de qualquer pasta), com as variáveis de ambiente por cima.
+const config = require('../config');
+config.carregar();
 const mysql = require('mysql2/promise');
 const { prepararBanco } = require('../scripts/preparar-banco');
 
@@ -15,12 +16,8 @@ const ORIGEM_SITE = 'http://127.0.0.1:4173';
 
 function configMysql() {
   if (!process.env.DB_USER) return null;
-  return {
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD || '',
-  };
+  const { host, port, user, password } = config.configBanco();
+  return { host, port, user, password };
 }
 
 const SEM_MYSQL =
